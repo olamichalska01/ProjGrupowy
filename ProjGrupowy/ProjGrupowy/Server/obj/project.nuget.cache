@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "WvMoLWLIislutUnDAdvGJJw+cojMDwau5eVT40eK8Z2i3F8WGPuG4l0GJInYVBNZrOWz1twH6OzoposE7MQLpQ==",
+  "dgSpecHash": "7o8uQPPci9dBJveAVl9nruFY8ERdXtXcOL2do5GkLz6g+MRtPmFd5iyd28QCbS9e4lE++YdDZ9Zhui55IaOJ2A==",
   "success": true,
-  "projectFilePath": "C:\\Users\\01159365\\source\\repos\\ProjGrupowy\\ProjGrupowy\\Server\\ProjGrupowy.Server.csproj",
+  "projectFilePath": "C:\\Users\\01159365\\Desktop\\ProjGrupowy\\ProjGrupowy\\ProjGrupowy\\Server\\ProjGrupowy.Server.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\01159365\\.nuget\\packages\\azure.core\\1.24.0\\azure.core.1.24.0.nupkg.sha512",
     "C:\\Users\\01159365\\.nuget\\packages\\azure.identity\\1.6.0\\azure.identity.1.6.0.nupkg.sha512",

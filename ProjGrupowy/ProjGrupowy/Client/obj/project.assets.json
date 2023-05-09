@@ -1793,11 +1793,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\01159365\\source\\repos\\ProjGrupowy\\ProjGrupowy\\Client\\ProjGrupowy.Client.csproj",
+      "projectUniqueName": "C:\\Users\\01159365\\Desktop\\ProjGrupowy\\ProjGrupowy\\ProjGrupowy\\Client\\ProjGrupowy.Client.csproj",
       "projectName": "ProjGrupowy.Client",
-      "projectPath": "C:\\Users\\01159365\\source\\repos\\ProjGrupowy\\ProjGrupowy\\Client\\ProjGrupowy.Client.csproj",
+      "projectPath": "C:\\Users\\01159365\\Desktop\\ProjGrupowy\\ProjGrupowy\\ProjGrupowy\\Client\\ProjGrupowy.Client.csproj",
       "packagesPath": "C:\\Users\\01159365\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\01159365\\source\\repos\\ProjGrupowy\\ProjGrupowy\\Client\\obj\\",
+      "outputPath": "C:\\Users\\01159365\\Desktop\\ProjGrupowy\\ProjGrupowy\\ProjGrupowy\\Client\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\01159365\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -1814,8 +1814,8 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "C:\\Users\\01159365\\source\\repos\\ProjGrupowy\\ProjGrupowy\\Shared\\ProjGrupowy.Shared.csproj": {
-              "projectPath": "C:\\Users\\01159365\\source\\repos\\ProjGrupowy\\ProjGrupowy\\Shared\\ProjGrupowy.Shared.csproj"
+            "C:\\Users\\01159365\\Desktop\\ProjGrupowy\\ProjGrupowy\\ProjGrupowy\\Shared\\ProjGrupowy.Shared.csproj": {
+              "projectPath": "C:\\Users\\01159365\\Desktop\\ProjGrupowy\\ProjGrupowy\\ProjGrupowy\\Shared\\ProjGrupowy.Shared.csproj"
             }
           }
         }

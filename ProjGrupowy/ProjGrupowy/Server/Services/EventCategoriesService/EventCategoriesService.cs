@@ -20,7 +20,14 @@ namespace ProjGrupowy.Server.Services.EventCategoriesService
 
         public async Task<ServiceResponse<EventCategory>> AddEventCategory(string name)
         {
-            var eventCategory = new EventCategory()
+            var eventCategory = await databaseContext.EventCategories.FirstOrDefaultAsync(e => e.CategoryName == name);
+
+            if(eventCategory != null)
+            {
+                return new ServiceResponse<EventCategory> { Message = "This category already exists.", Success = false };
+            }
+
+            eventCategory = new EventCategory()
             {
                 CategoryName = name,
             };

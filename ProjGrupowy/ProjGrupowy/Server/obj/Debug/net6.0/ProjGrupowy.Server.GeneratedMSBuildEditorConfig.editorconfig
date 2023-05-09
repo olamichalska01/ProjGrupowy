@@ -8,13 +8,13 @@ build_property.PlatformNeutralAssembly =
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = ProjGrupowy.Server
 build_property.RootNamespace = ProjGrupowy.Server
-build_property.ProjectDir = C:\Users\01159365\source\repos\ProjGrupowy\ProjGrupowy\Server\
+build_property.ProjectDir = C:\Users\01159365\Desktop\ProjGrupowy\ProjGrupowy\ProjGrupowy\Server\
 build_property.RazorLangVersion = 6.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Users\01159365\source\repos\ProjGrupowy\ProjGrupowy\Server
+build_property.MSBuildProjectDirectory = C:\Users\01159365\Desktop\ProjGrupowy\ProjGrupowy\ProjGrupowy\Server
 build_property._RazorSourceGeneratorDebug = 
 
-[C:/Users/01159365/source/repos/ProjGrupowy/ProjGrupowy/Server/Pages/Error.cshtml]
+[C:/Users/01159365/Desktop/ProjGrupowy/ProjGrupowy/ProjGrupowy/Server/Pages/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 

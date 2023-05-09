@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "mdpLdznrXeqdBonuLjcWJ4HJGb2Td08XgVolUJ0Fu21WL9x/hglJ06yANW9vAyLk4OTeB3o37y1M9YFZ3Nl4Ug==",
+  "dgSpecHash": "BlVpVnh8jLMfBpMBk8fbHxsQ0zlZG+YaLGUoZRbt4iPIoqWv3xAZhhjtqwesfICQH4OWyaWbahCP/QNu/DjrPQ==",
   "success": true,
-  "projectFilePath": "C:\\Users\\01159365\\source\\repos\\ProjGrupowy\\ProjGrupowy\\Client\\ProjGrupowy.Client.csproj",
+  "projectFilePath": "C:\\Users\\01159365\\Desktop\\ProjGrupowy\\ProjGrupowy\\ProjGrupowy\\Client\\ProjGrupowy.Client.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\01159365\\.nuget\\packages\\microsoft.aspnetcore.authorization\\6.0.10\\microsoft.aspnetcore.authorization.6.0.10.nupkg.sha512",
     "C:\\Users\\01159365\\.nuget\\packages\\microsoft.aspnetcore.components\\6.0.10\\microsoft.aspnetcore.components.6.0.10.nupkg.sha512",

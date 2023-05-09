@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\01159365\\source\\repos\\ProjGrupowy\\ProjGrupowy\\Shared\\ProjGrupowy.Shared.csproj": {}
+    "C:\\Users\\01159365\\Desktop\\ProjGrupowy\\ProjGrupowy\\ProjGrupowy\\Shared\\ProjGrupowy.Shared.csproj": {}
   },
   "projects": {
-    "C:\\Users\\01159365\\source\\repos\\ProjGrupowy\\ProjGrupowy\\Shared\\ProjGrupowy.Shared.csproj": {
+    "C:\\Users\\01159365\\Desktop\\ProjGrupowy\\ProjGrupowy\\ProjGrupowy\\Shared\\ProjGrupowy.Shared.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\01159365\\source\\repos\\ProjGrupowy\\ProjGrupowy\\Shared\\ProjGrupowy.Shared.csproj",
+        "projectUniqueName": "C:\\Users\\01159365\\Desktop\\ProjGrupowy\\ProjGrupowy\\ProjGrupowy\\Shared\\ProjGrupowy.Shared.csproj",
         "projectName": "ProjGrupowy.Shared",
-        "projectPath": "C:\\Users\\01159365\\source\\repos\\ProjGrupowy\\ProjGrupowy\\Shared\\ProjGrupowy.Shared.csproj",
+        "projectPath": "C:\\Users\\01159365\\Desktop\\ProjGrupowy\\ProjGrupowy\\ProjGrupowy\\Shared\\ProjGrupowy.Shared.csproj",
         "packagesPath": "C:\\Users\\01159365\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\01159365\\source\\repos\\ProjGrupowy\\ProjGrupowy\\Shared\\obj\\",
+        "outputPath": "C:\\Users\\01159365\\Desktop\\ProjGrupowy\\ProjGrupowy\\ProjGrupowy\\Shared\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\01159365\\AppData\\Roaming\\NuGet\\NuGet.Config",
