@@ -36,6 +36,19 @@ namespace ProjGrupowy.Server.Controllers
             return Ok(response);
         }
 
+        [HttpGet("GetEventsByCategory/{categoryName}")]
+        public async Task<ActionResult<ServiceResponse<IEnumerable<Event>>>> GetEventsByCategory(string categoryName)
+        {
+            var response = await eventsService.GetEventsFromCategory(categoryName);
+
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+
+            return Ok(response);
+        }
+
         [HttpPost("AddEvent")]
         public async Task<ActionResult<IEnumerable<Event>>> AddEvent(EventDto eDto)
         {

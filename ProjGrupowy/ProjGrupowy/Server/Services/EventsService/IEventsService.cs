@@ -12,5 +12,7 @@ namespace ProjGrupowy.Server.Services.EventsService
         Task<ServiceResponse<Event>> AddEvent(EventDto eDto);
 
         Task<ServiceResponse<Event>> DeleteEvent(int id);
+
+        Task<ServiceResponse<IEnumerable<Event>>> GetEventsFromCategory(string categoryName);
     }
 }

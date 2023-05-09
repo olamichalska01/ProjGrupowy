@@ -30,6 +30,19 @@ namespace ProjGrupowy.Server.Services.EventsService
             return new ServiceResponse<Event> { Data = e, Message = "Event found." };
         }
 
+        public async Task<ServiceResponse<IEnumerable<Event>>> GetEventsFromCategory(string categoryName) {
+            var eCategory = await databaseContext.EventCategories.FirstOrDefaultAsync(ec => ec.CategoryName == categoryName);
+
+            if (eCategory == null)
+            {
+                return new ServiceResponse<IEnumerable<Event>> { Message = "Supplied event category doesn't exist.", Success = false };
+            }
+
+            var eventsList = await databaseContext.Events.Where(e => e.EventCategory == eCategory).Include(e => e.EventCategory).ToListAsync();
+
+            return new ServiceResponse<IEnumerable<Event>>() { Data = eventsList };
+        }
+
         public async Task<ServiceResponse<Event>> AddEvent(EventDto eDto)
         {
             var eCategory = await databaseContext.EventCategories.FirstOrDefaultAsync(ec => ec.CategoryName == eDto.EventCategory);
