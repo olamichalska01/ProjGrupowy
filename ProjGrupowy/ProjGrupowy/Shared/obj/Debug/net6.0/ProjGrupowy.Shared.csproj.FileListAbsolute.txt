@@ -1,0 +1,12 @@
+C:\Users\01159365\source\repos\ProjGrupowy\ProjGrupowy\Shared\bin\Debug\net6.0\ProjGrupowy.Shared.deps.json
+C:\Users\01159365\source\repos\ProjGrupowy\ProjGrupowy\Shared\bin\Debug\net6.0\ProjGrupowy.Shared.dll
+C:\Users\01159365\source\repos\ProjGrupowy\ProjGrupowy\Shared\bin\Debug\net6.0\ProjGrupowy.Shared.pdb
+C:\Users\01159365\source\repos\ProjGrupowy\ProjGrupowy\Shared\obj\Debug\net6.0\ProjGrupowy.Shared.csproj.AssemblyReference.cache
+C:\Users\01159365\source\repos\ProjGrupowy\ProjGrupowy\Shared\obj\Debug\net6.0\ProjGrupowy.Shared.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\01159365\source\repos\ProjGrupowy\ProjGrupowy\Shared\obj\Debug\net6.0\ProjGrupowy.Shared.AssemblyInfoInputs.cache
+C:\Users\01159365\source\repos\ProjGrupowy\ProjGrupowy\Shared\obj\Debug\net6.0\ProjGrupowy.Shared.AssemblyInfo.cs
+C:\Users\01159365\source\repos\ProjGrupowy\ProjGrupowy\Shared\obj\Debug\net6.0\ProjGrupowy.Shared.csproj.CoreCompileInputs.cache
+C:\Users\01159365\source\repos\ProjGrupowy\ProjGrupowy\Shared\obj\Debug\net6.0\ProjGrupowy.Shared.dll
+C:\Users\01159365\source\repos\ProjGrupowy\ProjGrupowy\Shared\obj\Debug\net6.0\refint\ProjGrupowy.Shared.dll
+C:\Users\01159365\source\repos\ProjGrupowy\ProjGrupowy\Shared\obj\Debug\net6.0\ProjGrupowy.Shared.pdb
+C:\Users\01159365\source\repos\ProjGrupowy\ProjGrupowy\Shared\obj\Debug\net6.0\ref\ProjGrupowy.Shared.dll
