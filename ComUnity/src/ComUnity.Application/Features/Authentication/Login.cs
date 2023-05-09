@@ -59,7 +59,7 @@ internal class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponse
 
     public async Task<LoginResponse> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
-        var user = await _context.Set<AuthenticationUser>().FirstOrDefaultAsync(x => x.Email == request.Email);
+        var user = await _context.Set<AuthenticationUser>().FirstOrDefaultAsync(x => x.Email == request.Email, cancellationToken);
 
         if (user == null)
         {

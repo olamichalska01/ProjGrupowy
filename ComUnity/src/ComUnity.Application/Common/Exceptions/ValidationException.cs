@@ -2,15 +2,15 @@
 
 namespace ComUnity.Application.Common.Exceptions;
 
-public class BusinessRuleException : Exception
+public class ValidationException : Exception
 {
-    public BusinessRuleException()
+    public ValidationException()
         : base("One or more validation failures have occurred.")
     {
         Errors = new Dictionary<string, string[]>();
     }
 
-    public BusinessRuleException(IEnumerable<ValidationFailure> failures)
+    public ValidationException(IEnumerable<ValidationFailure> failures)
         : this()
     {
         Errors = failures

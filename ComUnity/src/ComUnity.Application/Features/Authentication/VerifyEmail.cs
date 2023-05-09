@@ -32,7 +32,7 @@ internal class VerifyEmailCommandHandler : IRequestHandler<VerifyEmailCommand>
 
     public async Task Handle(VerifyEmailCommand request, CancellationToken cancellationToken)
     {
-        var user = await _context.Set<AuthenticationUser>().FirstOrDefaultAsync(x => x.SecurityCode == request.VerificationCode);
+        var user = await _context.Set<AuthenticationUser>().FirstOrDefaultAsync(x => x.SecurityCode == request.VerificationCode, cancellationToken);
 
         if (user == null || user.SecurityCodeExpirationDate < DateTime.UtcNow)
         {
@@ -40,6 +40,6 @@ internal class VerifyEmailCommandHandler : IRequestHandler<VerifyEmailCommand>
         }
 
         user.VerifyEmail();
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(cancellationToken);
     }
 }

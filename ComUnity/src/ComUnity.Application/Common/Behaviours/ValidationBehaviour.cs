@@ -2,7 +2,7 @@
 using MediatR;
 
 
-using ValidationException = ComUnity.Application.Common.Exceptions.BusinessRuleException;
+using ValidationException = ComUnity.Application.Common.Exceptions.ValidationException;
 
 namespace ComUnity.Application.Common.Behaviours;
 

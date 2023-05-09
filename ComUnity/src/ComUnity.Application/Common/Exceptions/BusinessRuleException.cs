@@ -1,12 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Runtime.Serialization;
 
-namespace ComUnity.Application.Common.Exceptions
+namespace ComUnity.Application.Common.Exceptions;
+
+public class BusinessRuleException : Exception
 {
-    internal class BusinessRuleException
+    public BusinessRuleException() : base() { }
+
+    public BusinessRuleException(string? message) : base(message)
+    {
+    }
+
+    public BusinessRuleException(string? message, Exception? innerException) : base(message, innerException)
+    {
+    }
+
+    protected BusinessRuleException(SerializationInfo info, StreamingContext context) : base(info, context)
     {
     }
 }

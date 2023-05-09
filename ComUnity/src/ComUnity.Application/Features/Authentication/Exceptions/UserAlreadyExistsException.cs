@@ -2,7 +2,7 @@
 
 namespace ComUnity.Application.Features.Authentication.Exceptions;
 
-internal class UserAlreadyExists : BusinessRuleException
+internal class UserAlreadyExistsException : BusinessRuleException
 {
-    public UserAlreadyExists() : base("User with this email already exists.") { }
+    public UserAlreadyExistsException() : base("User with this email already exists.") { }
 }

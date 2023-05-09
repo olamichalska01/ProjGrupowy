@@ -1,5 +1,4 @@
 ﻿using ComUnity.Application.Common;
-using ComUnity.Application.Common.Exceptions;
 using ComUnity.Application.Database;
 using ComUnity.Application.Features.Authentication.Entities;
 using ComUnity.Application.Features.Authentication.Exceptions;
@@ -8,7 +7,6 @@ using FluentValidation;
 using Isopoh.Cryptography.Argon2;
 using MassTransit;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,7 +14,6 @@ namespace ComUnity.Application.Features.Authentication;
 
 public class RegisterUserController : ApiControllerBase
 {
-    [Authorize]
     [HttpPost("/api/users")]
     public async Task<ActionResult<Guid>> RegisterUser([FromBody] RegisterUserCommand command)
     {
@@ -56,7 +53,7 @@ internal sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserC
 
     public async Task<Guid> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
-        if (await _context.Set<AuthenticationUser>().AnyAsync(x => x.Email == request.Email))
+        if (await _context.Set<AuthenticationUser>().AnyAsync(x => x.Email == request.Email, cancellationToken))
         {
             throw new UserAlreadyExistsException();
         }
@@ -70,7 +67,7 @@ internal sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserC
         user.DomainEvents.Add(new UserRegisteredEvent(userId));
 
         _context.Add(user);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(cancellationToken);
 
         return userId;
     }

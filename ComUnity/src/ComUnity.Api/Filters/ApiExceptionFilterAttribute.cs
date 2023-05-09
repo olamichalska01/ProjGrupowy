@@ -12,7 +12,7 @@ public class ApiExceptionFilterAttribute : ExceptionFilterAttribute
     {
         _exceptionHandlers = new Dictionary<Type, Action<ExceptionContext>>
         {
-            {typeof(BusinessRuleException), HandleValidationException},
+            {typeof(ValidationException), HandleValidationException},
             {typeof(BusinessRuleException), HandleBusinessRuleException},
             {typeof(NotFoundException), HandleNotFoundException},
             {typeof(UnauthorizedAccessException), HandleUnauthorizedAccessException},
@@ -47,7 +47,7 @@ public class ApiExceptionFilterAttribute : ExceptionFilterAttribute
 
     private void HandleValidationException(ExceptionContext context)
     {
-        BusinessRuleException? exception = context.Exception as BusinessRuleException;
+        ValidationException? exception = context.Exception as ValidationException;
 
         ValidationProblemDetails details = new(exception!.Errors)
         {
@@ -66,7 +66,7 @@ public class ApiExceptionFilterAttribute : ExceptionFilterAttribute
         ProblemDetails details = new()
         {
             Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
-            Title = "Request could not be processed due to buisness rule violation.",
+            Title = "Request could not be processed due to buisness rules validation",
             Detail = exception!.Message
         };
 

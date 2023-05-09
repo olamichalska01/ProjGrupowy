@@ -22,6 +22,6 @@ internal class UserRegisteredEventHandler : INotificationHandler<DomainEventNoti
         var userProfile = new UserProfile(domainEvent.UserId);
 
         _context.Set<UserProfile>().Add(userProfile);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(cancellationToken);
     }
 }

@@ -30,7 +30,7 @@ namespace ComUnity.Api
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(o =>
             {
-                var secret = builder.Configuration.GetValue<string>("JwtSettings:Secret");
+                var secret = builder.Configuration.GetValue<string>("JwtSettings:Secret") ?? throw new ArgumentException("Missing jwt secret");
                 o.TokenValidationParameters = new TokenValidationParameters
                 {
                     IssuerSigningKey = new SymmetricSecurityKey
