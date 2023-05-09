@@ -1,0 +1,2 @@
+# ProjGrupowy
+Projekt grupowy
