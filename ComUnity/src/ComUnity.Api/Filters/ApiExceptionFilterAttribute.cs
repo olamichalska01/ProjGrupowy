@@ -36,6 +36,13 @@ public class ApiExceptionFilterAttribute : ExceptionFilterAttribute
             return;
         }
 
+        var baseClass = type.BaseType;
+        if (baseClass is not null && _exceptionHandlers.ContainsKey(baseClass))
+        {
+            _exceptionHandlers[baseClass].Invoke(context);
+            return;
+        }
+
         if (!context.ModelState.IsValid)
         {
             HandleInvalidModelStateException(context);
