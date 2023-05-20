@@ -11,16 +11,16 @@ namespace ComUnity.Application.Features.ManagingEvents;
 public class SearchEvent : ApiControllerBase
 {
     [HttpGet("/api/events/{searchText}")]
-    public async Task<ActionResult<GetEventsResponse>> GetEvents([FromRoute] string searchText)
+    public async Task<ActionResult<GetEventsSearchResponse>> GetEvents([FromRoute] string searchText)
     {
-        return await Mediator.Send(new GetEventsQuery(searchText));
+        return await Mediator.Send(new GetEventsSearchQuery(searchText));
     }
 
-    public record GetEventsQuery(string searchText) : IRequest<GetEventsResponse>;
+    public record GetEventsSearchQuery(string searchText) : IRequest<GetEventsSearchResponse>;
 
-    public record GetEventsResponse(ICollection<EventDto> Events);
+    public record GetEventsSearchResponse(ICollection<EventDto> Events);
 
-    internal class GetEventByIdQueryHandler : IRequestHandler<GetEventsQuery, GetEventsResponse>
+    internal class GetEventByIdQueryHandler : IRequestHandler<GetEventsSearchQuery, GetEventsSearchResponse>
     {
         private readonly ComUnityContext _context;
 
@@ -29,7 +29,7 @@ public class SearchEvent : ApiControllerBase
             _context = context;
         }
 
-        public async Task<GetEventsResponse> Handle(GetEventsQuery request, CancellationToken cancellationToken)
+        public async Task<GetEventsSearchResponse> Handle(GetEventsSearchQuery request, CancellationToken cancellationToken)
         {
             var events = await _context.Set<Event>()
                 .Where(e => e.EventName.ToLower().Contains(request.searchText.ToLower())
@@ -37,7 +37,7 @@ public class SearchEvent : ApiControllerBase
                 e.Place.ToLower().Contains(request.searchText.ToLower()))
                 .ToListAsync();
 
-            return new GetEventsResponse(
+            return new GetEventsSearchResponse(
                 events.Select(e => new EventDto(
                     e.Id,
                     e.EventName,
