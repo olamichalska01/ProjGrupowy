@@ -60,10 +60,14 @@ public class AddEventController : ApiControllerBase
         public AddEventHandler(ComUnityContext context)
         {
             _context = context;
+        public AddEventHandler(ComUnityContext context)
+        {
+            _context = context;
         }
 
         public async Task<AddEventResponse> Handle(AddEventCommand request, CancellationToken cancellationToken)
         {
+
             var eCategory = await _context.Set<EventCategory>().FirstOrDefaultAsync(ec => ec.CategoryName == request.EventCategory, cancellationToken);
 
             if (eCategory == null)
@@ -85,6 +89,7 @@ public class AddEventController : ApiControllerBase
 
             await _context.AddAsync(e, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
+
 
             return new AddEventResponse(
                 e.Id,

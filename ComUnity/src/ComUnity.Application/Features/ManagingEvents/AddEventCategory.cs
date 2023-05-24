@@ -24,6 +24,7 @@ public class AddEventCategoryController : ApiControllerBase
 
     public class AddEventCategoryCommandValidator : AbstractValidator<AddEventCategoryCommand>
     {
+
         public AddEventCategoryCommandValidator()
         {
             RuleFor(x => x.Name)
@@ -43,6 +44,7 @@ public class AddEventCategoryController : ApiControllerBase
 
         public async Task<Unit> Handle(AddEventCategoryCommand request, CancellationToken cancellationToken)
         {
+
             var eventCategory = await _context.Set<EventCategory>().FirstOrDefaultAsync(e => e.CategoryName == request.Name, cancellationToken);
 
             if (eventCategory != null)

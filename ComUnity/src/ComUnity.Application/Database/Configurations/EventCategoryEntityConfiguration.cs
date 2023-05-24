@@ -8,6 +8,6 @@ internal class EventCategoryEntityConfiguration : IEntityTypeConfiguration<Event
 {
     public void Configure(EntityTypeBuilder<EventCategory> builder)
     {
-        builder.HasKey(x => x.CategoryName);
+        builder.HasKey(x => x.EventCategoryId);
     }
 }
