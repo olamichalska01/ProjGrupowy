@@ -8,6 +8,8 @@ namespace ComUnity.Api
 {
     public class Program
     {
+        private static string AllowAll = "AllowAll";
+
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +19,16 @@ namespace ComUnity.Api
             builder.Services.AddControllers(options =>
             {
                 options.Filters.Add<ApiExceptionFilterAttribute>();
+            });
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(name: AllowAll, policy =>
+                {
+                    policy.AllowAnyHeader();
+                    policy.AllowAnyOrigin();
+                    policy.AllowAnyMethod();
+                });
             });
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -64,6 +76,8 @@ namespace ComUnity.Api
             {
                 app.UseExceptionHandler("/error");
             }
+
+            app.UseCors(AllowAll);
 
             app.UseAuthentication();
 

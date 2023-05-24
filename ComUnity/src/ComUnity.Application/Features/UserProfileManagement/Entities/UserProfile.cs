@@ -1,4 +1,4 @@
-﻿using ComUnity.Application.Features.ManagingEvents.Entities;
+using ComUnity.Application.Features.ManagingEvents.Entities;
 
 namespace ComUnity.Application.Features.UserProfileManagement.Entities;
 
