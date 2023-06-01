@@ -21,7 +21,7 @@ namespace ComUnity.Application.Database.Configurations
 
             // Configure foreign key relationships
             builder.HasOne(ufec => ufec.User)
-                .WithMany()
+                .WithMany(u => u.FavoriteCategories)
                 .HasForeignKey(ufec => ufec.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 

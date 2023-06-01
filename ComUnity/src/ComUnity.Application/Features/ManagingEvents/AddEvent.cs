@@ -60,9 +60,6 @@ public class AddEventController : ApiControllerBase
         public AddEventHandler(ComUnityContext context)
         {
             _context = context;
-        public AddEventHandler(ComUnityContext context)
-        {
-            _context = context;
         }
 
         public async Task<AddEventResponse> Handle(AddEventCommand request, CancellationToken cancellationToken)
