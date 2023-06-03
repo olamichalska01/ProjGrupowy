@@ -7,6 +7,8 @@ using FluentValidation;
 using Isopoh.Cryptography.Argon2;
 using MassTransit;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,10 +16,12 @@ namespace ComUnity.Application.Features.Authentication;
 
 public class RegisterUserController : ApiControllerBase
 {
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
     [HttpPost("/api/users")]
-    public async Task<ActionResult<Guid>> RegisterUser([FromBody] RegisterUserCommand command)
+    public async Task<ActionResult<Guid>> RegisterUser([FromBody] RegisterUserCommand command, CancellationToken cancellationToken)
     {
-        return await Mediator.Send(command);
+        return await Mediator.Send(command, cancellationToken);
     }
 }
 

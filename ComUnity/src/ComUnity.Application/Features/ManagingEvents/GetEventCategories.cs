@@ -2,14 +2,17 @@
 using ComUnity.Application.Database;
 using ComUnity.Application.Features.ManagingEvents.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static ComUnity.Application.Features.ManagingEvents.GetEventByIdController;
 
 namespace ComUnity.Application.Features.ManagingEvents;
 
 public class GetEventsCategoriesController : ApiControllerBase
 {
     [HttpGet("/api/events-categories/")]
+    [ProducesResponseType(typeof(GetEventsCategoriesResponse), StatusCodes.Status200OK)]
     public async Task<ActionResult<GetEventsCategoriesResponse>> GetEvents()
     {
         return await Mediator.Send(new GetEventsCategoriesQuery());

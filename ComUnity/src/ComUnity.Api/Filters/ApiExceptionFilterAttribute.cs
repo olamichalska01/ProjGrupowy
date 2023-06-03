@@ -1,6 +1,7 @@
 ﻿using ComUnity.Application.Common.Exceptions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace ComUnity.Api.Filters;
 
@@ -72,12 +73,13 @@ public class ApiExceptionFilterAttribute : ExceptionFilterAttribute
 
         ProblemDetails details = new()
         {
+            Status = StatusCodes.Status422UnprocessableEntity,
             Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
             Title = "Request could not be processed due to buisness rules validation",
             Detail = exception!.Message
         };
 
-        context.Result = new BadRequestObjectResult(details);
+        context.Result = new ObjectResult(details) { StatusCode = StatusCodes.Status422UnprocessableEntity };
 
         context.ExceptionHandled = true;
     }
@@ -130,7 +132,8 @@ public class ApiExceptionFilterAttribute : ExceptionFilterAttribute
         {
             Status = StatusCodes.Status403Forbidden,
             Title = "Forbidden",
-            Type = "https://tools.ietf.org/html/rfc7231#section-6.5.3"
+            Type = "https://tools.ietf.org/html/rfc7231#section-6.5.3",
+            Detail = "You do not have sufficient permissions."
         };
 
         context.Result = new ObjectResult(details) { StatusCode = StatusCodes.Status403Forbidden };
@@ -144,7 +147,8 @@ public class ApiExceptionFilterAttribute : ExceptionFilterAttribute
         {
             Status = StatusCodes.Status500InternalServerError,
             Title = "An error occurred while processing your request.",
-            Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1"
+            Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1",
+            Detail = "Internal server error."
         };
 
         context.Result = new ObjectResult(details) { StatusCode = StatusCodes.Status500InternalServerError };

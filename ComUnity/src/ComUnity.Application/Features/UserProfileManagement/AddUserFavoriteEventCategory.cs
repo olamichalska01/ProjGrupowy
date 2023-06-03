@@ -1,25 +1,20 @@
 ﻿using ComUnity.Application.Common;
 using ComUnity.Application.Database;
-using ComUnity.Application.Features.ManagingEvents.Entities;
 using ComUnity.Application.Features.ManagingEvents.Exceptions;
 using ComUnity.Application.Features.UserProfileManagement.Entities;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static ComUnity.Application.Features.ManagingEvents.AddEventController;
 
 namespace ComUnity.Application.Features.UserProfileManagement;
 
 
-    public class AddUserFavoriteEventCategory : ApiControllerBase
+public class AddUserFavoriteEventCategory : ApiControllerBase
     {
     [HttpPost("/api/user/favorite")]
+    [ProducesResponseType(typeof(AddFavoriteCategoryResponse), StatusCodes.Status200OK)]
     public async Task<ActionResult<AddFavoriteCategoryResponse>> AddUserFavoriteCategory([FromBody] AddFavoriteCategoryCommand command)
     {
         return await Mediator.Send(command);

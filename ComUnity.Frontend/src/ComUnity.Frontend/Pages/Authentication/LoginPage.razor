@@ -1,0 +1,101 @@
+﻿@using ComUnity.Frontend.Extensions;
+@using ComUnity.Frontend.Services;
+@page "/login"
+@layout UnauthorizedLayout
+@inject IComUnityApiClient _client
+@inject ErrorHandler _errorHandler
+@inject NavigationManager _navigation
+@inject AuthenticationStateProvider _authenticationStateProvider
+
+<MudContainer MaxWidth="MaxWidth.Medium">
+    <MudCard>
+        <MudText Typo="Typo.h4"
+                 Class="pa-4">Login</MudText>
+        <MudForm Model="@model" @ref="@form" Validation="@(loginValidator.CreateValueValidator())" ValidationDelay="0">
+            <MudCardContent Class="pa-10">
+                <MudTextField Variant="Variant.Outlined"
+                              @bind-Value="model.Email"
+                              For="@(() => model.Email)"
+                              Immediate="true"
+                              Label="Email" />
+                <MudTextField Variant="Variant.Outlined"
+                              Label="Password"
+                              Class="mt-3"
+                              Immediate="true"
+                              @bind-Value="model.Password"
+                              For="@(() => model.Password)"
+                              InputType="InputType.Password" />
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@(async () => await Submit())">Login</MudButton>
+                </MudCardActions>
+    </MudForm>
+</MudCard>
+</MudContainer>
+
+
+@code {
+    [AllowNull]
+    [CascadingParameter]
+    protected Task<AuthenticationState> AuthState { get; set; }
+
+    [AllowNull]
+    MudForm form;
+
+    private string redirectUrl = string.Empty;
+
+    private LoginCommand model = new();
+
+    private LoginCommandValidator loginValidator = new();
+
+    protected async override Task OnInitializedAsync()
+    {
+        base.OnInitialized();
+        _navigation.TryGetQueryString<string>("redirectUrl", out redirectUrl);
+        var user = (await AuthState).User;
+        if (user.Identity!.IsAuthenticated)
+        {
+            _navigation.NavigateTo(redirectUrl ?? "/");
+        }
+    }
+
+    private async Task Submit()
+    {
+        await form.Validate();
+
+        if (!form.IsValid)
+        {
+            return;
+        }
+
+        model.AuthenticationType = "cookie";
+        var (isSuccess, _) = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiAuthLoginAsync(model));
+        if(!isSuccess)
+        {
+            return;
+        }
+
+        (isSuccess, var userInfo) = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiAuthUserInfoAsync());
+        if (!isSuccess)
+        {
+            return;
+        }
+        (_authenticationStateProvider as CookieAuthenticationStateProvider)!.SetAuthInfo(userInfo!);
+        _navigation.NavigateTo(redirectUrl ?? "/");
+        
+    }
+
+    private class LoginCommandValidator : AbstractValidator<LoginCommand>
+    {
+        public LoginCommandValidator()
+        {
+            RuleFor(x => x.Email)
+                .NotEmpty()
+                .EmailAddress();
+
+            RuleFor(x => x.Password)
+                .NotEmpty()
+                .Length(8, 64);
+        }
+    }
+}

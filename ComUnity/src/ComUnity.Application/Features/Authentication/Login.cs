@@ -6,6 +6,10 @@ using ComUnity.Application.Features.Authentication.Settings;
 using FluentValidation;
 using Isopoh.Cryptography.Argon2;
 using MediatR;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -18,19 +22,27 @@ namespace ComUnity.Application.Features.Authentication.Utils;
 
 public class LoginController : ApiControllerBase
 {
+    [AllowAnonymous]
     [HttpPost("/api/auth/login")]
-    public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginCommand command)
+    [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
+    public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginCommand command, CancellationToken cancellationToken)
     {
-        return await Mediator.Send(command);
+        return await Mediator.Send(command, cancellationToken);
     }
 }
 
-public record LoginCommand(string Email, string Password) : IRequest<LoginResponse>;
+public record LoginCommand(string Email, string Password, string? AuthenticationType) : IRequest<LoginResponse>;
 
-public record LoginResponse(string Token);
+public record LoginResponse(string? Token);
 
 public class LoginCommandValidator : AbstractValidator<LoginCommand>
 {
+    public static List<string> AllAuthenticationTypes = new List<string>
+    {
+        AuthenticationTypes.Cookie,
+        AuthenticationTypes.Jwt
+    };
+
     public LoginCommandValidator()
     {
         RuleFor(x => x.Email)
@@ -42,18 +54,23 @@ public class LoginCommandValidator : AbstractValidator<LoginCommand>
             .NotEmpty()
             .MinimumLength(12)
             .MaximumLength(320);
+
+        RuleFor(x => x.AuthenticationType)
+            .Must(x => x is null || AllAuthenticationTypes.Contains(x));
     }
 }
 
 internal class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponse>
 {
     private readonly ComUnityContext _context;
+    private readonly HttpContext _httpContext;
 
     private readonly JwtSettings _jwtSettings;
 
-    public LoginCommandHandler(ComUnityContext context, IOptions<JwtSettings> jwtSettings)
+    public LoginCommandHandler(ComUnityContext context, IOptions<JwtSettings> jwtSettings, IHttpContextAccessor httpContextAccessor)
     {
         _context = context;
+        _httpContext = httpContextAccessor.HttpContext;
         _jwtSettings = jwtSettings.Value;
     }
 
@@ -76,20 +93,37 @@ internal class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponse
             throw new InvalidEmailOrPasswordException();
         }
 
-        return new LoginResponse(GenerateJwtToken(user));
+        var subject = new ClaimsIdentity(new[]
+                    {
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                    new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim("role", user.Role)
+                }, CookieAuthenticationDefaults.AuthenticationScheme);
+
+        if(request.AuthenticationType == AuthenticationTypes.Cookie)
+        {
+            await _httpContext.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            new ClaimsPrincipal(subject),
+            new AuthenticationProperties
+            {
+                IsPersistent = true,
+                AllowRefresh = true,
+                ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(10),
+            });
+
+            return new LoginResponse(null);
+        }
+
+        return new LoginResponse(GenerateJwtToken(subject));
     }
 
-    private string GenerateJwtToken(AuthenticationUser user)
+    private string GenerateJwtToken(ClaimsIdentity subject)
     {
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            Subject = new ClaimsIdentity(new[]
-                    {
-                    new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-                    new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    new Claim(ClaimTypes.Role, user.Role)
-                }),
+            Subject = subject,
             Expires = DateTime.UtcNow.AddMinutes(5),
             Issuer = _jwtSettings.Issuer,
             Audience = _jwtSettings.Audience,
