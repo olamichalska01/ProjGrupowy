@@ -1,11 +1,7 @@
-﻿using ComUnity.Application.Features.UserProfileManagement.Entities;
-
-namespace ComUnity.Application.Features.ManagingEvents.Entities;
+﻿namespace ComUnity.Application.Features.ManagingEvents.Entities;
 
 public class EventCategory
 {
-    private string name;
-
     public Guid Id { get; private set;  }
     public string CategoryName { get; private set; }
 
@@ -21,6 +17,6 @@ public class EventCategory
 
     public EventCategory(string name)
     {
-        this.name = name;
+        CategoryName = name;
     }
 }

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33530.505
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComUnity.Frontend", "ComUnity.Frontend.csproj", "{6DECF6CB-CC56-46BF-8E41-347F1E157BDB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ComUnity.Frontend", "ComUnity.Frontend.csproj", "{6DECF6CB-CC56-46BF-8E41-347F1E157BDB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -3,6 +3,7 @@ using ComUnity.Application.Database;
 using ComUnity.Application.Features.ManagingEvents.Dtos;
 using ComUnity.Application.Features.ManagingEvents.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -16,6 +17,7 @@ namespace ComUnity.Application.Features.ManagingEvents
     public class FilterEventsController : ApiControllerBase
     {
         [HttpGet("/api/events/filter/")]
+        [ProducesResponseType(typeof(FilterEventsResponse), StatusCodes.Status200OK)]
         public async Task<ActionResult<FilterEventsResponse>> GetEvents(
             [FromQuery] string? categoryName, 
             [FromQuery] int costMin, 

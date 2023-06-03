@@ -3,6 +3,8 @@ using ComUnity.Application.Common.Exceptions;
 using ComUnity.Application.Database;
 using ComUnity.Application.Features.Authentication.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,12 +12,14 @@ namespace ComUnity.Application.Features.Authentication;
 
 public class VerifyEmailController : ApiControllerBase
 {
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [HttpPut("/api/users/verifyEmail")]
-    public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailCommand command)
+    public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailCommand command, CancellationToken cancellationToken)
     {
-        await Mediator.Send(command);
+        await Mediator.Send(command, cancellationToken);
 
-        return Ok();
+        return NoContent();
     }
 }
 

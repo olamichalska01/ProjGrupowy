@@ -1,8 +1,12 @@
-﻿namespace ComUnity.Application.Features.ManagingEvents.Entities;
+﻿using NetTopologySuite.Geometries;
+
+namespace ComUnity.Application.Features.ManagingEvents.Entities;
 
 public class Event
 {
     public Guid Id { get; private set; }
+
+    public Guid OwnerId { get; private set; }
 
     public string EventName { get; private set; }
 
@@ -12,11 +16,15 @@ public class Event
 
     public string Place { get; private set; }
 
+    public Point Location { get; private set; }
+
     public DateTime EventDate { get; private set; }
 
     public double Cost { get; private set; }
 
     public int MinAge { get; private set; }
+
+    public bool IsPublic { get; private set; }
 
     public EventCategory EventCategory { get; private set; }
 
@@ -26,18 +34,22 @@ public class Event
 
     public Event(
         Guid id,
+        Guid ownerId,
         string eventName,
         int maxAmountOfPeople,
         string place,
+        Point location,
         DateTime eventDate,
         double cost,
         int minAge,
         EventCategory eventCategory)
     {
         Id = id;
+        OwnerId = ownerId;
         EventName = eventName;
         MaxAmountOfPeople = maxAmountOfPeople;
         Place = place;
+        Location = location;
         EventDate = eventDate;
         Cost = cost;
         MinAge = minAge;

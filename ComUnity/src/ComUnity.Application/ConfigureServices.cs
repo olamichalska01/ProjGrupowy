@@ -30,10 +30,12 @@ public static class ConfigureServices
         services.AddDbContext<ComUnityContext>(options =>
             options.UseSqlServer(
                 configuration.GetConnectionString("DefaultConnection"),
-                b => b.MigrationsAssembly(typeof(ComUnityContext).Assembly.FullName)));
+                b => b.MigrationsAssembly(typeof(ComUnityContext).Assembly.FullName)
+                    .UseNetTopologySuite()));
 
         services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
 
+        services.AddScoped<IAuthenticatedUserProvider, AuthenticatedUserProvider>();
         services.AddScoped<IDomainEventService, DomainEventService>();
 
         return services;

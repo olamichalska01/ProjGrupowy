@@ -3,6 +3,7 @@ using ComUnity.Application.Common.Exceptions;
 using ComUnity.Application.Database;
 using ComUnity.Application.Features.ManagingEvents.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,6 +12,7 @@ namespace ComUnity.Application.Features.ManagingEvents;
 public class DeleteEventCategoryController : ApiControllerBase
 {
     [HttpDelete("/api/event-categories/{name}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> AddEvent([FromRoute] string name)
     {
         await Mediator.Send(new DeleteEventCategoryCommand(name));

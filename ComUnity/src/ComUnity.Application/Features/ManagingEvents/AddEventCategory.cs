@@ -7,12 +7,14 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static ComUnity.Application.Features.ManagingEvents.AddEventController;
 
 namespace ComUnity.Application.Features.ManagingEvents;
 
 public class AddEventCategoryController : ApiControllerBase
 {
     [HttpPost("/api/event-categories/")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<IActionResult> AddEventCategory([FromBody] AddEventCategoryCommand command)
     {
         await Mediator.Send(command);

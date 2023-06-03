@@ -1,17 +1,72 @@
-﻿@inherits LayoutComponentBase
+﻿@using ComUnity.Frontend.Services;
+@using Microsoft.AspNetCore.Components.Authorization;
+@inherits LayoutComponentBase
+@inject NavigationManager _navigation
+@inject IComUnityApiClient _client
+@inject AuthenticationStateProvider _authenticationStateProvider
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-        </div>
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
 
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+<MudLayout>
+    <MudAppBar Dense="true" Style="background-color: white">
+        <MudSpacer />
+        <MudMenu Dense="true" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopRight">
+            <ActivatorContent>
+                <MudAvatar Color="Color.Warning" Variant="Variant.Filled" Size="Size.Small">
+                    <MudIcon Color="Color.Dark" Icon="@Icons.Custom.Uncategorized.Radioactive" Size="Size.Small" />
+                </MudAvatar>
+            </ActivatorContent>
+            <ChildContent>
+                <MudMenuItem IconSize="Size.Small" IconColor="Color.Dark" Icon="@Icons.Material.Outlined.Person">Profile</MudMenuItem>
+                <MudMenuItem IconSize="Size.Small" IconColor="Color.Dark" Icon="@Icons.Material.Outlined.Logout" OnClick="SignOut">Sign Out</MudMenuItem>
+            </ChildContent>
+        </MudMenu>
+
+    </MudAppBar>
+    <MudDrawer Open="true" Style="z-index: 1900">
+        <MudStack>
+            <MudNavMenu>
+                <MudText Typo="Typo.h6" Class="px-4">ComUnity</MudText>
+                <MudText Typo="Typo.body2" Class="px-4 mud-text-secondary">Secondary Text</MudText>
+                <MudDivider Class="my-2"/>
+                <MudNavLink Href="/" Match="NavLinkMatch.All">Dashboard</MudNavLink>
+                <MudNavLink Href="/servers" Match="NavLinkMatch.Prefix">Servers</MudNavLink>
+                <MudNavGroup Title="Settings" Expanded="true">
+                    <MudNavLink Href="/users" Match="NavLinkMatch.Prefix">Users</MudNavLink>
+                    <MudNavLink Href="/security" Match="NavLinkMatch.Prefix">Security</MudNavLink>
+                </MudNavGroup>
+                <MudNavLink Href="/about" Match="NavLinkMatch.Prefix">About</MudNavLink>
+            </MudNavMenu>
+        </MudStack>
+        
+    </MudDrawer>
+    <MudMainContent>
+        @Body
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    [AllowNull]
+    [CascadingParameter]
+    protected Task<AuthenticationState> AuthState { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        base.OnInitialized();
+        var user = (await AuthState).User;
+        if (!user.Identity!.IsAuthenticated)
+        {
+            _navigation.NavigateTo($"login?redirectUrl={Uri.EscapeDataString(_navigation.Uri)}");
+        }
+    }
+
+    private async Task SignOut()
+    {
+        await _client.ApiAuthLogoutAsync();
+        (_authenticationStateProvider as CookieAuthenticationStateProvider)!.ClearIdentity();
+        _navigation.NavigateTo("/login");
+    }
+}

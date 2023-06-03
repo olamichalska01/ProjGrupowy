@@ -1,25 +1,20 @@
 ﻿using ComUnity.Application.Common;
 using ComUnity.Application.Common.Exceptions;
 using ComUnity.Application.Database;
-using ComUnity.Application.Features.ManagingEvents.Entities;
 using ComUnity.Application.Features.UserProfileManagement.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static ComUnity.Application.Features.ManagingEvents.DeleteEventCategoryController;
 using static ComUnity.Application.Features.UserProfileManagement.AddUserFavoriteEventCategory;
 
 namespace ComUnity.Application.Features.UserProfileManagement;
 
-    public class DeleteUserFavoriteEventCategory : ApiControllerBase
+public class DeleteUserFavoriteEventCategory : ApiControllerBase
     {
         [HttpDelete("/api/favorite")]
-        public async Task<ActionResult> DeleteFavoriteCategory([FromBody] DeleteFavoriteCategoryCommand deleteFavoriteCategoryCommand )
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<ActionResult> DeleteFavoriteCategory([FromBody] DeleteFavoriteCategoryCommand deleteFavoriteCategoryCommand )
         {
             await Mediator.Send(deleteFavoriteCategoryCommand);
             return NoContent();

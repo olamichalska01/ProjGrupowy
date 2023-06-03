@@ -4,14 +4,17 @@ using ComUnity.Application.Database;
 using ComUnity.Application.Features.ManagingEvents.Dtos;
 using ComUnity.Application.Features.ManagingEvents.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static ComUnity.Application.Features.ManagingEvents.FilterEventsController;
 
 namespace ComUnity.Application.Features.ManagingEvents;
 
 public class GetEventByIdController : ApiControllerBase
 {
     [HttpGet("/api/events/{id}")]
+    [ProducesResponseType(typeof(GetEventByIdResponse), StatusCodes.Status200OK)]
     public async Task<ActionResult<GetEventByIdResponse>> GetEventById([FromRoute] Guid id)
     {
         return await Mediator.Send(new GetEventByIdQuery(id));

@@ -2,17 +2,21 @@
 using ComUnity.Application.Database;
 using ComUnity.Application.Features.ManagingEvents.Entities;
 using ComUnity.Application.Features.ManagingEvents.Exceptions;
+using ComUnity.Application.Infrastructure.Services;
 using FluentValidation;
 using MassTransit;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NetTopologySuite.Geometries;
 
 namespace ComUnity.Application.Features.ManagingEvents;
 
 public class AddEventController : ApiControllerBase
 {
     [HttpPost("/api/events")]
+    [ProducesResponseType(typeof(AddEventResponse), StatusCodes.Status200OK)]
     public async Task<ActionResult<AddEventResponse>> AddEvent([FromBody] AddEventCommand command)
     {
         return await Mediator.Send(command);
@@ -22,6 +26,8 @@ public class AddEventController : ApiControllerBase
         string EventName,
         int MaxAmountOfPeople,
         string Place,
+        double Latitude,
+        double Longitude,
         DateTime EventDate,
         double Cost, 
         int MinAge,
@@ -56,15 +62,16 @@ public class AddEventController : ApiControllerBase
     internal class AddEventHandler : IRequestHandler<AddEventCommand, AddEventResponse>
     {
         private readonly ComUnityContext _context;
+        private readonly IAuthenticatedUserProvider _authenticatedUserProvider;
 
-        public AddEventHandler(ComUnityContext context)
+        public AddEventHandler(ComUnityContext context, IAuthenticatedUserProvider authenticatedUserProvider)
         {
             _context = context;
+            _authenticatedUserProvider = authenticatedUserProvider;
         }
 
         public async Task<AddEventResponse> Handle(AddEventCommand request, CancellationToken cancellationToken)
         {
-
             var eCategory = await _context.Set<EventCategory>().FirstOrDefaultAsync(ec => ec.CategoryName == request.EventCategory, cancellationToken);
 
             if (eCategory == null)
@@ -73,12 +80,15 @@ public class AddEventController : ApiControllerBase
             }
 
             var newEventId = NewId.NextGuid();
+            var userId = _authenticatedUserProvider.GetUserId();
 
             var e = new Event(
                 newEventId,
+                userId,
                 request.EventName,
                 request.MaxAmountOfPeople,
                 request.Place,
+                new Point(request.Latitude, request.Longitude) { SRID = 4326 },
                 request.EventDate,
                 request.Cost,
                 request.MinAge,
@@ -86,7 +96,6 @@ public class AddEventController : ApiControllerBase
 
             await _context.AddAsync(e, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
-
 
             return new AddEventResponse(
                 e.Id,

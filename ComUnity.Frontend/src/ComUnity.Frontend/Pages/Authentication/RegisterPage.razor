@@ -1,0 +1,91 @@
+﻿@layout UnauthorizedLayout
+@page "/register"
+@using ComUnity.Frontend.Extensions;
+@inject NavigationManager _navigation
+@inject ErrorHandler _errorHandler
+@inject IComUnityApiClient _client
+
+<MudContainer MaxWidth="MaxWidth.Medium">
+    <MudCard>
+        <MudText Typo="Typo.h4"
+                 Class="pa-4">Register</MudText>
+        <MudForm Model="@model" @ref="@form" Validation="@(registerValidator.CreateValueValidator())" ValidationDelay="0">
+            <MudCardContent Class="pa-10">
+                <MudTextField Variant="Variant.Outlined"
+                              @bind-Value="model.Email"
+                              For="@(() => model.Email)"
+                              Immediate="true"
+                              Label="Email" />
+                <MudTextField Variant="Variant.Outlined"
+                              Label="Password"
+                              Class="mt-3"
+                              HelperText="Choose a strong password"
+                              Immediate="true"
+                              @bind-Value="model.Password"
+                              For="@(() => model.Password)"
+                              InputType="InputType.Password" />
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@(async () => await Submit())">Login</MudButton>
+            </MudCardActions>
+        </MudForm>
+
+        @if (SuccessfullRegistration)
+        {
+            <MudAlert Severity="MudBlazor.Severity.Success">Successfuly created your account. You need to activate your account using link we will send to your e-mail address (@model.Email) </MudAlert>
+        }
+    </MudCard>
+</MudContainer>
+
+
+@code {
+    [AllowNull]
+    [CascadingParameter]
+    protected Task<AuthenticationState> AuthState { get; set; }
+
+    [AllowNull]
+    MudForm form;
+
+    private RegisterUserCommand model = new();
+
+    private RegisterUserCommandValidator registerValidator = new();
+
+    private bool SuccessfullRegistration = false;
+
+    protected async override Task OnInitializedAsync()
+    {
+        base.OnInitialized();
+        var user = (await AuthState).User;
+        if (user.Identity!.IsAuthenticated)
+        {
+            _navigation.NavigateTo("/");
+        }
+    }
+
+    private async Task Submit()
+    {
+        await form.Validate();
+
+        if (!form.IsValid)
+        {
+            return;
+        }
+
+        var(isSuccess, _) = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiUsersAsync(model));
+        SuccessfullRegistration = isSuccess;
+    }
+
+    private class RegisterUserCommandValidator : AbstractValidator<RegisterUserCommand>
+    {
+        public RegisterUserCommandValidator()
+        {
+            RuleFor(x => x.Email)
+                .NotEmpty()
+                .EmailAddress();
+
+            RuleFor(x => x.Password)
+                .NotEmpty()
+                .Length(12, 64);
+        }
+    }
+}
