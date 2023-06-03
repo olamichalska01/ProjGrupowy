@@ -8,6 +8,8 @@ public class Event
 
     public int MaxAmountOfPeople { get; private set; }
 
+    public int TakenPlacesAmount { get; private set; }
+
     public string Place { get; private set; }
 
     public DateTime EventDate { get; private set; }
