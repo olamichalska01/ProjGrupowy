@@ -4,17 +4,20 @@ using ComUnity.Application.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 
 #nullable disable
 
-namespace ComUnity.Application.Migrations
+namespace ComUnity.Application.Database.Migrations
 {
     [DbContext(typeof(ComUnityContext))]
-    partial class ComUnityContextModelSnapshot : ModelSnapshot
+    [Migration("20230603203638_Init")]
+    partial class Init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
