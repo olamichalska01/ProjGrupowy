@@ -6,12 +6,13 @@
 @inject ErrorHandler _errorHandler
 @inject NavigationManager _navigation
 @inject AuthenticationStateProvider _authenticationStateProvider
+@inject IValidator<LoginCommand> _loginValidator
 
 <MudContainer MaxWidth="MaxWidth.Medium">
     <MudCard>
         <MudText Typo="Typo.h4"
                  Class="pa-4">Login</MudText>
-        <MudForm Model="@model" @ref="@form" Validation="@(loginValidator.CreateValueValidator())" ValidationDelay="0">
+        <MudForm Model="@model" @ref="@form" Validation="@(_loginValidator.CreateValueValidator())" ValidationDelay="0">
             <MudCardContent Class="pa-10">
                 <MudTextField Variant="Variant.Outlined"
                               @bind-Value="model.Email"
@@ -25,10 +26,11 @@
                               @bind-Value="model.Password"
                               For="@(() => model.Password)"
                               InputType="InputType.Password" />
-                </MudCardContent>
-                <MudCardActions>
-                    <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@(async () => await Submit())">Login</MudButton>
-                </MudCardActions>
+                <MudText Class="mt-4">Tou don't have an acoount? <MudLink Href="/register">Sign up here!</MudLink></MudText>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@(async () => await Submit())">Login</MudButton>
+            </MudCardActions>
     </MudForm>
 </MudCard>
 </MudContainer>
@@ -45,8 +47,6 @@
     private string redirectUrl = string.Empty;
 
     private LoginCommand model = new();
-
-    private LoginCommandValidator loginValidator = new();
 
     protected async override Task OnInitializedAsync()
     {

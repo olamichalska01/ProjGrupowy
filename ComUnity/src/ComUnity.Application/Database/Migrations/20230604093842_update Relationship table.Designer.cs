@@ -4,6 +4,7 @@ using ComUnity.Application.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 
@@ -12,9 +13,11 @@ using NetTopologySuite.Geometries;
 namespace ComUnity.Application.Database.Migrations
 {
     [DbContext(typeof(ComUnityContext))]
-    partial class ComUnityContextModelSnapshot : ModelSnapshot
+    [Migration("20230604093842_update Relationship table")]
+    partial class updateRelationshiptable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
