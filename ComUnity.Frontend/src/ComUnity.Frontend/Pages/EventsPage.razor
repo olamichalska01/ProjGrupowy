@@ -35,7 +35,6 @@
 
 @code {
     private List<EventDto> Events = new List<EventDto>();
-    private List<EventDto> DisplayedEvents = new List<EventDto>();
     private int TotalEvents;
 
 
@@ -60,13 +59,6 @@
 
     private void UpdateDisplayedEvents()
     {
-        // Calculate the start and end indexes for the current page
-        var startIndex = (CurrentPage - 1) * PageSize;
-        var endIndex = Math.Min(startIndex + PageSize, TotalEvents);
-
-        // Update the displayed events based on the current page
-        DisplayedEvents = Events.Skip(startIndex).Take(endIndex - startIndex).ToList();
-
         // Update the UI
         StateHasChanged();
     }
