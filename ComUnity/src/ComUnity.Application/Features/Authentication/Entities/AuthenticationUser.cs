@@ -41,4 +41,15 @@ public class AuthenticationUser : IHasDomainEvent
         SecurityCode = string.Empty;
         SecurityCodeExpirationDate = DateTime.MinValue;
     }
+
+    public void SetPasswordResetSecurityCode(string securityCode, DateTime expirationDate)
+    {
+        SecurityCode = securityCode;
+        SecurityCodeExpirationDate = expirationDate;
+    }
+
+    public void SetNewPassword(string hashedPassword)
+    {
+        HashedPassword = hashedPassword;
+    }
 }

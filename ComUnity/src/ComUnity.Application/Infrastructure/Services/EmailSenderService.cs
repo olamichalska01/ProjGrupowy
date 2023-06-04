@@ -7,11 +7,14 @@ namespace ComUnity.Application.Infrastructure.Services;
 
 public class EmailSenderService : IEmailSenderService
 {
+    public string From { get; }
+
     private readonly SmtpSettings _smtpSettings;
 
     public EmailSenderService(IOptions<SmtpSettings> smtpSettings)
     {
         _smtpSettings = smtpSettings.Value;
+        From = _smtpSettings.Account;
     }
 
     public async Task SendEmail(MailMessage message)
@@ -29,5 +32,7 @@ public class EmailSenderService : IEmailSenderService
 
 public interface IEmailSenderService
 {
+    string From { get; }
+
     Task SendEmail(MailMessage message);
 }
