@@ -4,6 +4,7 @@ using ComUnity.Application.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 
@@ -12,9 +13,11 @@ using NetTopologySuite.Geometries;
 namespace ComUnity.Application.Database.Migrations
 {
     [DbContext(typeof(ComUnityContext))]
-    partial class ComUnityContextModelSnapshot : ModelSnapshot
+    [Migration("20230604085202_Add Notification table")]
+    partial class AddNotificationtable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -159,24 +162,25 @@ namespace ComUnity.Application.Database.Migrations
 
             modelBuilder.Entity("ComUnity.Application.Features.UserProfileManagement.Entities.Relationship", b =>
                 {
-                    b.Property<Guid>("User1Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("User2Id")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("RelationshipType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("User1Id", "User2Id");
+                    b.Property<Guid>("User1Id")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.HasIndex("Id");
+                    b.Property<Guid>("User2Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("User2Id");
+
+                    b.HasIndex("User1Id", "User2Id");
 
                     b.ToTable("Relationship");
                 });

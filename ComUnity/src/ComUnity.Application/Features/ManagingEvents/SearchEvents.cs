@@ -90,8 +90,8 @@ internal class SearchEventQueryHandler : IRequestHandler<SearchEventsQuery, Sear
             query = query
                 .WhereIf(!string.IsNullOrEmpty(request.Filters.EventName), x => EF.Functions.Like(x.EventName, $"{request.Filters!.EventName}%"))
                 // Categories
-                //.WhereIf(request.Filters.SelectedCategoriesIds is not null && request.Filters.SelectedCategoriesIds.Count > 0,
-                //    x => request.Filters.SelectedCategoriesIds!.Contains(x.EventCategory.Id))
+                .WhereIf(request.Filters.SelectedCategoriesIds is not null && request.Filters.SelectedCategoriesIds.Count > 0,
+                    x => request.Filters.SelectedCategoriesIds!.Contains(x.EventCategory.Id))
                 // Public Events
                 .WhereIf(request.Filters.ShowPublicEvents.HasValue && request.Filters.ShowPublicEvents.Value,
                     x => x.IsPublic)
