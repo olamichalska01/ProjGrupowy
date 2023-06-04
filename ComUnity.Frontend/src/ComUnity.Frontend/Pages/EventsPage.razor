@@ -1,0 +1,79 @@
+﻿@using ComUnity.Frontend.Extensions;
+@using ComUnity.Frontend.Services;
+@page "/events"
+@layout UnauthorizedLayout
+@inject IComUnityApiClient _client
+@inject ErrorHandler _errorHandler
+@inject NavigationManager _navigation
+@inject AuthenticationStateProvider _authenticationStateProvider
+
+<MudCard>
+    <MudCardContent>
+        <MudGrid>
+            <MudTable Items="@Events" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+                <HeaderContent>
+                    <MudTh>EventDate</MudTh>
+                    <MudTh>Location</MudTh>
+                    <MudTh>Max Amount Of people</MudTh>
+                    <MudTh>Cost</MudTh>
+                    <MudTh>MinAge</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="EventDate">@context.EventDate.ToShortDateString()</MudTd>
+                    <MudTd DataLabel="Location">@context.Place</MudTd>
+                    <MudTd DataLabel="Max Amount Of peopl">@context.MaxAmountOfPeople</MudTd>
+                    <MudTd DataLabel="Cost">@context.Cost</MudTd>
+                    <MudTd DataLabel="MinAge">@context.MinAge</MudTd>
+                </RowTemplate>
+                <PagerContent>
+                    <MudTablePager />
+                </PagerContent>
+            </MudTable>
+        </MudGrid>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    private List<EventDto> Events = new List<EventDto>();
+    private List<EventDto> DisplayedEvents = new List<EventDto>();
+    private int TotalEvents;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadEvents();
+    }
+
+    private async Task LoadEvents()
+    {
+        // Fetch all events from the API
+        GetEventsResponse getEventsResponse = await _client.ApiEventsGetAsync();
+
+        Events = getEventsResponse.Events.ToList<EventDto>();
+
+        // Update the total number of events
+        TotalEvents = Events.Count;
+
+        // Update the UI
+        UpdateDisplayedEvents();
+    }
+
+    private void UpdateDisplayedEvents()
+    {
+        // Calculate the start and end indexes for the current page
+        var startIndex = (CurrentPage - 1) * PageSize;
+        var endIndex = Math.Min(startIndex + PageSize, TotalEvents);
+
+        // Update the displayed events based on the current page
+        DisplayedEvents = Events.Skip(startIndex).Take(endIndex - startIndex).ToList();
+
+        // Update the UI
+        StateHasChanged();
+    }
+
+    private async Task HandlePageChanged()
+    {
+        // Update the displayed events based on the current page
+        UpdateDisplayedEvents();
+    }
+}
