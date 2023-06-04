@@ -27,6 +27,7 @@
                               For="@(() => model.Password)"
                               InputType="InputType.Password" />
                 <MudText Class="mt-4">Tou don't have an acoount? <MudLink Href="/register">Sign up here!</MudLink></MudText>
+                <MudText Class="mt-4">Forgot your password? <MudLink Href="/requestPasswordReset">Click here!</MudLink></MudText>
             </MudCardContent>
             <MudCardActions>
                 <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@(async () => await Submit())">Login</MudButton>
