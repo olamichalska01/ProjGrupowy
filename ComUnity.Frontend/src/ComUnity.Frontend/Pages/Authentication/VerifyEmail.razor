@@ -1,0 +1,31 @@
+﻿@page "/verifyAccount"
+@using ComUnity.Frontend.Extensions;
+@inject NavigationManager _navigation
+@inject IComUnityApiClient _client
+@inject ErrorHandler _errorHandler
+@inject ISnackbar _snackbar
+
+@code {
+    protected async override Task OnInitializedAsync()
+    {
+        var verificationCode = string.Empty;
+        _navigation.TryGetQueryString<string>("token", out verificationCode);
+        if (string.IsNullOrWhiteSpace(verificationCode))
+        {
+            _snackbar.Add("Invalid verification code.", MudBlazor.Severity.Error);
+            _navigation.NavigateTo("/");
+            return;
+        }
+        var isSuccess = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiUsersVerifyEmailAsync(new VerifyEmailCommand { VerificationCode = verificationCode }));
+        if(isSuccess)
+        {
+            _snackbar.Add("Successfuly verified account.", MudBlazor.Severity.Success);
+            _navigation.NavigateTo("/");
+            return;
+        }
+
+        _snackbar.Add("Invalid verification code.", MudBlazor.Severity.Error);
+        _navigation.NavigateTo("/");
+        return;
+    }
+}

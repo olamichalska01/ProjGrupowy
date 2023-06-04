@@ -3,6 +3,7 @@ using ComUnity.Application.Common.Behaviours;
 using ComUnity.Application.Database;
 using ComUnity.Application.Features.Authentication.Settings;
 using ComUnity.Application.Infrastructure.Services;
+using ComUnity.Application.Infrastructure.Settings;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -34,7 +35,10 @@ public static class ConfigureServices
                     .UseNetTopologySuite()));
 
         services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+        services.Configure<SmtpSettings>(configuration.GetSection("SmtpSettings"));
+        services.Configure<Links>(configuration.GetSection("Links"));
 
+        services.AddScoped<IEmailSenderService, EmailSenderService>();
         services.AddScoped<IAuthenticatedUserProvider, AuthenticatedUserProvider>();
         services.AddScoped<IDomainEventService, DomainEventService>();
 
