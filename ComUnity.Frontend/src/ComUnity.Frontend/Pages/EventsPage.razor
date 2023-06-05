@@ -1,29 +1,34 @@
 ﻿@using ComUnity.Frontend.Extensions;
 @using ComUnity.Frontend.Services;
 @page "/events"
-@layout UnauthorizedLayout
+@layout MainLayout
 @inject IComUnityApiClient _client
 @inject ErrorHandler _errorHandler
 @inject NavigationManager _navigation
 @inject AuthenticationStateProvider _authenticationStateProvider
+
 
 <MudCard>
     <MudCardContent>
         <MudGrid>
             <MudTable Items="@Events" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
                 <HeaderContent>
-                    <MudTh>EventDate</MudTh>
+                    <MudTh>Name</MudTh>
+                    <MudTh>Date</MudTh>
                     <MudTh>Location</MudTh>
                     <MudTh>Max Amount Of people</MudTh>
                     <MudTh>Cost</MudTh>
                     <MudTh>MinAge</MudTh>
+                    <MudTh></MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    <MudTd DataLabel="EventDate">@context.EventDate.ToShortDateString()</MudTd>
+                    <MudTd DataLabel="Name"><b>@context.Name</b></MudTd>
+                    <MudTd DataLabel="Date">@context.EventDate.ToShortDateString()</MudTd>
                     <MudTd DataLabel="Location">@context.Place</MudTd>
                     <MudTd DataLabel="Max Amount Of peopl">@context.MaxAmountOfPeople</MudTd>
                     <MudTd DataLabel="Cost">@context.Cost</MudTd>
                     <MudTd DataLabel="MinAge">@context.MinAge</MudTd>
+                    <MudNavLink Href="@($"/events/{context.Id}")" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Info" IconColor="Color.Info"></MudNavLink>
                 </RowTemplate>
                 <PagerContent>
                     <MudTablePager />
@@ -32,6 +37,8 @@
         </MudGrid>
     </MudCardContent>
 </MudCard>
+
+
 
 @code {
     private List<EventDto> Events = new List<EventDto>();
