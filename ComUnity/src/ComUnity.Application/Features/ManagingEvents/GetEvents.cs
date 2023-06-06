@@ -2,6 +2,7 @@
 using ComUnity.Application.Database;
 using ComUnity.Application.Features.ManagingEvents.Dtos;
 using ComUnity.Application.Features.ManagingEvents.Entities;
+using ComUnity.Application.Features.UserProfileManagement.Dtos;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -34,18 +35,20 @@ public class GetEventsController : ApiControllerBase
 
         public async Task<GetEventsResponse> Handle(GetEventsQuery request, CancellationToken cancellationToken)
         {
-            var events = await _context.Set<Event>().Include(x => x.EventCategory).ToListAsync(cancellationToken);
+            var events = await _context.Set<Event>().Include(x => x.EventCategory).Include(y => y.Participants).ToListAsync(cancellationToken);
 
             return new GetEventsResponse(
                 events.Select(e => new EventDto(
                     e.Id,
                     e.EventName,
+                    e.TakenPlacesAmount,
                     e.MaxAmountOfPeople,
                     e.Place,
                     e.EventDate,
                     e.Cost,
                     e.MinAge,
-                    e.EventCategory.CategoryName)).ToList());
+                    e.EventCategory.CategoryName,
+                    e.Participants.Select(y => new UserDto(y.UserId, y.Username)))).ToList());
         }
     }
 }

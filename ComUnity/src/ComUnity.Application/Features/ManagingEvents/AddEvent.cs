@@ -2,6 +2,7 @@
 using ComUnity.Application.Database;
 using ComUnity.Application.Features.ManagingEvents.Entities;
 using ComUnity.Application.Features.ManagingEvents.Exceptions;
+using ComUnity.Application.Features.UserProfileManagement.Entities;
 using ComUnity.Application.Infrastructure.Services;
 using FluentValidation;
 using MassTransit;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
+using System.Collections;
 
 namespace ComUnity.Application.Features.ManagingEvents;
 
@@ -37,12 +39,15 @@ public class AddEventController : ApiControllerBase
     public record AddEventResponse(
         Guid Id,
         string EventName,
+        int TakenPlaces,
         int MaxAmountOfPeople,
         string Place,
         DateTime EventDate,
         double Cost,
         int MinAge,
-        string EventCategory)
+        string EventCategory,
+        string UserName
+        )
         : IRequest<AddEventResponse>;
 
     public class AddEventValidator : AbstractValidator<AddEventCommand>
@@ -82,17 +87,25 @@ public class AddEventController : ApiControllerBase
             var newEventId = NewId.NextGuid();
             var userId = _authenticatedUserProvider.GetUserId();
 
+            var user = await _context.Set<UserProfile>().FirstOrDefaultAsync(u => u.UserId == userId);
+
             var e = new Event(
                 newEventId,
                 userId,
                 request.EventName,
+                1,
                 request.MaxAmountOfPeople,
                 request.Place,
                 new Point(request.Latitude, request.Longitude) { SRID = 4326 },
                 request.EventDate,
                 request.Cost,
                 request.MinAge,
-                eCategory);
+                eCategory,
+                new List<UserProfile>()
+                );
+
+            e.Participants.Add(user);
+            user.UserEvents.Add(e);
 
             await _context.AddAsync(e, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
@@ -100,12 +113,15 @@ public class AddEventController : ApiControllerBase
             return new AddEventResponse(
                 e.Id,
                 e.EventName,
+                e.TakenPlacesAmount,
                 e.MaxAmountOfPeople,
                 e.Place,
                 e.EventDate,
                 e.Cost,
                 e.MinAge,
-                e.EventCategory.CategoryName);
+                e.EventCategory.CategoryName,
+                e.Participants.First(x => x.UserId == userId).Username
+                );
         }
     }
 }

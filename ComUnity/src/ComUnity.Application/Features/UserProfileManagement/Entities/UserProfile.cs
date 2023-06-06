@@ -11,6 +11,7 @@ public class UserProfile
     public DateTime DateOfBirth { get; private set; }
 
     public virtual ICollection<UserFavoriteEventCategory> FavoriteCategories { get; set; }
+    public ICollection<Event> UserEvents { get; set; } = new List<Event>();
 
     public virtual ICollection<Relationship>? Relationships { get; set; }
 
