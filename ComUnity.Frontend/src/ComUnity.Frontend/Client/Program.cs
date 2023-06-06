@@ -1,5 +1,6 @@
 using ComUnity.Frontend.Api;
 using ComUnity.Frontend.Services;
+using FluentValidation;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -19,6 +20,7 @@ public class Program
 
         builder.Services.AddAuthenticationCore();
         builder.Services.AddAuthorizationCore();
+        builder.Services.AddValidatorsFromAssemblyContaining<Program>();
         builder.Services.AddMudServices();
         builder.Services.AddScoped<AuthenticationStateProvider, CookieAuthenticationStateProvider>();
         builder.Services.AddTransient<CookieHandler>();

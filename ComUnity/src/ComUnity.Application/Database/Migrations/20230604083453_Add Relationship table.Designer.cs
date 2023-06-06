@@ -4,6 +4,7 @@ using ComUnity.Application.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 
@@ -12,9 +13,11 @@ using NetTopologySuite.Geometries;
 namespace ComUnity.Application.Database.Migrations
 {
     [DbContext(typeof(ComUnityContext))]
-    partial class ComUnityContextModelSnapshot : ModelSnapshot
+    [Migration("20230604083453_Add Relationship table")]
+    partial class AddRelationshiptable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -126,57 +129,27 @@ namespace ComUnity.Application.Database.Migrations
                     b.ToTable("EventCategory");
                 });
 
-            modelBuilder.Entity("ComUnity.Application.Features.Notifications.Entities.Notification", b =>
+            modelBuilder.Entity("ComUnity.Application.Features.UserProfileManagement.Entities.Relationship", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("AdditionalData")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("ExpirationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("NotificationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Notification");
-                });
-
-            modelBuilder.Entity("ComUnity.Application.Features.UserProfileManagement.Entities.Relationship", b =>
-                {
-                    b.Property<Guid>("User1Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("User2Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("RelationshipType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("User1Id", "User2Id");
+                    b.Property<Guid>("User1Id")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.HasIndex("Id");
+                    b.Property<Guid>("User2Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("User2Id");
+
+                    b.HasIndex("User1Id", "User2Id");
 
                     b.ToTable("Relationship");
                 });
@@ -212,21 +185,6 @@ namespace ComUnity.Application.Database.Migrations
                     b.HasKey("UserId");
 
                     b.ToTable("UserProfile");
-                });
-
-            modelBuilder.Entity("EventUserProfile", b =>
-                {
-                    b.Property<Guid>("ParticipantsUserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("UserEventsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("ParticipantsUserId", "UserEventsId");
-
-                    b.HasIndex("UserEventsId");
-
-                    b.ToTable("EventUserProfile");
                 });
 
             modelBuilder.Entity("ComUnity.Application.Features.ManagingEvents.Entities.Event", b =>
@@ -276,21 +234,6 @@ namespace ComUnity.Application.Database.Migrations
                     b.Navigation("Category");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("EventUserProfile", b =>
-                {
-                    b.HasOne("ComUnity.Application.Features.UserProfileManagement.Entities.UserProfile", null)
-                        .WithMany()
-                        .HasForeignKey("ParticipantsUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ComUnity.Application.Features.ManagingEvents.Entities.Event", null)
-                        .WithMany()
-                        .HasForeignKey("UserEventsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("ComUnity.Application.Features.UserProfileManagement.Entities.UserProfile", b =>
