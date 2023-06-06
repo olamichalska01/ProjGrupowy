@@ -50,7 +50,7 @@ namespace ComUnity.Application.Features.UserProfileManagement
             public async Task<JoinEventResponse> Handle(JoinEventCommand request, CancellationToken cancellationToken)
             {
                 var e = await _context.Set<Event>().FirstOrDefaultAsync(ev => ev.Id == request.EventId, cancellationToken);
-                var u = await _context.Set<UserProfile>().FirstOrDefaultAsync(up => up.UserId == request.UserId, cancellationToken);
+                var u = await _context.Set<UserProfile>().Include(x => x.Relationships).FirstOrDefaultAsync(up => up.UserId == request.UserId, cancellationToken);
 
                 var ue = await _context.Set<UserProfile>().FirstOrDefaultAsync(ue => ue.UserId == request.UserId && ue.UserEvents.Contains(e), cancellationToken);
 
@@ -62,6 +62,23 @@ namespace ComUnity.Application.Features.UserProfileManagement
                 if(e.Participants.Count() == e.MaxAmountOfPeople)
                 {
                     throw new EventFullException();
+                }
+
+                if(e.OwnerId == u.UserId)
+                {
+                    throw new CantJoinYourOwnEventException();
+                }
+
+                // check if private and if so, then if owner is friend
+                if(!e.IsPublic)
+                {
+                    if(u.Relationships.Where(r => 
+                        (r.User1Id == u.UserId || r.User2Id == u.UserId) && 
+                        (r.User1Id == e.OwnerId || r.User2Id == e.OwnerId) && 
+                        r.RelationshipType == "Friendship") == null)
+                    {
+                        throw new ThisEventIsForOwnersFriendsOnlyException();
+                    }
                 }
 
                 e.Participants.Add(u);

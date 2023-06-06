@@ -57,6 +57,11 @@ namespace ComUnity.Application.Features.UserProfileManagement
                     throw new UserHasntJoindThisEventException();
                 }
 
+                if (e.OwnerId == u.UserId)
+                {
+                    throw new CantLeaveYourOwnEventException();
+                }
+
                 e.Participants.Remove(u);
                 e.TakenPlacesAmount--;
                 u.UserEvents.Remove(e);
