@@ -156,6 +156,21 @@ namespace ComUnity.Application.Database.Migrations
                     b.ToTable("UserProfile");
                 });
 
+            modelBuilder.Entity("EventUserProfile", b =>
+                {
+                    b.Property<Guid>("ParticipantsUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserEventsId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ParticipantsUserId", "UserEventsId");
+
+                    b.HasIndex("UserEventsId");
+
+                    b.ToTable("EventUserProfile");
+                });
+
             modelBuilder.Entity("ComUnity.Application.Features.ManagingEvents.Entities.Event", b =>
                 {
                     b.HasOne("ComUnity.Application.Features.ManagingEvents.Entities.EventCategory", "EventCategory")
@@ -184,6 +199,21 @@ namespace ComUnity.Application.Database.Migrations
                     b.Navigation("Category");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("EventUserProfile", b =>
+                {
+                    b.HasOne("ComUnity.Application.Features.UserProfileManagement.Entities.UserProfile", null)
+                        .WithMany()
+                        .HasForeignKey("ParticipantsUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ComUnity.Application.Features.ManagingEvents.Entities.Event", null)
+                        .WithMany()
+                        .HasForeignKey("UserEventsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ComUnity.Application.Features.UserProfileManagement.Entities.UserProfile", b =>

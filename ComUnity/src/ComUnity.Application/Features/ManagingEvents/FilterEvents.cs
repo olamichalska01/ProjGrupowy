@@ -2,6 +2,7 @@
 using ComUnity.Application.Database;
 using ComUnity.Application.Features.ManagingEvents.Dtos;
 using ComUnity.Application.Features.ManagingEvents.Entities;
+using ComUnity.Application.Features.UserProfileManagement.Dtos;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -92,12 +93,14 @@ namespace ComUnity.Application.Features.ManagingEvents
                     events.Select(e => new EventDto(
                         e.Id,
                         e.EventName,
+                        e.TakenPlacesAmount,
                         e.MaxAmountOfPeople,
                         e.Place,
                         e.EventDate,
                         e.Cost,
                         e.MinAge,
-                        e.EventCategory.CategoryName)).ToList());
+                        e.EventCategory.CategoryName,
+                        e.Participants.Select(y => new UserDto(y.UserId, y.Username)))).ToList());
             }
         }
     }

@@ -3,6 +3,7 @@ using ComUnity.Application.Common.Exceptions;
 using ComUnity.Application.Database;
 using ComUnity.Application.Features.ManagingEvents.Dtos;
 using ComUnity.Application.Features.ManagingEvents.Entities;
+using ComUnity.Application.Features.UserProfileManagement.Dtos;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -45,12 +46,14 @@ public class GetEventByIdController : ApiControllerBase
             return new GetEventByIdResponse(new EventDto(
                     result.Id,
                     result.EventName,
+                    result.TakenPlacesAmount,
                     result.MaxAmountOfPeople,
                     result.Place,
                     result.EventDate,
                     result.Cost,
                     result.MinAge,
-                    result.EventCategory.CategoryName));
+                    result.EventCategory.CategoryName,
+                    result.Participants.Select(y => new UserDto(y.UserId, y.Username))));
         }
     }
 }
