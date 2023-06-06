@@ -59,6 +59,11 @@ namespace ComUnity.Application.Features.UserProfileManagement
                     throw new UserAlreadyJoinedThisEventException();
                 }
 
+                if(e.Participants.Count() == e.MaxAmountOfPeople)
+                {
+                    throw new EventFullException();
+                }
+
                 e.Participants.Add(u);
                 e.TakenPlacesAmount++;
                 u.UserEvents.Add(e);
