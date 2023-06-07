@@ -10,6 +10,7 @@ public class ErrorHandler
     private readonly ISnackbar _snackbar;
     private readonly AuthenticationStateProvider _authenticationStateProvider;
 
+
     public ErrorHandler(ISnackbar snackbar, AuthenticationStateProvider authenticationStateProvider)
     {
         _authenticationStateProvider = authenticationStateProvider;

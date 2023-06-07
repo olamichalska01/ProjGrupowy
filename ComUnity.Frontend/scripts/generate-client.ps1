@@ -1,2 +1,2 @@
-## npm i -g nswag
+npm i -g nswag
 nswag run

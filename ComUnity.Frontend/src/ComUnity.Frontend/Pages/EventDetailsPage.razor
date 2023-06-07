@@ -1,0 +1,71 @@
+﻿@using ComUnity.Frontend.Extensions;
+@using ComUnity.Frontend.Services;
+@page "/events/{eventID}"
+@layout UnauthorizedLayout
+@inject IComUnityApiClient _client
+@inject ErrorHandler _errorHandler
+@inject NavigationManager _navigation
+@inject AuthenticationStateProvider _authenticationStateProvider
+
+
+<MudCard>
+    <MudCardHeader>
+        <CardHeaderAvatar>
+            <MudAvatar Color="Color.Secondary">E</MudAvatar>
+        </CardHeaderAvatar>
+        <CardHeaderContent>
+            <MudText Typo="Typo.body1">@Event.Name</MudText>
+            <MudText Typo="Typo.body2">@Event.Place</MudText>
+        </CardHeaderContent>
+        <CardHeaderActions>
+            <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Default" />
+        </CardHeaderActions>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudText Typo="Typo.body2">Join us for a thrilling and action-packed family football event that promises a day of fun, excitement, and friendly competition! Bring your loved ones and cheer on your favorite teams as they go head-to-head on the field. With players of all ages showcasing their skills and passion for the game, there will be non-stop entertainment for everyone. From kids to grandparents, everyone can get involved in the festivities, whether it's playing in the mini-matches, participating in engaging activities, or simply enjoying delicious snacks and refreshments on the sidelines. It's a perfect opportunity to strengthen family bonds, create lasting memories, and celebrate the joy of football together. Don't miss out on this unforgettable experience that combines the love for sports and the warmth of family camaraderie. Lace up your shoes, grab your jerseys, and let the games begin!</MudText>
+    </MudCardContent>
+    <MudCardContent>
+        <MudText Typo="Typo.body2"><b>Min age: </b> @Event.MinAge</MudText>
+        <MudText Typo="Typo.body2"><b>Cost: </b> @Event.Cost</MudText>
+    </MudCardContent>
+    <MudCardActions>
+        <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Default" />
+        <MudIconButton Icon="@Icons.Material.Filled.Share" Color="Color.Default" />
+    </MudCardActions>
+</MudCard>
+
+
+@code {
+    private EventDto Event = new EventDto();
+
+    [Parameter]
+    public String eventID { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadEvent(Guid.Parse(eventID));
+    }
+
+    private async Task LoadEvent(Guid eventId)
+    {
+        GetEventByIdResponse getEventResponse = await _client.ApiEventsGetAsync(eventId);
+
+        Event = getEventResponse.EventDetails;
+
+        // Update the UI
+        UpdateDisplayedEvents();
+    }
+
+    private void UpdateDisplayedEvents()
+    {
+        // Update the UI
+        StateHasChanged();
+    }
+
+    private async Task HandlePageChanged()
+    {
+        // Update the displayed events based on the current page
+        UpdateDisplayedEvents();
+    }
+}
