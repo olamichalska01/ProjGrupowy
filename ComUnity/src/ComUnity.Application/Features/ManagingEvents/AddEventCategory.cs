@@ -2,6 +2,7 @@
 using ComUnity.Application.Database;
 using ComUnity.Application.Features.ManagingEvents.Entities;
 using ComUnity.Application.Features.ManagingEvents.Exceptions;
+using ComUnity.Application.Infrastructure.Services;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -20,14 +21,16 @@ namespace ComUnity.Application.Features.ManagingEvents
 
         [HttpPost("/api/event-categories/")]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<IActionResult> AddEventCategory([FromForm] AddEventCategoryCommand command)
+        public async Task<IActionResult> AddEventCategory([FromBody] AddEventCategoryCommand command)
         {
             await Mediator.Send(command);
 
             return StatusCode(StatusCodes.Status201Created);
         }
 
-        public record AddEventCategoryCommand(string Name, IFormFile Image) : IRequest<Unit>;
+        public record AddEventCategoryCommand(string Name, Guid? ImageId) : IRequest<AddEventCategoryResponse>;
+
+        public record AddEventCategoryResponse(string PictureUrl);
 
         public class AddEventCategoryCommandValidator : AbstractValidator<AddEventCategoryCommand>
         {
@@ -39,17 +42,18 @@ namespace ComUnity.Application.Features.ManagingEvents
             }
         }
 
-        internal class AddEventCategoryCommandHandler : IRequestHandler<AddEventCategoryCommand, Unit>
+        internal class AddEventCategoryCommandHandler : IRequestHandler<AddEventCategoryCommand, AddEventCategoryResponse>
         {
             private readonly ComUnityContext _context;
-            private string ImageUploadPath = "..\\ComUnity.Application\\Common\\Images\\"; 
+            private readonly IAzureStorageService _azureStorageService;
 
-            public AddEventCategoryCommandHandler(ComUnityContext context)
+            public AddEventCategoryCommandHandler(ComUnityContext context, IAzureStorageService azureStorageService, IAuthenticatedUserProvider authenticatedUserProvider)
             {
                 _context = context;
+                _azureStorageService = azureStorageService;
             }
 
-            public async Task<Unit> Handle(AddEventCategoryCommand request, CancellationToken cancellationToken)
+            public async Task<AddEventCategoryResponse> Handle(AddEventCategoryCommand request, CancellationToken cancellationToken)
             {
                 var eventCategory = await _context.Set<EventCategory>().FirstOrDefaultAsync(e => e.CategoryName == request.Name, cancellationToken);
 
@@ -59,24 +63,18 @@ namespace ComUnity.Application.Features.ManagingEvents
                 }
 
                 eventCategory = new EventCategory(request.Name);
-
-                if (request.Image != null && request.Image.Length > 0)
+                
+                if(request.ImageId != null)
                 {
-                    var fileName = $"{Guid.NewGuid()}{Path.GetExtension(request.Image.FileName)}";
-                    var filePath = Path.Combine(ImageUploadPath, fileName);
-
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await request.Image.CopyToAsync(stream);
-                    }
-
-                    eventCategory.ImagePath = filePath; 
+                    eventCategory.SetCategoryImage((Guid)request.ImageId);
                 }
 
                 await _context.AddAsync(eventCategory);
                 await _context.SaveChangesAsync();
 
-                return Unit.Value;
+                var pictureUrl = _azureStorageService.GetReadFileToken((Guid)request.ImageId);
+
+                return new AddEventCategoryResponse(pictureUrl);
             }
         }
     }

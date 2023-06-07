@@ -1,0 +1,104 @@
+﻿@layout MainLayout
+@page "/categories"
+@using ComUnity.Frontend.Services;
+@using System.Security.Claims;
+@inject IComUnityApiClient _client
+@inject IAzureStorageFileUploader _fileUploader
+@inject ErrorHandler _errorHandler
+@inject ISnackbar _snackbar
+
+<MudOverlay @bind-Visible="isLoading" DarkBackground="true">
+    <MudProgressCircular Color="Color.Primary" Size="Size.Large" Indeterminate="true" />
+</MudOverlay>
+
+@if (!isLoading)
+{
+    <MudContainer Class="ml-10 mt-10">
+        <MudStack Row="true" AlignItems="AlignItems.End">
+            <div>
+                <MudImage Src="@(userProfile?.ProfilePicture ?? string.Empty)" Width="200" Height="200" Alt="Profile picture" Elevation="25" Class="rounded-lg" />
+                @if (isOwner)
+                {
+                    <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles" Class="relative d-inline-block mt-0" style="right: 30px; top: 170px">
+                        <ButtonTemplate>
+                            <MudIconButton HtmlTag="label"
+                                           Variant="Variant.Filled"
+                                           Size="Size.Small"
+                                           Color="Color.Info"
+                                           Icon="@Icons.Material.Filled.PhotoCamera"
+                                           for="@context">
+                            </MudIconButton>
+                        </ButtonTemplate>
+                    </MudFileUpload>
+                }
+            </div>
+            <MudText Typo="Typo.h2">@userProfile!.Username</MudText>
+            <MudSpacer />
+      
+       
+        </MudStack>
+
+    </MudContainer>
+}
+
+@code {
+    [AllowNull]
+    [CascadingParameter]
+    protected Task<AuthenticationState> AuthState { get; set; }
+
+    GetUserProfileResponse? userProfile;
+
+    private bool isInEditingMode = false;
+
+    UpdateUserProfileCommand updateUserProfileCommand = new();
+    private bool isLoading = true;
+    private bool isOwner = false;
+
+    [AllowNull]
+    [Parameter]
+    public string UserId { get; set; }
+    private Guid userId => Guid.Parse(UserId);
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthState).User;
+        var authenticatedUserId = user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
+        if (UserId.ToLowerInvariant() == authenticatedUserId)
+        {
+            isOwner = true;
+        }
+
+        isLoading = true;
+        await LoadUserProfile();
+        isLoading = false;
+
+        StateHasChanged();
+    }
+
+    public async Task UploadFiles(IBrowserFile file)
+    {
+        var (isSuccess, response) = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiFilesSasTokenAsync());
+        if (!isSuccess)
+        {
+            return;
+        }
+
+        var pictureId = await _fileUploader.UploadFile(response!.Token, file, CancellationToken.None);
+        (isSuccess, var profilePictue) = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiProfileProfilePictureAsync(new AddProfilePictureCommand { PictureId = pictureId }));
+        if (!isSuccess)
+        {
+            return;
+        }
+
+        userProfile!.ProfilePicture = profilePictue!.PictureUrl;
+    }
+
+    private async Task LoadUserProfile()
+    {
+        (_, userProfile) = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiUsersGetAsync(userId));
+    }
+
+
+
+}
+
