@@ -1,18 +1,37 @@
-﻿using ComUnity.Frontend.Api;
+﻿using Blazored.SessionStorage;
+using ComUnity.Frontend.Api;
 using Microsoft.AspNetCore.Components.Authorization;
-using System.Runtime.CompilerServices;
 using System.Security.Claims;
 
 namespace ComUnity.Frontend.Services;
 
 public class CookieAuthenticationStateProvider : AuthenticationStateProvider
 {
-    private ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity());
+    private const string UserProfileKey = "userProfile";
+
+    private readonly ISessionStorageService _sessionStorage;
+
+    public CookieAuthenticationStateProvider(ISessionStorageService sessionStorage)
+    {
+        _sessionStorage = sessionStorage;
+    }
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        await Task.CompletedTask;
-        return new AuthenticationState(claimsPrincipal);
+        var userProfile = await _sessionStorage.GetItemAsync<GetUserInfoResponse>(UserProfileKey);
+
+        if (userProfile is null)
+        {
+            return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+        }
+
+        var identity = new ClaimsIdentity(new[]{
+            new Claim(ClaimTypes.NameIdentifier, userProfile.UserId),
+            new Claim(ClaimTypes.Email, userProfile.UserEmail),
+            new Claim(ClaimTypes.Role, userProfile.UserRole)
+        }, "CookieAuth");
+
+        return new AuthenticationState(new ClaimsPrincipal(identity));
     }
 
     public void NotifyAuthenticationStateChanged()
@@ -20,21 +39,15 @@ public class CookieAuthenticationStateProvider : AuthenticationStateProvider
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }
 
-    public void SetAuthInfo(GetUserInfoResponse userProfile)
+    public async Task SetAuthInfo(GetUserInfoResponse userProfile)
     {
-        var identity = new ClaimsIdentity(new[]{
-            new Claim(ClaimTypes.NameIdentifier, userProfile.UserId),
-            new Claim(ClaimTypes.Email, userProfile.UserEmail),
-            new Claim(ClaimTypes.Role, userProfile.UserRole)
-        }, "CookieAuth");
-
-        claimsPrincipal = new ClaimsPrincipal(identity);
+        await _sessionStorage.SetItemAsync(UserProfileKey, userProfile);
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }
 
-    public void ClearIdentity()
+    public async Task ClearIdentity()
     {
-        claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity());
+        await _sessionStorage.RemoveItemAsync(UserProfileKey);
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }
 }

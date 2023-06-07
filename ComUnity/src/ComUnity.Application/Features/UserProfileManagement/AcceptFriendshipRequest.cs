@@ -22,7 +22,7 @@ public class AcceptFriendshipRequestController : ApiControllerBase
     }
 }
 
-public record AcceptFriendshipRequestCommand(Guid RequestId) : IRequest<Unit>;
+public record AcceptFriendshipRequestCommand(Guid UserId) : IRequest<Unit>;
 
 internal class AcceptFriendshipRequestCommandHandler : IRequestHandler<AcceptFriendshipRequestCommand, Unit>
 {
@@ -37,14 +37,14 @@ internal class AcceptFriendshipRequestCommandHandler : IRequestHandler<AcceptFri
 
     public async Task<Unit> Handle(AcceptFriendshipRequestCommand request, CancellationToken cancellationToken)
     {
-        var relationship = await _context.Set<Relationship>().Include(x => x.User2).FirstOrDefaultAsync(x => x.Id == request.RequestId, cancellationToken);
+        var user = await _authenticatedUserProvider.GetUserProfile(cancellationToken);
+
+        var relationship = await _context.Set<Relationship>().Include(x => x.User2).FirstOrDefaultAsync(x => x.User1Id == request.UserId && x.User2Id == user.UserId, cancellationToken);
 
         if (relationship is null || relationship.RelationshipType != RelationshipTypes.FrienshipRequested)
         {
             throw new FriendshipRequestDoesNotExistException();
         }
-
-        var user = await _authenticatedUserProvider.GetUserProfile(cancellationToken);
 
         if(relationship.User2Id != user.UserId)
         {

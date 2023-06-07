@@ -34,10 +34,12 @@ public static class ConfigureServices
                 b => b.MigrationsAssembly(typeof(ComUnityContext).Assembly.FullName)
                     .UseNetTopologySuite()));
 
+        services.Configure<AzureStorageSettings>(configuration.GetSection("AzureStorageSettings"));
         services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
         services.Configure<SmtpSettings>(configuration.GetSection("SmtpSettings"));
         services.Configure<Links>(configuration.GetSection("Links"));
 
+        services.AddScoped<IAzureStorageService, AzureStorageService>();
         services.AddScoped<IEmailSenderService, EmailSenderService>();
         services.AddScoped<IAuthenticatedUserProvider, AuthenticatedUserProvider>();
         services.AddScoped<IDomainEventService, DomainEventService>();

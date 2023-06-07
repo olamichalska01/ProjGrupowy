@@ -8,6 +8,12 @@ public class UserProfile
 
     public string Username { get; private set; }
 
+    public Guid? ProfilePicture { get; private set; }
+
+    public string? AboutMe{ get; private set; }
+
+    public string? City { get; private set; }
+
     public DateTime DateOfBirth { get; private set; }
 
     public virtual ICollection<UserFavoriteEventCategory> FavoriteCategories { get; set; }
@@ -24,5 +30,16 @@ public class UserProfile
         UserId = userId;
         Username = username;
         DateOfBirth = dateOfBirth;
+    }
+
+    public void ChangeProfilePicture(Guid newPictureId)
+    {
+        ProfilePicture = newPictureId;
+    }
+
+    public void UpdateBasicProfileInformation(string aboutMe, string city)
+    {
+        AboutMe = aboutMe;
+        City = city;
     }
 }
