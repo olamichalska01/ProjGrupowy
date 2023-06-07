@@ -4,18 +4,27 @@
 @inject NavigationManager _navigation
 @inject ErrorHandler _errorHandler
 @inject IComUnityApiClient _client
+@inject IValidator<RegisterUserCommand> _registerValidator
+@inject ISnackbar _snackbar
 
 <MudContainer MaxWidth="MaxWidth.Medium">
     <MudCard>
         <MudText Typo="Typo.h4"
                  Class="pa-4">Register</MudText>
-        <MudForm Model="@model" @ref="@form" Validation="@(registerValidator.CreateValueValidator())" ValidationDelay="0">
+        <MudForm Model="@model" @ref="@form" Validation="@(_registerValidator.CreateValueValidator())" ValidationDelay="1000">
             <MudCardContent Class="pa-10">
                 <MudTextField Variant="Variant.Outlined"
                               @bind-Value="model.Email"
                               For="@(() => model.Email)"
                               Immediate="true"
                               Label="Email" />
+                <MudTextField Variant="Variant.Outlined"
+                              Label="Username"
+                              Class="mt-3"
+                              Immediate="true"
+                              @bind-Value="model.Username"
+                              For="@(() => model.Username)"
+                              InputType="InputType.Text" />
                 <MudTextField Variant="Variant.Outlined"
                               Label="Password"
                               Class="mt-3"
@@ -24,16 +33,13 @@
                               @bind-Value="model.Password"
                               For="@(() => model.Password)"
                               InputType="InputType.Password" />
+                <MudDatePicker Variant="Variant.Outlined" Label="Date of birth"
+                               @bind-Date="_dateOfBirth" DisableToolbar="true" />
             </MudCardContent>
             <MudCardActions>
-                <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@(async () => await Submit())">Login</MudButton>
+                <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@(async () => await Submit())">Register</MudButton>
             </MudCardActions>
         </MudForm>
-
-        @if (SuccessfullRegistration)
-        {
-            <MudAlert Severity="MudBlazor.Severity.Success">Successfuly created your account. You need to activate your account using link we will send to your e-mail address (@model.Email) </MudAlert>
-        }
     </MudCard>
 </MudContainer>
 
@@ -46,11 +52,9 @@
     [AllowNull]
     MudForm form;
 
+    DateTime? _dateOfBirth;
+
     private RegisterUserCommand model = new();
-
-    private RegisterUserCommandValidator registerValidator = new();
-
-    private bool SuccessfullRegistration = false;
 
     protected async override Task OnInitializedAsync()
     {
@@ -71,13 +75,18 @@
             return;
         }
 
-        var(isSuccess, _) = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiUsersAsync(model));
-        SuccessfullRegistration = isSuccess;
+        model.DateOfBirth = _dateOfBirth!.Value;
+        var (isSuccess, _) = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiUsersPostAsync(model));
+        if(isSuccess)
+        {
+            _snackbar.Add($"Successfuly created your account. You need to activate your account using link we will send to your e-mail address ({model.Email})", MudBlazor.Severity.Success);
+            _navigation.NavigateTo("/login");
+        }
     }
 
-    private class RegisterUserCommandValidator : AbstractValidator<RegisterUserCommand>
+    public class RegisterUserCommandValidator : AbstractValidator<RegisterUserCommand>
     {
-        public RegisterUserCommandValidator()
+        public RegisterUserCommandValidator(IComUnityApiClient client)
         {
             RuleFor(x => x.Email)
                 .NotEmpty()
@@ -86,6 +95,11 @@
             RuleFor(x => x.Password)
                 .NotEmpty()
                 .Length(12, 64);
+
+            RuleFor(x => x.Username)
+                .NotEmpty()
+                .MinimumLength(3)
+                .MustAsync(async (x, cancelationToken) => !(await client.ApiUsersExistsAsync(x, cancelationToken))).WithMessage("Username is already taken.");
         }
     }
 }

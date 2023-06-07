@@ -19,7 +19,7 @@ internal class UserRegisteredEventHandler : INotificationHandler<DomainEventNoti
     {
         var domainEvent = notification.DomainEvent;
 
-        var userProfile = new UserProfile(domainEvent.UserId, "a");
+        var userProfile = new UserProfile(domainEvent.UserId, domainEvent.Username, domainEvent.DateOfBirth);
 
         _context.Set<UserProfile>().Add(userProfile);
         await _context.SaveChangesAsync(cancellationToken);

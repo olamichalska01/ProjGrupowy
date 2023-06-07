@@ -1,0 +1,227 @@
+﻿@layout MainLayout
+@page "/user/{UserId}"
+@using ComUnity.Frontend.Services;
+@using System.Security.Claims;
+@inject IComUnityApiClient _client
+@inject IAzureStorageFileUploader _fileUploader
+@inject ErrorHandler _errorHandler
+@inject ISnackbar _snackbar
+
+<MudOverlay @bind-Visible="isLoading" DarkBackground="true">
+    <MudProgressCircular Color="Color.Primary" Size="Size.Large" Indeterminate="true" />
+</MudOverlay>
+
+@if(!isLoading)
+{
+    <MudContainer Class="ml-10 mt-10">
+        <MudStack Row="true" AlignItems="AlignItems.End">
+            <div>
+                <MudImage Src="@(userProfile?.ProfilePicture ?? string.Empty)" Width="200" Height="200" Alt="Profile picture" Elevation="25" Class="rounded-lg" />
+                @if (isOwner)
+                {
+                    <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles" Class="relative d-inline-block mt-0" style="right: 30px; top: 170px">
+                        <ButtonTemplate>
+                            <MudIconButton HtmlTag="label"
+                                   Variant="Variant.Filled"
+                                   Size="Size.Small"
+                                   Color="Color.Info"
+                                   Icon="@Icons.Material.Filled.PhotoCamera"
+                                           for="@context">
+                            </MudIconButton>
+                        </ButtonTemplate>
+                    </MudFileUpload>
+                }
+            </div>
+            <MudText Typo="Typo.h2">@userProfile!.Username</MudText>
+            <MudSpacer />
+            @if(isOwner)
+            {
+                @if(isInEditingMode)
+                {
+                    <MudButton Color="Color.Success" Size="Size.Small" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Save" OnClick="UpdateUserProfile">Save changes</MudButton>
+                    <MudButton Size="Size.Small" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Cancel" OnClick="CancelEditing">Cancel</MudButton>
+                }
+                else
+                {
+                    <MudButton Size="Size.Small" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Edit" OnClick="HandleEditProfileButtonClicked">Edit profile</MudButton>
+                }
+            }
+            @if(userProfile!.IsFriendshipRequestReceived)
+            {
+                <MudButton Size="Size.Small" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.PersonAdd" OnClick="AcceptFriendRequest">Accept friend request</MudButton>
+            }
+            else if (userProfile.IsFriendshipRequestSent)
+            {
+                <MudButton Size="Size.Small" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Cancel" OnClick="CancelFriendRequest">Cancel friend request</MudButton>
+            } 
+            else if (!userProfile!.IsFriend)
+            {
+                <MudButton Size="Size.Small" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Person" OnClick="SendFriendRequest">Send friend request</MudButton>
+            }
+        </MudStack>
+        <MudDivider Class="my-5" />
+        <MudStack Row="true" Class="flex-grow-1">
+            <MudPaper Width="300px" Class="pa-4">
+                <MudText Typo="Typo.h5">User details</MudText>
+
+                <MudDivider Class="my-5" />
+
+                @if (!string.IsNullOrWhiteSpace(userProfile?.City))
+                {
+                    <MudText Typo="Typo.subtitle2" Class="mb-1">City</MudText>
+                    @if (isInEditingMode)
+                    {
+                        <MudTextField T="string" Label="City" Variant="Variant.Text" @bind-Value="updateUserProfileCommand.City" Lines="1" />
+                    }
+                    else
+                    {
+                        <MudText Typo="Typo.body2">@userProfile!.City</MudText>
+                    }
+                }
+
+                @if (userProfile?.Age is not null)
+                {
+                    <MudText Typo="Typo.subtitle2" Class="mb-1 mt-5">Age</MudText>
+                    <MudText Typo="Typo.body2">@userProfile!.Age</MudText>
+                }
+
+                @if (userProfile?.FavouriteCategories.Count > 0)
+                {
+                    <MudText Typo="Typo.subtitle2" Class="mb-1 mt-5">Favourite Categories</MudText>
+                    <MudText Typo="Typo.body2">@string.Join(", ", userProfile.FavouriteCategories.Select(x => x.Name))</MudText>
+                }
+            </MudPaper>
+            <div>
+                <MudStack>
+                    <MudPaper Width="100%" Class="pa-4">
+                        <MudText Typo="Typo.h5">About me</MudText>
+                        @if(isInEditingMode)
+                        {
+                            <MudTextField T="string" Label="About me" Variant="Variant.Text" @bind-Value="updateUserProfileCommand.AboutMe" Lines="5" />
+                        }
+                        else
+                        {
+                            <MudText Typo="Typo.body2" Class="mb-1 mt-5">@userProfile!.AboutMe</MudText>
+                        }
+                    </MudPaper>
+                </MudStack>
+            </div>
+           
+        </MudStack>
+    </MudContainer>
+}
+
+@code {
+    [AllowNull]
+    [CascadingParameter]
+    protected Task<AuthenticationState> AuthState { get; set; }
+
+    GetUserProfileResponse? userProfile;
+
+    private bool isInEditingMode = false;
+
+    UpdateUserProfileCommand updateUserProfileCommand = new();
+    private bool isLoading = true;
+    private bool isOwner = false;
+
+    [AllowNull]
+    [Parameter]
+    public string UserId { get; set; }
+    private Guid userId => Guid.Parse(UserId);
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthState).User;
+        var authenticatedUserId = user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
+        if (UserId.ToLowerInvariant() == authenticatedUserId)
+        {
+            isOwner = true;
+        }
+
+        isLoading = true;
+        await LoadUserProfile();
+        isLoading = false;
+
+        StateHasChanged();
+    }
+
+    public async Task UploadFiles(IBrowserFile file)
+    {
+        var (isSuccess, response) = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiFilesSasTokenAsync());
+        if (!isSuccess)
+        {
+            return;
+        }
+
+        var pictureId = await _fileUploader.UploadFile(response!.Token, file, CancellationToken.None);
+        (isSuccess, var profilePictue) = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiProfileProfilePictureAsync(new AddProfilePictureCommand { PictureId = pictureId }));
+        if(!isSuccess)
+        {
+            return;
+        }
+
+        userProfile!.ProfilePicture = profilePictue!.PictureUrl;
+    }
+
+    private async Task LoadUserProfile()
+    {
+        (_, userProfile) = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiUsersGetAsync(userId));
+    }
+
+    private void HandleEditProfileButtonClicked()
+    {
+        updateUserProfileCommand = new UpdateUserProfileCommand
+        {
+            AboutMe = userProfile!.AboutMe ?? string.Empty,
+            City = userProfile!.City ?? string.Empty
+        };
+        isInEditingMode = true;
+        StateHasChanged();
+    }
+
+    private void CancelEditing()
+    {
+        updateUserProfileCommand = new();
+        isInEditingMode = false;
+        StateHasChanged();
+    }
+
+    private async Task UpdateUserProfile()
+    {
+        var isSuccess = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiUsersProfileAsync(updateUserProfileCommand));
+        if (isSuccess)
+        {
+            _snackbar.Add("Successfuly changed profile details!", MudBlazor.Severity.Success);
+        }
+
+        isInEditingMode = false;
+        await LoadUserProfile();
+    }
+
+    private async Task SendFriendRequest()
+    {
+        var isSuccess = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiUsersAddFriendAsync(userId));
+        if (isSuccess)
+        {
+            _snackbar.Add("Successfuly sent request!", MudBlazor.Severity.Success);
+        }
+    }
+
+    private async Task AcceptFriendRequest()
+    {
+        var isSuccess = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiFriendshipRequestsAcceptAsync(new AcceptFriendshipRequestCommand { UserId = userId }));
+        if (isSuccess)
+        {
+            _snackbar.Add("Successfuly accepted request!", MudBlazor.Severity.Success);
+        }
+    }
+
+    private async Task CancelFriendRequest()
+    {
+        var isSuccess = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiFriendshipRequestsAsync(userId));
+        if (isSuccess)
+        {
+            _snackbar.Add("Successfuly canceled request!", MudBlazor.Severity.Success);
+        }
+    }
+}

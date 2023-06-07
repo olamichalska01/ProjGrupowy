@@ -126,6 +126,61 @@ namespace ComUnity.Application.Database.Migrations
                     b.ToTable("EventCategory");
                 });
 
+            modelBuilder.Entity("ComUnity.Application.Features.Notifications.Entities.Notification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AdditionalData")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ExpirationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("NotificationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Notification");
+                });
+
+            modelBuilder.Entity("ComUnity.Application.Features.UserProfileManagement.Entities.Relationship", b =>
+                {
+                    b.Property<Guid>("User1Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("User2Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("RelationshipType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("User1Id", "User2Id");
+
+                    b.HasIndex("Id");
+
+                    b.HasIndex("User2Id");
+
+                    b.ToTable("Relationship");
+                });
+
             modelBuilder.Entity("ComUnity.Application.Features.UserProfileManagement.Entities.UserFavoriteEventCategory", b =>
                 {
                     b.Property<Guid>("UserId")
@@ -147,6 +202,18 @@ namespace ComUnity.Application.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("AboutMe")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("City")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DateOfBirth")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("ProfilePicture")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -154,6 +221,21 @@ namespace ComUnity.Application.Database.Migrations
                     b.HasKey("UserId");
 
                     b.ToTable("UserProfile");
+                });
+
+            modelBuilder.Entity("EventUserProfile", b =>
+                {
+                    b.Property<Guid>("ParticipantsUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserEventsId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ParticipantsUserId", "UserEventsId");
+
+                    b.HasIndex("UserEventsId");
+
+                    b.ToTable("EventUserProfile");
                 });
 
             modelBuilder.Entity("ComUnity.Application.Features.ManagingEvents.Entities.Event", b =>
@@ -165,6 +247,25 @@ namespace ComUnity.Application.Database.Migrations
                         .IsRequired();
 
                     b.Navigation("EventCategory");
+                });
+
+            modelBuilder.Entity("ComUnity.Application.Features.UserProfileManagement.Entities.Relationship", b =>
+                {
+                    b.HasOne("ComUnity.Application.Features.UserProfileManagement.Entities.UserProfile", "User1")
+                        .WithMany("Relationships")
+                        .HasForeignKey("User1Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ComUnity.Application.Features.UserProfileManagement.Entities.UserProfile", "User2")
+                        .WithMany()
+                        .HasForeignKey("User2Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User1");
+
+                    b.Navigation("User2");
                 });
 
             modelBuilder.Entity("ComUnity.Application.Features.UserProfileManagement.Entities.UserFavoriteEventCategory", b =>
@@ -186,9 +287,26 @@ namespace ComUnity.Application.Database.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("EventUserProfile", b =>
+                {
+                    b.HasOne("ComUnity.Application.Features.UserProfileManagement.Entities.UserProfile", null)
+                        .WithMany()
+                        .HasForeignKey("ParticipantsUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ComUnity.Application.Features.ManagingEvents.Entities.Event", null)
+                        .WithMany()
+                        .HasForeignKey("UserEventsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("ComUnity.Application.Features.UserProfileManagement.Entities.UserProfile", b =>
                 {
                     b.Navigation("FavoriteCategories");
+
+                    b.Navigation("Relationships");
                 });
 #pragma warning restore 612, 618
         }

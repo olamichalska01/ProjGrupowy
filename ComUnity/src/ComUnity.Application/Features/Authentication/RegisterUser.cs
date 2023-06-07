@@ -3,6 +3,7 @@ using ComUnity.Application.Database;
 using ComUnity.Application.Features.Authentication.Entities;
 using ComUnity.Application.Features.Authentication.Exceptions;
 using ComUnity.Application.Features.Authentication.Utils;
+using ComUnity.Application.Features.UserProfileManagement.Entities;
 using FluentValidation;
 using Isopoh.Cryptography.Argon2;
 using MassTransit;
@@ -25,7 +26,7 @@ public class RegisterUserController : ApiControllerBase
     }
 }
 
-public record RegisterUserCommand(string Email, string Password) : IRequest<Guid>;
+public record RegisterUserCommand(string Email, string Password, string Username, DateTime DateOfBirth) : IRequest<Guid>;
 
 public class RegisterUserCommandValidator : AbstractValidator<RegisterUserCommand>
 {
@@ -39,7 +40,16 @@ public class RegisterUserCommandValidator : AbstractValidator<RegisterUserComman
         RuleFor(x => x.Password)
             .NotEmpty()
             .MinimumLength(12)
-            .MaximumLength(320);
+            .MaximumLength(64);
+
+        RuleFor(x => x.Username)
+            .NotEmpty()
+            .MinimumLength(3)
+            .MaximumLength(64);
+
+        RuleFor(x => x.DateOfBirth)
+            .NotEmpty()
+            .Must(x => DateTime.UtcNow.AddYears(-13) > x).WithMessage("You must be at least 13 years old to use this application.");
     }
 }
 
@@ -62,13 +72,18 @@ internal sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserC
             throw new UserAlreadyExistsException();
         }
 
+        if (await _context.Set<UserProfile>().AnyAsync(x => x.Username == request.Username, cancellationToken))
+        {
+            throw new UsernameTakenException();
+        }
+
         var hashedPassword = Argon2.Hash(request.Password);
         var emailVerificationCode = RandomSecurityStringGenerator.Generate(EmailVerificationCodeLength);
         var emailConfirmationCodeExpiration = DateTime.UtcNow.AddHours(EmailVerificationCodeValidityHours);
         var userId = NewId.NextGuid();
 
         var user = new AuthenticationUser(userId, request.Email, hashedPassword, emailVerificationCode, emailConfirmationCodeExpiration);
-        user.DomainEvents.Add(new UserRegisteredEvent(userId));
+        user.DomainEvents.Add(new UserRegisteredEvent(userId, request.Username, request.DateOfBirth));
 
         _context.Add(user);
         await _context.SaveChangesAsync(cancellationToken);
@@ -79,10 +94,16 @@ internal sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserC
 
 public class UserRegisteredEvent : DomainEvent
 {
-    public UserRegisteredEvent(Guid userId)
+    public UserRegisteredEvent(Guid userId, string username, DateTime dateOfBirth)
     {
         UserId = userId;
+        Username = username;
+        DateOfBirth = dateOfBirth;
     }
 
     public Guid UserId { get; }
+
+    public string Username { get; }
+
+    public DateTime DateOfBirth { get; }
 }

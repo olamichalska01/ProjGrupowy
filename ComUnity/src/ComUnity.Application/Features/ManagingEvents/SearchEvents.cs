@@ -3,6 +3,7 @@ using ComUnity.Application.Common.Utils;
 using ComUnity.Application.Database;
 using ComUnity.Application.Features.ManagingEvents.Dtos;
 using ComUnity.Application.Features.ManagingEvents.Entities;
+using ComUnity.Application.Features.UserProfileManagement.Dtos;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -90,8 +91,8 @@ internal class SearchEventQueryHandler : IRequestHandler<SearchEventsQuery, Sear
             query = query
                 .WhereIf(!string.IsNullOrEmpty(request.Filters.EventName), x => EF.Functions.Like(x.EventName, $"{request.Filters!.EventName}%"))
                 // Categories
-                //.WhereIf(request.Filters.SelectedCategoriesIds is not null && request.Filters.SelectedCategoriesIds.Count > 0,
-                //    x => request.Filters.SelectedCategoriesIds!.Contains(x.EventCategory.Id))
+                .WhereIf(request.Filters.SelectedCategoriesIds is not null && request.Filters.SelectedCategoriesIds.Count > 0,
+                    x => request.Filters.SelectedCategoriesIds!.Contains(x.EventCategory.Id))
                 // Public Events
                 .WhereIf(request.Filters.ShowPublicEvents.HasValue && request.Filters.ShowPublicEvents.Value,
                     x => x.IsPublic)
@@ -122,11 +123,14 @@ internal class SearchEventQueryHandler : IRequestHandler<SearchEventsQuery, Sear
             Results: results.Select(x => new EventDto(
                 x.Id,
                 x.EventName,
+                x.TakenPlacesAmount,
                 x.MaxAmountOfPeople,
                 x.Place,
                 x.EventDate,
                 x.Cost,
                 x.MinAge,
-                x.EventCategory.CategoryName)).ToList());
+                x.EventCategory.CategoryName,
+                x.Participants.Select(y => new UserDto(y.UserId, y.Username))
+                )).ToList());
     }
 }

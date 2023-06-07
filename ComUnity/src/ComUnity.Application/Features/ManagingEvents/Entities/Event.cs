@@ -1,4 +1,5 @@
-﻿using NetTopologySuite.Geometries;
+﻿using ComUnity.Application.Features.UserProfileManagement.Entities;
+using NetTopologySuite.Geometries;
 
 namespace ComUnity.Application.Features.ManagingEvents.Entities;
 
@@ -12,7 +13,7 @@ public class Event
 
     public int MaxAmountOfPeople { get; private set; }
 
-    public int TakenPlacesAmount { get; private set; }
+    public int TakenPlacesAmount { get; set; }
 
     public string Place { get; private set; }
 
@@ -28,6 +29,8 @@ public class Event
 
     public EventCategory EventCategory { get; private set; }
 
+    public ICollection<UserProfile> Participants { get; private set; } = new List<UserProfile>();
+
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public Event() { }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
@@ -36,17 +39,21 @@ public class Event
         Guid id,
         Guid ownerId,
         string eventName,
+        int takenPlacesAmount,
         int maxAmountOfPeople,
         string place,
         Point location,
         DateTime eventDate,
         double cost,
         int minAge,
-        EventCategory eventCategory)
+        EventCategory eventCategory,
+        ICollection<UserProfile> participants
+        )
     {
         Id = id;
         OwnerId = ownerId;
         EventName = eventName;
+        TakenPlacesAmount = takenPlacesAmount;
         MaxAmountOfPeople = maxAmountOfPeople;
         Place = place;
         Location = location;
@@ -54,5 +61,6 @@ public class Event
         Cost = cost;
         MinAge = minAge;
         EventCategory = eventCategory;
+        Participants = participants;
     }
 }
