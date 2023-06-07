@@ -10,16 +10,11 @@ public class ErrorHandler
     private readonly ISnackbar _snackbar;
     private readonly AuthenticationStateProvider _authenticationStateProvider;
 
-<<<<<<< HEAD
-    public ErrorHandler(ISnackbar snackbar)
-    {
-        _snackbar = snackbar;
-=======
+
     public ErrorHandler(ISnackbar snackbar, AuthenticationStateProvider authenticationStateProvider)
     {
         _authenticationStateProvider = authenticationStateProvider;
         _snackbar = snackbar;
->>>>>>> main
     }
 
     public async Task<(bool Success, TResult? Result)> ExecuteWithErrorHandling<TResult>(Func<Task<TResult>> func)
