@@ -1,3 +1,4 @@
+using Blazored.SessionStorage;
 using ComUnity.Frontend.Api;
 using ComUnity.Frontend.Services;
 using FluentValidation;
@@ -18,6 +19,7 @@ public class Program
         builder.RootComponents.Add<App>("#app");
         builder.RootComponents.Add<HeadOutlet>("head::after");
 
+        builder.Services.AddBlazoredSessionStorage();
         builder.Services.AddAuthenticationCore();
         builder.Services.AddAuthorizationCore();
         builder.Services.AddValidatorsFromAssemblyContaining<Program>();
@@ -26,6 +28,7 @@ public class Program
         builder.Services.AddTransient<CookieHandler>();
         builder.Services.AddHttpClient(ComUnityApi, conf => conf.BaseAddress = new Uri("https://localhost:7229/"))
             .AddHttpMessageHandler<CookieHandler>();
+        builder.Services.AddScoped<IAzureStorageFileUploader, AzureStorageFileUploader>();
         builder.Services.AddScoped<ErrorHandler>();
         builder.Services.AddScoped<IComUnityApiClient>(sp =>
         {

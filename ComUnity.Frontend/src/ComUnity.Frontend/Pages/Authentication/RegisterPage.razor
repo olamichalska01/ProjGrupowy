@@ -76,7 +76,7 @@
         }
 
         model.DateOfBirth = _dateOfBirth!.Value;
-        var(isSuccess, _) = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiUsersAsync(model));
+        var (isSuccess, _) = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiUsersPostAsync(model));
         if(isSuccess)
         {
             _snackbar.Add($"Successfuly created your account. You need to activate your account using link we will send to your e-mail address ({model.Email})", MudBlazor.Severity.Success);

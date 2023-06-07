@@ -1,10 +1,10 @@
-using ComUnity.Api.Filters;
+using Azure.Identity;
+using ComUnity.Api.Middlewares;
 using ComUnity.Application;
 using ComUnity.Application.Common.Exceptions;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -19,6 +19,8 @@ namespace ComUnity.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Configuration.AddAzureKeyVault(new Uri(builder.Configuration["KeyVaultUri"]!), new DefaultAzureCredential());
+
             // Add services to the container.
 
             builder.Services.AddControllers(options =>
@@ -29,7 +31,6 @@ namespace ComUnity.Api
                 options.Filters.Add(new ProducesResponseTypeAttribute(typeof(ProblemDetails), StatusCodes.Status404NotFound));
                 options.Filters.Add(new ProducesResponseTypeAttribute(typeof(ProblemDetails), StatusCodes.Status422UnprocessableEntity));
                 options.Filters.Add(new ProducesResponseTypeAttribute(typeof(ProblemDetails), StatusCodes.Status500InternalServerError));
-                options.Filters.Add<ApiExceptionFilterAttribute>();
             });
 
             builder.Services.AddCors(options =>
@@ -116,6 +117,7 @@ namespace ComUnity.Api
                 };
             });
 
+            builder.Services.AddScoped<ExceptionHandlingMiddleware>();
             builder.Services.AddProblemDetails();
 
             builder.Services.AddApplication();
@@ -140,6 +142,8 @@ namespace ComUnity.Api
             {
                 app.UseExceptionHandler("/error");
             }
+
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
 
             app.UseCors(AllowAll);
 

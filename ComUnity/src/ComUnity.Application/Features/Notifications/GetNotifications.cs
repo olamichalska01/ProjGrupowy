@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ComUnity.Application.Features.Notifications;
 
-internal class GetNotificationsController : ApiControllerBase
+public class GetNotificationsController : ApiControllerBase
 {
     [HttpGet("/api/notifications")]
     [ProducesResponseType(typeof(GetNotificationsResponse), StatusCodes.Status200OK)]

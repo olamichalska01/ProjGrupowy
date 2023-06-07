@@ -1,14 +1,18 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using ComUnity.Frontend.Services;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Http;
 using MudBlazor;
 
 namespace ComUnity.Frontend.Api;
 
 public class ErrorHandler
 {
-    private ISnackbar _snackbar;
+    private readonly ISnackbar _snackbar;
+    private readonly AuthenticationStateProvider _authenticationStateProvider;
 
-    public ErrorHandler(ISnackbar snackbar)
+    public ErrorHandler(ISnackbar snackbar, AuthenticationStateProvider authenticationStateProvider)
     {
+        _authenticationStateProvider = authenticationStateProvider;
         _snackbar = snackbar;
     }
 
@@ -33,6 +37,7 @@ public class ErrorHandler
                     _snackbar.Add(exception.Result.Detail, Severity.Error);
                     break;
                 case StatusCodes.Status401Unauthorized:
+                    await (_authenticationStateProvider as CookieAuthenticationStateProvider)!.ClearIdentity();
                     break;
                 default:
                     throw;

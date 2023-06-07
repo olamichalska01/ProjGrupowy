@@ -1,10 +1,11 @@
 ﻿@using ComUnity.Frontend.Services;
 @using Microsoft.AspNetCore.Components.Authorization;
+@using System.Security.Claims;
 @inherits LayoutComponentBase
 @inject NavigationManager _navigation
 @inject IComUnityApiClient _client
 @inject AuthenticationStateProvider _authenticationStateProvider
-
+@inject ErrorHandler _errorHandler
 
 <MudThemeProvider />
 <MudDialogProvider />
@@ -13,6 +14,25 @@
 <MudLayout>
     <MudAppBar Dense="true" Style="background-color: white">
         <MudSpacer />
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" OnClick="ToggleNotifications">
+                <MudBadge Content="@notifications.Count" Overlap="true" Class="mx-6 my-4">
+                    <MudIcon Color="Color.Dark" Icon="@Icons.Material.Outlined.Notifications" Size="Size.Small" />
+                </MudBadge>
+        </MudButton>
+        <MudPopover Open="_isOpen" OverflowBehavior="OverflowBehavior.FlipAlways" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" Paper="false">
+            <MudPaper Outlined="true" Class="px-4 py-8">
+                <MudList>
+                    @foreach(var notification in notifications)
+                    {
+                        <MudListItem>
+                            @notification.Content
+                            @notification.NotificationDate
+                            @notification.Type
+                        </MudListItem>
+                    }
+                </MudList>
+            </MudPaper>
+        </MudPopover>
         <MudMenu Dense="true" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopRight">
             <ActivatorContent>
                 <MudAvatar Color="Color.Warning" Variant="Variant.Filled" Size="Size.Small">
@@ -20,7 +40,7 @@
                 </MudAvatar>
             </ActivatorContent>
             <ChildContent>
-                <MudMenuItem IconSize="Size.Small" IconColor="Color.Dark" Icon="@Icons.Material.Outlined.Person">Profile</MudMenuItem>
+                <MudMenuItem Href="@userProfile" IconSize="Size.Small" IconColor="Color.Dark" Icon="@Icons.Material.Outlined.Person">Profile</MudMenuItem>
                 <MudMenuItem IconSize="Size.Small" IconColor="Color.Dark" Icon="@Icons.Material.Outlined.Logout" OnClick="SignOut">Sign Out</MudMenuItem>
             </ChildContent>
         </MudMenu>
@@ -53,6 +73,12 @@
     [CascadingParameter]
     protected Task<AuthenticationState> AuthState { get; set; }
 
+    private string userProfile = string.Empty;
+
+    private ICollection<Notification> notifications = Array.Empty<Notification>();
+
+    private bool _isOpen = false;
+
     protected async override Task OnInitializedAsync()
     {
         base.OnInitialized();
@@ -61,6 +87,11 @@
         {
             _navigation.NavigateTo($"login?redirectUrl={Uri.EscapeDataString(_navigation.Uri)}");
         }
+
+        var userId = user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
+        userProfile = $"user/{userId}";
+
+        await LoadNotifications();
     }
 
     private async Task SignOut()
@@ -68,5 +99,19 @@
         await _client.ApiAuthLogoutAsync();
         (_authenticationStateProvider as CookieAuthenticationStateProvider)!.ClearIdentity();
         _navigation.NavigateTo("/login");
+    }
+
+    private async Task LoadNotifications()
+    {
+        var (isSuccess, response) = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiNotificationsAsync());
+        if(isSuccess)
+        {
+            notifications = response!.Notifications;
+        }
+    }
+
+    private void ToggleNotifications()
+    {
+        _isOpen = !_isOpen;
     }
 }
