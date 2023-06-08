@@ -1,0 +1,75 @@
+﻿@using ComUnity.Frontend.Extensions;
+@using ComUnity.Frontend.Services;
+@page "/events-form"
+@layout MainLayout
+@inject IComUnityApiClient _client
+@inject ErrorHandler _errorHandler
+@inject NavigationManager _navigation
+@inject AuthenticationStateProvider _authenticationStateProvider
+
+<MudCard>
+    <MudTextField @bind-Value="EventName" Label="EventName" Variant="Variant.Outlined" />
+    <MudTextField @bind-Value="Place" Label="Where" Variant="Variant.Outlined" />
+    <MudDatePicker Label="Select a Date" Date="SelectedDate" MaxDate="MaxDate" MinDate="@MinDate" Variant="Variant.Outlined"/>
+    <MudNumericField @bind-Value="MaxAmountOfPeople" Label="How many people" Variant="Variant.Outlined" />
+    <MudNumericField @bind-Value="MinAge" Label="Min age" Variant="Variant.Outlined" />
+    <MudNumericField @bind-Value="Cost" Label="Cost" Variant="Variant.Outlined" />
+    @if(selectedCategory != null) {
+        <MudSelect T="EventCategory" Label="Select a category" @bind-Value="selectedCategory" Variant="Variant.Outlined">
+            @foreach (var category in EventCategories)
+            {
+                <MudSelectItem Value="@category">@category.Name</MudSelectItem>;
+            }
+        </MudSelect>
+    }
+    <MudCheckBox Label="Only for friends" @bind-Checked="IsNotPublic" Variant="Variant.Outlined" />
+</MudCard>
+<MudCard>
+    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Color="Color.Primary" OnClick="SendIt">Send</MudButton>
+
+</MudCard>
+
+@*<MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Color="Color.Primary" OnClick="DoSth">Create</MudButton>
+*@
+@code {
+    private string EventName { get; set; }
+    private int MaxAmountOfPeople { get; set; }
+    private int MinAge { get; set; }
+    private string Place { get; set; }
+    private int Cost { get; set; }
+    private bool IsNotPublic { get; set; }
+    DateTime SelectedDate = DateTime.Now;
+    DateTime MaxDate = DateTime.Now.AddYears(6);
+    DateTime MinDate = DateTime.Now;
+    private List<EventCategory> EventCategories = new List<EventCategory>();
+    private EventCategory selectedCategory;
+    private string placeholder = "choose category";
+
+    [CascadingParameter]
+    protected Task<AuthenticationState> AuthState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        GetEventsCategoriesResponse getEventCategoriesResponse = await _client.ApiEventsCategoriesAsync();
+
+        EventCategories = getEventCategoriesResponse.Categories.ToList<EventCategory>();
+
+        selectedCategory = EventCategories[0];
+    }
+
+    private async Task SendIt()
+    {
+        AddEventCommand addEventCommand = new AddEventCommand();
+        addEventCommand.EventName = EventName;
+        addEventCommand.EventDate = SelectedDate;
+        addEventCommand.Latitude = 10;
+        addEventCommand.Longitude = 10;
+        addEventCommand.EventCategory = selectedCategory.Id.ToString();
+        addEventCommand.MaxAmountOfPeople = MaxAmountOfPeople;
+        addEventCommand.MinAge = MinAge;
+        addEventCommand.Place = Place;
+        addEventCommand.Cost = Cost;
+        _client.ApiEventsPostAsync(addEventCommand);
+        _navigation.NavigateTo("/");
+    }
+}
