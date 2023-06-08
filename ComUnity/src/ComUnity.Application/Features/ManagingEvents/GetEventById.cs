@@ -40,7 +40,7 @@ public class GetEventByIdController : ApiControllerBase
 
         public async Task<GetEventByIdResponse> Handle(GetEventByIdQuery request, CancellationToken cancellationToken)
         {
-            var result = await _context.Set<Event>().Include(x => x.EventCategory).FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
+            var result = await _context.Set<Event>().Include(x => x.EventCategory).Include(y => y.Participants).FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
 
             if (result == null)
             {
@@ -62,7 +62,7 @@ public class GetEventByIdController : ApiControllerBase
                     result.MinAge,
                     result.EventCategory.CategoryName,
                     result.EventCategory.ImageId.HasValue ? _azureStorageService.GetReadFileToken(result.EventCategory.ImageId.Value) : null,
-                    result.Participants.Select(y => new UserDto(y.UserId, y.Username))));
+                    result.Participants.Select(y => new UserDto(y.UserId, y.Username, y.ProfilePicture.HasValue ? _azureStorageService.GetReadFileToken(y.ProfilePicture.Value) : null))));
         }
     }
 }

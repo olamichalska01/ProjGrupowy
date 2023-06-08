@@ -81,56 +81,13 @@
                     Date: @DateRangeFilter.Start.Value.Date.ToString("dd.MM.yyyy") - @DateRangeFilter.End.Value.Date.ToString("dd.MM.yyyy")
                 </MudChip>
             }
+            @if (@CategoryFilter != null || @MinAgeFilter != 0 || @PriceFromFilter != 0 || PriceToFilter != 0 || @AmountOfPeopleFilter != 0 || DateRangeFilter.Start != null && DateRangeFilter.End != null)
+            {
+                <MudButton Variant="Variant.Filled" OnClick="RemoveFilters" Class="remove-style button-color">Remove filters</MudButton>
+            }
         </MudPaper>
     </MudItem>
 </MudGrid>
-
-<style>
- 
-    .my-custom-menu {
-        height: 56px;
-        margin-top: 6px;
-        margin-right: 20px;
-        margin-left: 50px;
-    }
-    .style-inputs{
-        margin-right: 20px;
-        margin-left: 20px;
-    }
-
-    .style-inputs2{
-        margin-right: 40px;
-        margin-left: 20px;
-    }
-    .style-date {
-        width: 400px;
-        margin-right: 20px;
-        margin-left: 20px;
-    }
-    .end-style{
-        width: 70px;
-        margin-right: 50px;
-        margin-left: 40px;
-    }
-    .filters-cont{
-        margin-right: 150px;
-        margin-left: 150px;
-    }
-
-    .testuje {
-        margin-right: 10px;
-        margin-left: 10px;
-        margin-bottom:50px;
-    }
-
-    .filter2 {
-        margin-right: 160px;
-        margin-left: 140px;
-        margin-bottom: 30px;
-    }
-</style>
-
-
 
 
 
@@ -166,7 +123,7 @@
                         </MudListItem>
                         <MudListItem Class="mt-n3">
                             <MudText Class="font-details">
-                                <span class="font-details">Price: </span><span class="font-details-values">@context.Cost</span>
+                                <span class="font-details">Price: </span><span class="font-details-values">@context.Cost $</span>
                             </MudText>
                         </MudListItem>
                         <MudListItem Class="mt-n3">
@@ -251,6 +208,18 @@
         TotalEvents = Events.Count;
 
         // Update the UI
+        StateHasChanged();
+    }
+
+    private async Task RemoveFilters()
+    {
+        CategoryFilter = null;
+        MinAgeFilter  = 0;
+        PriceFromFilter = 0;
+        PriceToFilter = 0;
+        AmountOfPeopleFilter = 0;
+        DateRangeFilter = new DateRange(null, null);
+        await LoadEvents();
         StateHasChanged();
     }
 }

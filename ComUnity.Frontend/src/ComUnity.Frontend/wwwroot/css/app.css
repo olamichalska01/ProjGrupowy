@@ -38,6 +38,19 @@
     font-size: 18px;
     color: #231f20;
 }
+.font-detials-people {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: #7ebdc2;
+    margin-top: 30px;
+}
+.font-detials-people2 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+    font-size: 18px;
+    color: #231f20;
+}
 .left-position {
     text-align: left;
 }
@@ -55,6 +68,17 @@
 .button-color {
     background-color: #17a398;
     color: white;
+}
+.button-color2 {
+    background-color: #17a398;
+    color: white;
+    margin-left:15px;
+    margin-top: 20px;
+    width: 100px;
+}
+
+.tab{
+    margin-left:-15px;
 }
 
 .pagination-style {
@@ -77,3 +101,97 @@
     margin-left: 10px;
 }
 
+.participant-holder {
+    height: 90px;
+}
+
+.avatar-class-participants {
+    margin-left: 30px;
+    margin-right: 10px;
+}
+
+.my-custom-menu {
+    height: 56px;
+    margin-top: 6px;
+    margin-right: 20px;
+    margin-left: 50px;
+}
+
+.style-inputs {
+    margin-right: 20px;
+    margin-left: 20px;
+}
+
+.style-inputs2 {
+    margin-right: 40px;
+    margin-left: 20px;
+}
+
+.style-date {
+    width: 400px;
+    margin-right: 20px;
+    margin-left: 20px;
+}
+
+.end-style {
+    width: 70px;
+    margin-right: 50px;
+    margin-left: 40px;
+}
+
+.remove-style {
+    width: 150px;
+    margin-right: 0px;
+    margin-left: 15px;
+    margin-bottom: 20px;
+    margin-bottom: 10px;
+}
+
+.filters-cont {
+    margin-right: 150px;
+    margin-left: 150px;
+}
+
+.testuje {
+    margin-right: 10px;
+    margin-left: 10px;
+    margin-bottom: 50px;
+}
+
+.filter2 {
+    margin-right: 160px;
+    margin-left: 140px;
+    margin-bottom: 30px;
+}
+
+.event-details1{
+    margin-left: 150px;
+    margin-top: 50px;
+}
+.event-details2 {
+    width: 500px;
+    margin-left: 50px;
+    overflow:scroll;
+}
+
+.back-button {
+    color: #17a398;
+    margin-left: 50px;
+    margin-top: 30px;
+}
+
+.event-title-for-details {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 50px;
+    margin-bottom: 20px;
+    color: #231f20;
+}
+
+.event-details-for-details {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 30px;
+    margin-bottom: 20px;
+    color: #dcc786;
+}

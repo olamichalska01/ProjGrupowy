@@ -8,4 +8,6 @@ namespace ComUnity.Application.Features.UserProfileManagement.Dtos;
 
 public record UserDto(
     Guid UserId,
-    string UserName);
+    string UserName,
+    string? ProfilePicture
+    );
