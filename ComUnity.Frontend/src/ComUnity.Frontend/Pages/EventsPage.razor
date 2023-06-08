@@ -8,168 +8,185 @@
 @inject AuthenticationStateProvider _authenticationStateProvider
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;500;700&display=swap" rel="stylesheet">
 
-<MudImage Src="logo1.png" Alt="logo" Width="200" Elevation="0" Class="rounded-lg ma-4" />
+<MudGrid>
+    <MudItem xs="12" Class="ml-16 mr-16">
+        <MudPaper Elevation="0" Class="d-flex align-center justify-center mud-width-full pt-6 pb-2">
+            <MudImage Src="logo.png" Alt="logo" Width="250" Elevation="0" />
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12">
+        <MudPaper Class="filters-cont filter-border">
+            <MudPaper Class="d-flex align-left justify-left py-1" Elevation="0">
+                <MudText Class="ml-4 mt-2 mr-16 testola">
+                    Filters
+                </MudText>
+            </MudPaper>
+            <MudPaper Class="d-flex align-center justify-center py-8" Elevation="0">
+                <MudMenu Class="my-custom-menu" Label="Categories" EndIcon="@Icons.Material.Filled.ArrowDropDown" Variant="Variant.Outlined" Clickable="true" SelectedValue="CategoryFilter" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopLeft">
+                    @foreach (var categ in EventCategories)
+                    {
+                        <MudMenuItem Value="@categ.Name" OnClick="(e => {CategoryFilter=categ.Name;})">
+                            <MudImage Src="@(categ?.ImageId ?? string.Empty)" Width="35" Height="35" Alt="" Elevation="0" /> @categ.Name
+                        </MudMenuItem>
+                    }
+                </MudMenu>
 
-@if (@CategoryFilter != null)
-{
-    <MudChip Color="Color.Secondary">
-        Category: @CategoryFilter
-    </MudChip>
-}
+                <MudNumericField HideSpinButtons="true" FullWidth="false" @bind-Value="PriceFromFilter" Label="$ price from" Variant="Variant.Outlined" Class="style-inputs" />
+                <MudNumericField HideSpinButtons="true" @bind-Value="PriceToFilter" Label="$ price to" Variant="Variant.Outlined" Class="style-inputs" />
+                <MudNumericField HideSpinButtons="true" @bind-Value="MinAgeFilter" Label="Min age" Variant="Variant.Outlined" Class="style-inputs" />
+                <MudNumericField HideSpinButtons="true" @bind-Value="AmountOfPeopleFilter" Label="No. of people" Variant="Variant.Outlined" Class="style-inputs2" />
+                <MudDateRangePicker Label="When" Editable="true" Variant="Variant.Outlined" @bind-DateRange="DateRangeFilter" />
+                <MudButton Variant="Variant.Filled" OnClick="DoSth" Class="end-style button-color">Apply</MudButton>
+            </MudPaper>
+            @if (@CategoryFilter != null || @MinAgeFilter != 0 || @PriceFromFilter != 0 || PriceToFilter != 0 || @AmountOfPeopleFilter != 0 || DateRangeFilter.Start != null && DateRangeFilter.End != null)
+            {
+                <MudText Class="font-details-values ml-4 mb-2">
+                    Your filters:
+                </MudText>
+            }
 
-@if (@MinAgeFilter != 0)
-{
-    <MudChip Color="Color.Secondary">
-        Min age: @MinAgeFilter
-    </MudChip>
-}
+            @if (@CategoryFilter != null)
+            {
+                <MudChip Class="ml-4 my-filters-style">
+                    Category: @CategoryFilter
+                </MudChip>
+            }
 
-@if (@PriceFromFilter != 0 || PriceToFilter != 0)
-{
-    <MudChip Color="Color.Secondary">
-        Price: @PriceFromFilter - @PriceToFilter
-    </MudChip>
-}
+            @if (@MinAgeFilter != 0)
+            {
+                <MudChip Class="ml-4 my-filters-style">
+                    Min age: @MinAgeFilter
+                </MudChip>
+            }
 
-@if (@AmountOfPeopleFilter != 0)
-{
-    <MudChip Color="Color.Secondary">
-        Amount of people: @AmountOfPeopleFilter
-    </MudChip>
-}
+            @if (@PriceFromFilter != 0 || PriceToFilter != 0)
+            {
+                <MudChip Class="ml-4 my-filters-style">
+                    Price: @PriceFromFilter - @PriceToFilter
+                </MudChip>
+            }
 
-@if (DateRangeFilter.Start != null && DateRangeFilter.End != null)
-{
-    <MudChip Color="Color.Secondary">
-        Date: @DateRangeFilter.Start.Value.Date.ToString("dd.mm.yyyy") - @DateRangeFilter.End.Value.Date.ToString("dd.mm.yyyy")
-    </MudChip>
-}
+            @if (@AmountOfPeopleFilter != 0)
+            {
+                <MudChip Class="ml-4 my-filters-style">
+                    Amount of people: @AmountOfPeopleFilter
+                </MudChip>
+            }
 
+            @if (DateRangeFilter.Start != null && DateRangeFilter.End != null)
+            {
+                <MudChip Class="ml-4 my-filters-style">
+                    Date: @DateRangeFilter.Start.Value.Date.ToString("dd.MM.yyyy") - @DateRangeFilter.End.Value.Date.ToString("dd.MM.yyyy")
+                </MudChip>
+            }
+        </MudPaper>
+    </MudItem>
+</MudGrid>
 
-
-<MudMenu Label="Categories" Clickable="true" SelectedValue="CategoryFilter" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopLeft">
-    @foreach (var categ in EventCategories)
-    {
-        <MudMenuItem Value="@categ.Name" OnClick="(e => {CategoryFilter=categ.Name;})">
-            <MudImage Src="@(categ?.ImageId ?? string.Empty)" Width="35" Height="35" Alt="" Elevation="0" /> @categ.Name
-        </MudMenuItem>
+<style>
+ 
+    .my-custom-menu {
+        height: 56px;
+        margin-top: 6px;
+        margin-right: 20px;
+        margin-left: 50px;
     }
-</MudMenu>
+    .style-inputs{
+        margin-right: 20px;
+        margin-left: 20px;
+    }
 
-<MudNumericField @bind-Value="PriceFromFilter" Label="from price" Variant="Variant.Outlined" />
-<MudNumericField @bind-Value="PriceToFilter" Label="to price" Variant="Variant.Outlined" />
-<MudNumericField @bind-Value="MinAgeFilter" Label="Min age" Variant="Variant.Outlined" />
-<MudNumericField @bind-Value="AmountOfPeopleFilter" Label="Amout of people" Variant="Variant.Outlined" />
-<MudDateRangePicker Label="When" Editable="true" @bind-DateRange="DateRangeFilter" />
+    .style-inputs2{
+        margin-right: 40px;
+        margin-left: 20px;
+    }
+    .style-date {
+        width: 400px;
+        margin-right: 20px;
+        margin-left: 20px;
+    }
+    .end-style{
+        width: 70px;
+        margin-right: 50px;
+        margin-left: 40px;
+    }
+    .filters-cont{
+        margin-right: 150px;
+        margin-left: 150px;
+    }
 
+    .testuje {
+        margin-right: 10px;
+        margin-left: 10px;
+        margin-bottom:50px;
+    }
 
-<MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Color="Color.Primary" OnClick="DoSth">Send</MudButton>
-
-
-
-<MudCard>
-    <MudCardContent>
-            <MudTable Items="@Events" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
-                <HeaderContent>
-                    <MudTh>Name</MudTh>
-                    <MudTh>Date</MudTh>
-                    <MudTh>Location</MudTh>
-                    <MudTh>Max Amount Of people</MudTh>
-                    <MudTh>Cost</MudTh>
-                    <MudTh>MinAge</MudTh>
-                    <MudTh></MudTh>
-                </HeaderContent>
-                <RowTemplate>
-                    <MudTd DataLabel="Name"><b>@context.Name</b></MudTd>
-                    <MudTd DataLabel="Date">@context.EventDate.ToShortDateString()</MudTd>
-                    <MudTd DataLabel="Location">@context.Place</MudTd>
-                    <MudTd DataLabel="Max Amount Of peopl">@context.MaxAmountOfPeople</MudTd>
-                    <MudTd DataLabel="Cost">@context.Cost</MudTd>
-                    <MudTd DataLabel="MinAge">@context.MinAge</MudTd>
-                    <MudNavLink Href="@($"/events/{context.Id}")" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Info" IconColor="Color.Info"></MudNavLink>
-                </RowTemplate>
-                <PagerContent>
-                    <MudTablePager />
-                </PagerContent>
-            </MudTable>
-    </MudCardContent>
-</MudCard>
+    .filter2 {
+        margin-right: 160px;
+        margin-left: 140px;
+        margin-bottom: 30px;
+    }
+</style>
 
 
-<MudTable Items="@Events" RowsPerPage="2" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info" Elevation="0">
+
+
+
+
+<MudTable Items="@Events" RowsPerPage="5" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info" Elevation="0" Class="testuje">
     <HeaderContent>
     </HeaderContent>
     <RowTemplate>
-        <MudItem xs="12" Class="ml-16 mr-16">
-            <MudPaper Square="true" Class="d-flex justify-space-around ml-16 mr-16 pa-4 mt-6">
-                <MudCard Height="250px" Elevation="0">
-                    <MudText Class="testola">@context.Name</MudText>
-                    <MudText Typo="Typo.body2">Join us for a thrilling and action-packed family football event that promises a day of fun, excitement, and friendly competition! Bring your loved ones and cheer on your favorite teams as they go head-to-head on the field. With players of all ages showcasing their skills and passion for the game, there will be non-stop entertainment for everyone. From kids to grandparents, everyone can get involved in the festivities, whether it's playing in the mini-matches, participating in engaging activities, or simply enjoying delicious snacks and refreshments on the sidelines. It's a perfect opportunity to strengthen family bonds, create lasting memories, and celebrate the joy of football together. Don't miss out on this unforgettable experience that combines the love for sports and the warmth of family camaraderie. Lace up your shoes, grab your jerseys, and let the games begin!</MudText>
+        <MudItem xs="12" Elevation="23">
+            <MudPaper Class="d-flex justify-space-around pa-4 mt-10 filter2">
+
+                <MudCard Height="250px" Width="70%" Elevation="0" Class="ml-n4">
+                    <MudText Class="testola left-position mb-2 ml-4">@context.Name</MudText>
+                    <MudText Class="mb-6 ml-4 font-author" Typo="Typo.body2">by TU ZROBICCCC</MudText>
+                    <MudText Class="font-normal ml-4" Typo="Typo.body2">Join us for a thrilling and action-packed family football event that promises a day of fun, excitement, and friendly competition! Don't miss out on this unforgettable experience that combines the love for sports and the warmth of family camaraderie.</MudText>
                 </MudCard>
+
+
                 <MudDivider Vertical="true" FlexItem="true" />
-                <MudCard Height="250px" Elevation="0">
-                    <MudImage Src="@(context?.EventCategoryPicture ?? string.Empty)" Width="50" Height="50" Alt="category picture" Elevation="0" />
+
+                <MudCard Height="250px" Width="30%" Elevation="0">
+                    <MudList>
+                        <MudListItem Class="mt-n3 mb-2">
+                            <MudImage Src="@(context?.EventCategoryPicture ?? string.Empty)" Width=" 50" Height="50" Alt="" Elevation="0" />
+                            <MudText Class="mt-n10 ml-15 font-details-category">@context.EventCategory </MudText>
+                        </MudListItem>
+                        <MudListItem Class="mt-n3">
+                            <MudText Class="font-details">
+                                <span class="font-details">Price: </span><span class="font-details-values">@context.Cost</span>
+                            </MudText>
+                        </MudListItem>
+                        <MudListItem Class="mt-n3">
+                            <MudText Class="font-details">
+                                <span class="font-details">Date: </span><span class="font-details-values">@context.EventDate.Date.ToString("dd.MM.yyyy")</span>
+                            </MudText>
+                        </MudListItem>
+                        <MudListItem Class="mt-n3">
+                            <MudText Class="font-details">
+                                <span class="font-details">Taken places: </span><span class="font-details-values">@context.TakenPlaces from @context.MaxAmountOfPeople</span>
+                            </MudText>
+                        </MudListItem>
+                        <MudListItem Class="ml-1 mt-3">
+                            <MudButton Class="d-flex align-center justify-center button-color" Href="@($" /events/{context.Id}")" Variant="Variant.Filled" >Check out the details</MudButton>
+                        </MudListItem>
+                    </MudList>
                 </MudCard>
-                
+
             </MudPaper>
         </MudItem>
-        @*<MudItem xs="12" Class="ml-16 mr-16">
-        <MudPaper Class="ml-16 mr-16 pa-4 mt-6" Elevation="0">
-            
-                <MudCard Class="ml-16 mr-16" Height="250px">
-                    <MudCardContent>
-                        <MudText Class="testola">@context.Name</MudText>
-                        <MudText Typo="Typo.body2">Join us for a thrilling and action-packed family football event that promises a day of fun, excitement, and friendly competition! Bring your loved ones and cheer on your favorite teams as they go head-to-head on the field. With players of all ages showcasing their skills and passion for the game, there will be non-stop entertainment for everyone. From kids to grandparents, everyone can get involved in the festivities, whether it's playing in the mini-matches, participating in engaging activities, or simply enjoying delicious snacks and refreshments on the sidelines. It's a perfect opportunity to strengthen family bonds, create lasting memories, and celebrate the joy of football together. Don't miss out on this unforgettable experience that combines the love for sports and the warmth of family camaraderie. Lace up your shoes, grab your jerseys, and let the games begin!</MudText>
-                    </MudCardContent>
-                    <MudDivider Vertical="true" FlexItem="true" />
-
-                    <MudCardActions>
-                        <MudButton Variant="Variant.Text" Color="Color.Primary">Learn More</MudButton>
-                    </MudCardActions>
-                </MudCard>
-        </MudPaper>
-        </MudItem>*@
 
     </RowTemplate>
-    <PagerContent>
-        <MudTablePager />
+    <PagerContent >
+        <MudTablePager Class="pagination-style" LastIcon="null" FirstIcon="null" HorizontalAlignment=HorizontalAlignment.Center/>
     </PagerContent>
 </MudTable>
 
-@*<MudCard>
-    <MudCardContent>
-        <MudGrid>
-            <MudTable Items="@Events" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
-                <HeaderContent>
-                    <MudTh>Name</MudTh>
-                    <MudTh>Date</MudTh>
-                    <MudTh>Location</MudTh>
-                    <MudTh>Max Amount Of people</MudTh>
-                    <MudTh>Cost</MudTh>
-                    <MudTh>MinAge</MudTh>
-                    <MudTh></MudTh>
-                </HeaderContent>
-                <RowTemplate>
-                    <MudTd DataLabel="Name"><b>@context.Name</b></MudTd>
-                    <MudTd DataLabel="Date">@context.EventDate.ToShortDateString()</MudTd>
-                    <MudTd DataLabel="Location">@context.Place</MudTd>
-                    <MudTd DataLabel="Max Amount Of peopl">@context.MaxAmountOfPeople</MudTd>
-                    <MudTd DataLabel="Cost">@context.Cost</MudTd>
-                    <MudTd DataLabel="MinAge">@context.MinAge</MudTd>
-                    <MudNavLink Href="@($"/events/{context.Id}")" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Info" IconColor="Color.Info"></MudNavLink>
-                </RowTemplate>
-                <PagerContent>
-                    <MudTablePager />
-                </PagerContent>
-            </MudTable>
-        </MudGrid>
-    </MudCardContent>
-</MudCard>*@
-
-
-<MudAlert Severity="MudBlazor.Severity.Info">@CategoryFilter</MudAlert>
 
 @code {
     private List<EventDto> Events = new List<EventDto>();
@@ -182,17 +199,6 @@
     private int PriceToFilter { get; set; } = 0;
     private int AmountOfPeopleFilter { get; set; } = 0;
     private DateRange DateRangeFilter = new DateRange(null, null);
-
-    MudTheme MyCustomTheme = new MudTheme()
-        {
-            Typography = new Typography()
-            {
-                Default = new Default()
-                {
-                    FontFamily = new[] { "Poppins", "Helvetica", "Arial", "sans-serif" }
-                }
-            }
-        };
 
     protected override async Task OnInitializedAsync()
     {

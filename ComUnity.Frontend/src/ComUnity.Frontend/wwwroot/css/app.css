@@ -1,8 +1,74 @@
+
 .mud-list-item-icon {
     min-width: 32px;
 }
 
 .testola {
     font-family: 'Poppins', sans-serif;
+    font-weight: 700;
     font-size: 30px;
+}
+.font-normal {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+    font-size: 18px;
+    color: #7c7b7b;
+}
+.font-author {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    color: #7ebdc2;
+}
+.font-details {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: #bb4430;
+}
+.font-details-values {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    font-size: 18px;
+    color: #231f20;
+}
+.font-details-category {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: #231f20;
+}
+.left-position {
+    text-align: left;
+}
+.filter-border {
+    border-color: #231f20;
+    border-width: 5px;
+    border-radius: 10px;
+}
+
+.mud-grid-spacing-xs-3 {
+    width: calc(100%);
+    margin: -12px;
+}
+
+.button-color {
+    background-color: #17a398;
+    color: white;
+}
+
+.pagination-style {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    color: #7ebdc2;
+}
+
+.my-filters-style {
+    background-color: #f3dfa2;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    color: #231f20;
+    margin-bottom: 10px;
 }
