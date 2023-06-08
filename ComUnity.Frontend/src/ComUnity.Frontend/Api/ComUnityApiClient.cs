@@ -4702,6 +4702,9 @@ namespace ComUnity.Frontend.Api
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Name { get; set; }
 
+        [Newtonsoft.Json.JsonProperty("imageId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Guid? ImageId { get; set; }
+
         public string ToJson()
         {
 
@@ -4930,6 +4933,9 @@ namespace ComUnity.Frontend.Api
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Name { get; set; }
 
+        [Newtonsoft.Json.JsonProperty("imageId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ImageId { get; set; }
+
         public string ToJson()
         {
 
@@ -4974,6 +4980,9 @@ namespace ComUnity.Frontend.Api
 
         [Newtonsoft.Json.JsonProperty("eventCategory", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string EventCategory { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("eventCategoryPicture", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string EventCategoryPicture { get; set; }
 
         [Newtonsoft.Json.JsonProperty("participants", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.ObjectModel.ObservableCollection<UserDto> Participants { get; set; }

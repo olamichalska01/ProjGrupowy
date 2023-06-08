@@ -3,6 +3,7 @@ using ComUnity.Application.Database;
 using ComUnity.Application.Features.ManagingEvents.Dtos;
 using ComUnity.Application.Features.ManagingEvents.Entities;
 using ComUnity.Application.Features.UserProfileManagement.Dtos;
+using ComUnity.Application.Infrastructure.Services;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -27,10 +28,12 @@ public class GetEventsByCategoryController : ApiControllerBase
     internal class GetEventByIdQueryHandler : IRequestHandler<GetEventsByCategoryQuery, GetEventsByCategoryResponse>
     {
         private readonly ComUnityContext _context;
+        private readonly IAzureStorageService _azureStorageService;
 
-        public GetEventByIdQueryHandler(ComUnityContext context)
+        public GetEventByIdQueryHandler(ComUnityContext context, IAzureStorageService azureStorageService)
         {
             _context = context;
+            _azureStorageService = azureStorageService;
         }
 
         public async Task<GetEventsByCategoryResponse> Handle(GetEventsByCategoryQuery request, CancellationToken cancellationToken)
@@ -51,6 +54,7 @@ public class GetEventsByCategoryController : ApiControllerBase
                     e.Cost,
                     e.MinAge,
                     e.EventCategory.CategoryName,
+                    e.EventCategory.ImageId.HasValue ? _azureStorageService.GetReadFileToken(e.EventCategory.ImageId.Value) : null,
                     e.Participants.Select(y => new UserDto(y.UserId, y.Username)))).ToList());
         }
     }

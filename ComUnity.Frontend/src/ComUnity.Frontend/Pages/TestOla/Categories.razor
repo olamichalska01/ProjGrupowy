@@ -6,96 +6,102 @@
 @inject IAzureStorageFileUploader _fileUploader
 @inject ErrorHandler _errorHandler
 @inject ISnackbar _snackbar
+@using ComUnity.Frontend.Extensions;
+@inject NavigationManager _navigation
+@inject AuthenticationStateProvider _authenticationStateProvider
 
-<MudOverlay @bind-Visible="isLoading" DarkBackground="true">
-    <MudProgressCircular Color="Color.Primary" Size="Size.Large" Indeterminate="true" />
-</MudOverlay>
 
-@if (!isLoading)
-{
-    <MudContainer Class="ml-10 mt-10">
-        <MudStack Row="true" AlignItems="AlignItems.End">
-            <div>
-                <MudImage Src="@(userProfile?.ProfilePicture ?? string.Empty)" Width="200" Height="200" Alt="Profile picture" Elevation="25" Class="rounded-lg" />
-                @if (isOwner)
-                {
-                    <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles" Class="relative d-inline-block mt-0" style="right: 30px; top: 170px">
-                        <ButtonTemplate>
-                            <MudIconButton HtmlTag="label"
-                                           Variant="Variant.Filled"
-                                           Size="Size.Small"
-                                           Color="Color.Info"
-                                           Icon="@Icons.Material.Filled.PhotoCamera"
-                                           for="@context">
-                            </MudIconButton>
-                        </ButtonTemplate>
-                    </MudFileUpload>
-                }
-            </div>
-            <MudText Typo="Typo.h2">@userProfile!.Username</MudText>
-            <MudSpacer />
-      
-       
-        </MudStack>
 
-    </MudContainer>
-}
+<MudCard>
+    <MudCardContent>
+        <MudGrid>
+            <MudTable Items="@Events" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+                <HeaderContent>
+                    <MudTh>Name</MudTh>
+                    <MudTh>image</MudTh>
+                    <MudTh></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Name"><b>@context.Name</b></MudTd>
+                    
+                    <MudTd DataLabel="image">
+                        <MudImage Src="@(context?.ImageId ?? string.Empty)" Width="50" Height="50" Alt="category picture" Elevation="0" />
+                    </MudTd>
+                </RowTemplate>
+                <PagerContent>
+                    <MudTablePager />
+                </PagerContent>
+            </MudTable>
+        </MudGrid>
+    </MudCardContent>
+</MudCard>
+
+<MudGrid>
+    <MudTextField @bind-Value="TextValue" Label="Standard" Variant="Variant.Text" Margin="Margin.Dense"></MudTextField>
+    <MudFileUpload T="IBrowserFile" FilesChanged="Testuje">
+        <ButtonTemplate>
+            <MudFab HtmlTag="label"
+                    Color="Color.Secondary"
+                    Icon="@Icons.Material.Filled.Image"
+                    Label="Load picture"
+                    for="@context" />
+        </ButtonTemplate>
+    </MudFileUpload>
+    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Color="Color.Primary" OnClick="UploadFiles">Send</MudButton>
+
+</MudGrid>
+
+
 
 @code {
-    [AllowNull]
-    [CascadingParameter]
-    protected Task<AuthenticationState> AuthState { get; set; }
-
-    GetUserProfileResponse? userProfile;
-
-    private bool isInEditingMode = false;
-
-    UpdateUserProfileCommand updateUserProfileCommand = new();
-    private bool isLoading = true;
-    private bool isOwner = false;
-
-    [AllowNull]
-    [Parameter]
-    public string UserId { get; set; }
-    private Guid userId => Guid.Parse(UserId);
+    public string TextValue { get; set; }
+    private List<EventCategory> Events = new List<EventCategory>();
+    IBrowserFile testowy; 
 
     protected override async Task OnInitializedAsync()
     {
-        var user = (await AuthState).User;
-        var authenticatedUserId = user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
-        if (UserId.ToLowerInvariant() == authenticatedUserId)
-        {
-            isOwner = true;
-        }
-
-        isLoading = true;
-        await LoadUserProfile();
-        isLoading = false;
+        await LoadEvents();
 
         StateHasChanged();
     }
 
-    public async Task UploadFiles(IBrowserFile file)
+    private async Task LoadEvents()
+    {
+        // Fetch all events from the API
+        GetEventsCategoriesResponse getEventsResponse = await _client.ApiEventsCategoriesAsync();
+
+        Events = getEventsResponse.Categories.ToList<EventCategory>();
+    }
+
+    public async Task Testuje(IBrowserFile file)
     {
         var (isSuccess, response) = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiFilesSasTokenAsync());
         if (!isSuccess)
         {
             return;
         }
+        testowy = file;
+    }
 
-        var pictureId = await _fileUploader.UploadFile(response!.Token, file, CancellationToken.None);
-        (isSuccess, var profilePictue) = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiProfileProfilePictureAsync(new AddProfilePictureCommand { PictureId = pictureId }));
+    public async Task UploadFiles()
+    {
+        var (isSuccess, response) = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiFilesSasTokenAsync());
+        if (!isSuccess)
+        {
+            return;
+        }
+        var pictureId = await _fileUploader.UploadFile(response!.Token, testowy, CancellationToken.None);
+        AddEventCategoryCommand categ = new AddEventCategoryCommand { ImageId = pictureId, Name = TextValue };
+        (isSuccess) = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiEventCategoriesPostAsync(categ));
         if (!isSuccess)
         {
             return;
         }
 
-        userProfile!.ProfilePicture = profilePictue!.PictureUrl;
-    }
+        await LoadEvents();
 
-    private async Task LoadUserProfile()
-    {
-        (_, userProfile) = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiUsersGetAsync(userId));
+        StateHasChanged();
+
     }
 
 
