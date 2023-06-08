@@ -3,6 +3,7 @@ using ComUnity.Application.Database;
 using ComUnity.Application.Features.ManagingEvents.Dtos;
 using ComUnity.Application.Features.ManagingEvents.Entities;
 using ComUnity.Application.Features.UserProfileManagement.Dtos;
+using ComUnity.Application.Features.UserProfileManagement.Entities;
 using ComUnity.Application.Infrastructure.Services;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -42,10 +43,13 @@ public class GetEventsByCategoryController : ApiControllerBase
                 .Include(x => x.EventCategory)
                 .Where(x => x.EventCategory.CategoryName == request.CategoryName)
                 .ToListAsync(cancellationToken);
+            var users = await _context.Set<UserProfile>().ToListAsync();
 
             return new GetEventsByCategoryResponse(
                 events.Select(e => new EventDto(
                     e.Id,
+                    users.Where(u => u.UserId == e.OwnerId).FirstOrDefault().Username,
+                    users.Where(u => u.UserId == e.OwnerId).FirstOrDefault().ProfilePicture.HasValue ? _azureStorageService.GetReadFileToken(users.Where(u => u.UserId == e.OwnerId).FirstOrDefault().ProfilePicture.Value) : null,
                     e.EventName,
                     e.TakenPlacesAmount,
                     e.MaxAmountOfPeople,

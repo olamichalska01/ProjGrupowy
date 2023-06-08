@@ -4,6 +4,7 @@ using ComUnity.Application.Database;
 using ComUnity.Application.Features.ManagingEvents.Dtos;
 using ComUnity.Application.Features.ManagingEvents.Entities;
 using ComUnity.Application.Features.UserProfileManagement.Dtos;
+using ComUnity.Application.Features.UserProfileManagement.Entities;
 using ComUnity.Application.Infrastructure.Services;
 using FluentValidation;
 using MediatR;
@@ -120,11 +121,14 @@ internal class SearchEventQueryHandler : IRequestHandler<SearchEventsQuery, Sear
             .Skip(skipRows)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
+        var users = await _context.Set<UserProfile>().ToListAsync();
 
         return new SearchEventsResponse(
             TotalCount: total, 
             Results: results.Select(x => new EventDto(
                 x.Id,
+                users.Where(u => u.UserId == x.OwnerId).FirstOrDefault().Username,
+                users.Where(u => u.UserId == x.OwnerId).FirstOrDefault().ProfilePicture.HasValue ? _azureStorageService.GetReadFileToken(users.Where(u => u.UserId == x.OwnerId).FirstOrDefault().ProfilePicture.Value) : null,
                 x.EventName,
                 x.TakenPlacesAmount,
                 x.MaxAmountOfPeople,
