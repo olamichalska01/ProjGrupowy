@@ -4,6 +4,7 @@ using ComUnity.Application.Database;
 using ComUnity.Application.Features.ManagingEvents.Dtos;
 using ComUnity.Application.Features.ManagingEvents.Entities;
 using ComUnity.Application.Features.UserProfileManagement.Dtos;
+using ComUnity.Application.Features.UserProfileManagement.Entities;
 using ComUnity.Application.Infrastructure.Services;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -46,8 +47,12 @@ public class GetEventByIdController : ApiControllerBase
                 throw new NotFoundException(nameof(Event), request.Id);
             }
 
+            var users = await _context.Set<UserProfile>().ToListAsync();
+
             return new GetEventByIdResponse(new EventDto(
                     result.Id,
+                    users.Where(u => u.UserId == result.OwnerId).FirstOrDefault().Username,
+                    users.Where(u => u.UserId == result.OwnerId).FirstOrDefault().ProfilePicture.HasValue ? _azureStorageService.GetReadFileToken(users.Where(u => u.UserId == result.OwnerId).FirstOrDefault().ProfilePicture.Value) : null,
                     result.EventName,
                     result.TakenPlacesAmount,
                     result.MaxAmountOfPeople,

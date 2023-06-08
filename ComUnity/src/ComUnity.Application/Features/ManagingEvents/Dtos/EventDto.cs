@@ -5,6 +5,8 @@ namespace ComUnity.Application.Features.ManagingEvents.Dtos;
 
 public record EventDto(
     Guid Id,
+    string OwnerName,
+    string? OwnerPicture,
     string Name,
     int TakenPlaces,
     int MaxAmountOfPeople,
