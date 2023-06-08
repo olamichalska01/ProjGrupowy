@@ -59,7 +59,7 @@ public class GetEventsByCategoryController : ApiControllerBase
                     e.MinAge,
                     e.EventCategory.CategoryName,
                     e.EventCategory.ImageId.HasValue ? _azureStorageService.GetReadFileToken(e.EventCategory.ImageId.Value) : null,
-                    e.Participants.Select(y => new UserDto(y.UserId, y.Username)))).ToList());
+                    e.Participants.Select(y => new UserDto(y.UserId, y.Username, y.ProfilePicture.HasValue ? _azureStorageService.GetReadFileToken(y.ProfilePicture.Value) : null)))).ToList());
         }
     }
 }

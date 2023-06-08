@@ -1,42 +1,111 @@
 ﻿@using ComUnity.Frontend.Extensions;
 @using ComUnity.Frontend.Services;
 @page "/events/{eventID}"
-@layout UnauthorizedLayout
+@layout MainLayout
 @inject IComUnityApiClient _client
+@using System.Security.Claims;
+@inject ISnackbar Snackbar
 @inject ErrorHandler _errorHandler
 @inject NavigationManager _navigation
 @inject AuthenticationStateProvider _authenticationStateProvider
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;500;700&display=swap" rel="stylesheet">
 
 
-<MudCard>
-    <MudCardHeader>
-        <CardHeaderAvatar>
-            <MudAvatar Color="Color.Secondary">E</MudAvatar>
-        </CardHeaderAvatar>
-        <CardHeaderContent>
-            <MudText Typo="Typo.body1">@Event.Name</MudText>
-            <MudText Typo="Typo.body2">@Event.Place</MudText>
-        </CardHeaderContent>
-        <CardHeaderActions>
-            <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Default" />
-        </CardHeaderActions>
-    </MudCardHeader>
-    <MudCardContent>
-        <MudText Typo="Typo.body2">Join us for a thrilling and action-packed family football event that promises a day of fun, excitement, and friendly competition! Bring your loved ones and cheer on your favorite teams as they go head-to-head on the field. With players of all ages showcasing their skills and passion for the game, there will be non-stop entertainment for everyone. From kids to grandparents, everyone can get involved in the festivities, whether it's playing in the mini-matches, participating in engaging activities, or simply enjoying delicious snacks and refreshments on the sidelines. It's a perfect opportunity to strengthen family bonds, create lasting memories, and celebrate the joy of football together. Don't miss out on this unforgettable experience that combines the love for sports and the warmth of family camaraderie. Lace up your shoes, grab your jerseys, and let the games begin!</MudText>
-    </MudCardContent>
-    <MudCardContent>
-        <MudText Typo="Typo.body2"><b>Min age: </b> @Event.MinAge</MudText>
-        <MudText Typo="Typo.body2"><b>Cost: </b> @Event.Cost</MudText>
-    </MudCardContent>
-    <MudCardActions>
-        <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Default" />
-        <MudIconButton Icon="@Icons.Material.Filled.Share" Color="Color.Default" />
-    </MudCardActions>
-</MudCard>
+<MudButton Variant="Variant.Text" StartIcon="@Icons.Material.Filled.ArrowBack" Class="back-button" Href="/events">Browse events</MudButton>
+
+<MudGrid>
+    <MudItem xs="6">
+        <MudPaper Class="event-details1" Elevation="0">
+            <MudText Class="event-title-for-details">@Event.Name</MudText>
+            <MudText class="font-normal" Typo="Typo.body2">Join us for a thrilling and action-packed family football event that promises a day of fun, excitement, and friendly competition!eshments on the sidelines. Lace up your shoes, grab your jerseys, and let the games begin!</MudText>
+        </MudPaper>
+        <MudPaper Class="event-details1" Elevation="0">
+            <MudText Class="event-details-for-details">Event details</MudText>
+            <MudList Class="tab">
+                <MudListItem Class="mt-n3 mb-2">
+                    <MudImage Src="@(Event?.EventCategoryPicture ?? string.Empty)" Width=" 50" Height="50" Alt="" Elevation="0" />
+                    <MudText Class="mt-n10 ml-15 font-details-category">@Event.EventCategory </MudText>
+                </MudListItem>
+                <MudListItem Class="mt-n3">
+                    <MudText Class="font-details">
+                        <span class="font-details">Price: </span><span class="font-details-values">@Event.Cost $</span>
+                    </MudText>
+                </MudListItem>
+                <MudListItem Class="mt-n3">
+                    <MudText Class="font-details">
+                        <span class="font-details">Date: </span><span class="font-details-values">@Event.EventDate.Date.ToString("dd.MM.yyyy")</span>
+                    </MudText>
+                </MudListItem>
+                <MudListItem Class="mt-n3">
+                    <MudText Class="font-details">
+                        <span class="font-details">Free places: </span><span class="font-details-values">@FreePlaces</span>
+                    </MudText>
+                </MudListItem>
+                <MudListItem Class="mt-n3">
+                    <MudText Class="font-details">
+                        <span class="font-details">Mininimum age: </span><span class="font-details-values">@Event.MinAge</span>
+                    </MudText>
+                </MudListItem>
+                <MudListItem Class="mt-n3">
+                    <MudText Class="font-details">
+                        <span class="font-details">Location: </span><span class="font-details-values">@Event.Place</span>
+                    </MudText>
+                </MudListItem>
+            </MudList>
+            <div @onclick="HandleJoining"><MudButton Class="d-flex align-center justify-center button-color2" Variant="Variant.Filled" Disabled="@IsJoiningNotPossible" OnClick="HandleJoining">Join!</MudButton></div>
+            
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="6">
+        <MudPaper Class="event-details2" Elevation="0" MaxHeight="85vh">
+            <MudList>
+                <MudListItem>
+                    <MudText Class="font-detials-people">
+                        Event owner
+                    </MudText>
+                </MudListItem>
+                <MudListItem>
+                    <MudText Class="d-flex align-center avatar-class-participants">
+                        <MudAvatar Style="height:80px; width:80px; font-size:2rem;">
+                            <MudImage Width="70" Src="@(Event.OwnerPicture ?? string.Empty)" Alt="" Elevation="0" />
+                        </MudAvatar>
+                        <span class="avatar-class-participants font-detials-people2">@Event.OwnerName</span>
+                    </MudText>
+                </MudListItem>
+                <MudListItem>
+                    <MudText Class="font-detials-people">
+                        Participants (@Event.TakenPlaces)
+                    </MudText>
+                </MudListItem>
+                @foreach(var p in Event.Participants.Where(x => x.UserName != Event.OwnerName))
+                {
+                    <MudListItem>
+                        <MudText Class="d-flex align-center avatar-class-participants">
+                            <MudAvatar Style="height:80px; width:80px; font-size:2rem;">
+                                <MudImage Width="70" Src="@(p.ProfilePicture ?? string.Empty)" Alt="" Elevation="0" />
+                            </MudAvatar>
+                            <span class="avatar-class-participants font-detials-people2">@p.UserName</span>
+                        </MudText>
+                    </MudListItem>
+                }               
+            </MudList>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
 
 
 @code {
+    [AllowNull]
+    [CascadingParameter]
+    protected Task<AuthenticationState> AuthState { get; set; }
+
     private EventDto Event = new EventDto();
+    private int FreePlaces = 0;
+    private bool IsJoiningNotPossible = false;
+    GetUserProfileResponse? userProfile;
+    private bool alreadyJoined = false;
 
     [Parameter]
     public String eventID { get; set; }
@@ -52,9 +121,55 @@
         GetEventByIdResponse getEventResponse = await _client.ApiEventsGetAsync(eventId);
 
         Event = getEventResponse.EventDetails;
+        FreePlaces = Event.MaxAmountOfPeople - Event.TakenPlaces;
+        var user = (await AuthState).User;
+        var authenticatedUserId = user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
+        (_, userProfile) = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiUsersGetAsync(Guid.Parse(authenticatedUserId)));
+
+        if(userProfile.Age < Event.MinAge || FreePlaces == 0)
+        {
+            IsJoiningNotPossible = true;
+        }
+
+        foreach (var p in Event.Participants)
+        {
+            if (p.UserId == userProfile.UserId)
+            {
+                alreadyJoined = true;
+                IsJoiningNotPossible = true;
+            }
+        }
 
         // Update the UI
         UpdateDisplayedEvents();
+    }
+
+    private async Task HandleJoining()
+    {
+        Snackbar.Clear();
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+
+        if(userProfile.Age < Event.MinAge)
+        {
+            Snackbar.Add("You are too young to join this event.", MudBlazor.Severity.Info);
+        }
+        if (FreePlaces == 0)
+        {
+            Snackbar.Add("This event is already full.", MudBlazor.Severity.Info);
+        }
+        if(alreadyJoined)
+        {
+            Snackbar.Add("You already joined this event.", MudBlazor.Severity.Info);
+            alreadyJoined = true;
+        }
+        else        
+        {
+            JoinEventCommand joinEventCommand = new JoinEventCommand { UserId = userProfile.UserId, EventId = Event.Id };
+            await _client.ApiUserJoinAsync(joinEventCommand);
+            await LoadEvent(Guid.Parse(eventID));
+
+            Snackbar.Add("Woo-hoo! You just joined this event!", MudBlazor.Severity.Success);
+        }
     }
 
     private void UpdateDisplayedEvents()
