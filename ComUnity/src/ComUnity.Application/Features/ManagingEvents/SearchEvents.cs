@@ -4,6 +4,7 @@ using ComUnity.Application.Database;
 using ComUnity.Application.Features.ManagingEvents.Dtos;
 using ComUnity.Application.Features.ManagingEvents.Entities;
 using ComUnity.Application.Features.UserProfileManagement.Dtos;
+using ComUnity.Application.Infrastructure.Services;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -64,10 +65,12 @@ internal class SearchEventQueryHandler : IRequestHandler<SearchEventsQuery, Sear
     private static int DefaultPageSize = 20;
 
     private readonly ComUnityContext _context;
+    private readonly IAzureStorageService _azureStorageService;
 
-    public SearchEventQueryHandler(ComUnityContext context)
+    public SearchEventQueryHandler(ComUnityContext context, IAzureStorageService azureStorageService)
     {
         _context = context;
+        _azureStorageService = azureStorageService;
     }
 
     public async Task<SearchEventsResponse> Handle(SearchEventsQuery request, CancellationToken cancellationToken)
@@ -130,6 +133,7 @@ internal class SearchEventQueryHandler : IRequestHandler<SearchEventsQuery, Sear
                 x.Cost,
                 x.MinAge,
                 x.EventCategory.CategoryName,
+                x.EventCategory.ImageId.HasValue ? _azureStorageService.GetReadFileToken(x.EventCategory.ImageId.Value) : null,
                 x.Participants.Select(y => new UserDto(y.UserId, y.Username))
                 )).ToList());
     }

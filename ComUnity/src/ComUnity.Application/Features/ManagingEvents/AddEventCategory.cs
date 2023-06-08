@@ -2,64 +2,80 @@
 using ComUnity.Application.Database;
 using ComUnity.Application.Features.ManagingEvents.Entities;
 using ComUnity.Application.Features.ManagingEvents.Exceptions;
+using ComUnity.Application.Infrastructure.Services;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using static ComUnity.Application.Features.ManagingEvents.AddEventController;
+using System;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using static ComUnity.Application.Features.ManagingEvents.AddEventCategoryController;
 
-namespace ComUnity.Application.Features.ManagingEvents;
-
-public class AddEventCategoryController : ApiControllerBase
+namespace ComUnity.Application.Features.ManagingEvents
 {
-    [HttpPost("/api/event-categories/")]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    public async Task<IActionResult> AddEventCategory([FromBody] AddEventCategoryCommand command)
-    {
-        await Mediator.Send(command);
-
-        return StatusCode(StatusCodes.Status201Created);
-    }
-
-    public record AddEventCategoryCommand(string Name) : IRequest<Unit>;
-
-    public class AddEventCategoryCommandValidator : AbstractValidator<AddEventCategoryCommand>
+    public class AddEventCategoryController : ApiControllerBase
     {
 
-        public AddEventCategoryCommandValidator()
+        [HttpPost("/api/event-categories/")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        public async Task<IActionResult> AddEventCategory([FromBody] AddEventCategoryCommand command)
         {
-            RuleFor(x => x.Name)
-                .NotEmpty()
-                .MinimumLength(3);
-        }
-    }
+            await Mediator.Send(command);
 
-    internal class AddEventCategoryCommandHandler : IRequestHandler<AddEventCategoryCommand, Unit>
-    {
-        private readonly ComUnityContext _context;
-
-        public AddEventCategoryCommandHandler(ComUnityContext context)
-        {
-            _context = context;
+            return StatusCode(StatusCodes.Status201Created);
         }
 
-        public async Task<Unit> Handle(AddEventCategoryCommand request, CancellationToken cancellationToken)
+        public record AddEventCategoryCommand(string Name, Guid? ImageId) : IRequest<AddEventCategoryResponse>;
+
+        public record AddEventCategoryResponse(string PictureUrl);
+
+        public class AddEventCategoryCommandValidator : AbstractValidator<AddEventCategoryCommand>
         {
-
-            var eventCategory = await _context.Set<EventCategory>().FirstOrDefaultAsync(e => e.CategoryName == request.Name, cancellationToken);
-
-            if (eventCategory != null)
+            public AddEventCategoryCommandValidator()
             {
-                throw new EventCategoryAlreadyExistException();
+                RuleFor(x => x.Name)
+                    .NotEmpty()
+                    .MinimumLength(3);
+            }
+        }
+
+        internal class AddEventCategoryCommandHandler : IRequestHandler<AddEventCategoryCommand, AddEventCategoryResponse>
+        {
+            private readonly ComUnityContext _context;
+            private readonly IAzureStorageService _azureStorageService;
+
+            public AddEventCategoryCommandHandler(ComUnityContext context, IAzureStorageService azureStorageService, IAuthenticatedUserProvider authenticatedUserProvider)
+            {
+                _context = context;
+                _azureStorageService = azureStorageService;
             }
 
-            eventCategory = new EventCategory(request.Name);
+            public async Task<AddEventCategoryResponse> Handle(AddEventCategoryCommand request, CancellationToken cancellationToken)
+            {
+                var eventCategory = await _context.Set<EventCategory>().FirstOrDefaultAsync(e => e.CategoryName == request.Name, cancellationToken);
 
-            await _context.AddAsync(eventCategory);
-            await _context.SaveChangesAsync();
+                if (eventCategory != null)
+                {
+                    throw new EventCategoryAlreadyExistException();
+                }
 
-            return Unit.Value;
+                eventCategory = new EventCategory(request.Name);
+                
+                if(request.ImageId != null)
+                {
+                    eventCategory.SetCategoryImage((Guid)request.ImageId);
+                }
+
+                await _context.AddAsync(eventCategory);
+                await _context.SaveChangesAsync();
+
+                var pictureUrl = _azureStorageService.GetReadFileToken((Guid)request.ImageId);
+
+                return new AddEventCategoryResponse(pictureUrl);
+            }
         }
     }
 }

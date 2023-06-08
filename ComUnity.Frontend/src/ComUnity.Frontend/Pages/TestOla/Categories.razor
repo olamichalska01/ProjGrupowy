@@ -1,0 +1,110 @@
+﻿@layout MainLayout
+@page "/categories"
+@using ComUnity.Frontend.Services;
+@using System.Security.Claims;
+@inject IComUnityApiClient _client
+@inject IAzureStorageFileUploader _fileUploader
+@inject ErrorHandler _errorHandler
+@inject ISnackbar _snackbar
+@using ComUnity.Frontend.Extensions;
+@inject NavigationManager _navigation
+@inject AuthenticationStateProvider _authenticationStateProvider
+
+
+
+<MudCard>
+    <MudCardContent>
+        <MudGrid>
+            <MudTable Items="@Events" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+                <HeaderContent>
+                    <MudTh>Name</MudTh>
+                    <MudTh>image</MudTh>
+                    <MudTh></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Name"><b>@context.Name</b></MudTd>
+                    
+                    <MudTd DataLabel="image">
+                        <MudImage Src="@(context?.ImageId ?? string.Empty)" Width="50" Height="50" Alt="category picture" Elevation="0" />
+                    </MudTd>
+                </RowTemplate>
+                <PagerContent>
+                    <MudTablePager />
+                </PagerContent>
+            </MudTable>
+        </MudGrid>
+    </MudCardContent>
+</MudCard>
+
+<MudGrid>
+    <MudTextField @bind-Value="TextValue" Label="Standard" Variant="Variant.Text" Margin="Margin.Dense"></MudTextField>
+    <MudFileUpload T="IBrowserFile" FilesChanged="Testuje">
+        <ButtonTemplate>
+            <MudFab HtmlTag="label"
+                    Color="Color.Secondary"
+                    Icon="@Icons.Material.Filled.Image"
+                    Label="Load picture"
+                    for="@context" />
+        </ButtonTemplate>
+    </MudFileUpload>
+    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Color="Color.Primary" OnClick="UploadFiles">Send</MudButton>
+
+</MudGrid>
+
+
+
+@code {
+    public string TextValue { get; set; }
+    private List<EventCategory> Events = new List<EventCategory>();
+    IBrowserFile testowy; 
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadEvents();
+
+        StateHasChanged();
+    }
+
+    private async Task LoadEvents()
+    {
+        // Fetch all events from the API
+        GetEventsCategoriesResponse getEventsResponse = await _client.ApiEventsCategoriesAsync();
+
+        Events = getEventsResponse.Categories.ToList<EventCategory>();
+    }
+
+    public async Task Testuje(IBrowserFile file)
+    {
+        var (isSuccess, response) = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiFilesSasTokenAsync());
+        if (!isSuccess)
+        {
+            return;
+        }
+        testowy = file;
+    }
+
+    public async Task UploadFiles()
+    {
+        var (isSuccess, response) = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiFilesSasTokenAsync());
+        if (!isSuccess)
+        {
+            return;
+        }
+        var pictureId = await _fileUploader.UploadFile(response!.Token, testowy, CancellationToken.None);
+        AddEventCategoryCommand categ = new AddEventCategoryCommand { ImageId = pictureId, Name = TextValue };
+        (isSuccess) = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiEventCategoriesPostAsync(categ));
+        if (!isSuccess)
+        {
+            return;
+        }
+
+        await LoadEvents();
+
+        StateHasChanged();
+
+    }
+
+
+
+}
+

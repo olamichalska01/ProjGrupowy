@@ -13,4 +13,5 @@ public record EventDto(
     double Cost,
     int MinAge,
     string EventCategory,
+    string? EventCategoryPicture,
     IEnumerable<UserDto> Participants);

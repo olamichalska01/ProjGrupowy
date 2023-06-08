@@ -4,6 +4,7 @@ public class EventCategory
 {
     public Guid Id { get; private set;  }
     public string CategoryName { get; private set; }
+    public Guid? ImageId { get;  set; }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public EventCategory() { }
@@ -18,5 +19,10 @@ public class EventCategory
     public EventCategory(string name)
     {
         CategoryName = name;
+    }
+
+    public void SetCategoryImage(Guid categoryImageId)
+    {
+        ImageId = categoryImageId;
     }
 }

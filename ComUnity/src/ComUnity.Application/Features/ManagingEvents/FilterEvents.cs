@@ -3,6 +3,7 @@ using ComUnity.Application.Database;
 using ComUnity.Application.Features.ManagingEvents.Dtos;
 using ComUnity.Application.Features.ManagingEvents.Entities;
 using ComUnity.Application.Features.UserProfileManagement.Dtos;
+using ComUnity.Application.Infrastructure.Services;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -40,10 +41,13 @@ namespace ComUnity.Application.Features.ManagingEvents
         internal class FilterEventsQueryHandler : IRequestHandler<FilterEventsQuery, FilterEventsResponse>
         {
             private readonly ComUnityContext _context;
+            private readonly IAzureStorageService _azureStorageService;
 
-            public FilterEventsQueryHandler(ComUnityContext context)
+
+            public FilterEventsQueryHandler(ComUnityContext context, IAzureStorageService azureStorageService)
             {
                 _context = context;
+                _azureStorageService = azureStorageService;
             }
 
             public async Task<FilterEventsResponse> Handle(FilterEventsQuery request, CancellationToken cancellationToken)
@@ -74,7 +78,7 @@ namespace ComUnity.Application.Features.ManagingEvents
 
                 if (request.MinAge > 0)
                 {
-                    query = query.Where(x => request.MinAge >= x.MinAge);
+                    query = query.Where(x => request.MinAge <= x.MinAge);
                 }
 
                 if (request.FromDate > DateTime.MinValue)
@@ -100,6 +104,7 @@ namespace ComUnity.Application.Features.ManagingEvents
                         e.Cost,
                         e.MinAge,
                         e.EventCategory.CategoryName,
+                        e.EventCategory.ImageId.HasValue ? _azureStorageService.GetReadFileToken(e.EventCategory.ImageId.Value) : null,
                         e.Participants.Select(y => new UserDto(y.UserId, y.Username)))).ToList());
             }
         }
