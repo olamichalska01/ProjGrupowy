@@ -2,7 +2,31 @@
 .mud-list-item-icon {
     min-width: 32px;
 }
-
+.up-event-title-font {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    font-size: 22px;
+    color: #231f20;
+}
+.up-event-title-font2 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 22px;
+    color: #231f20;
+    margin-bottom: 10px;
+}
+.font-title1 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    font-size: 20px;
+    margin-top: 10px;
+    color: #7ebdc2;
+}
+.c2{
+    border-top-width: 1px;
+    border-color: #d4d4d4;
+    padding-top: 30px;
+}
 .testola {
     font-family: 'Poppins', sans-serif;
     font-weight: 700;
@@ -13,6 +37,13 @@
     font-weight: 200;
     font-size: 12px;
     color: white;
+}
+.username-font {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 70px;
+    color: #231f20;
+    margin-top:40px;
 }
 .font-normal {
     font-family: 'Poppins', sans-serif;
@@ -60,6 +91,19 @@
 .left-position {
     text-align: left;
 }
+
+.event-user-title{
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 30px;
+    color: #dcc786;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+.c1 {
+    width: 60%;
+    margin-left: 30px;
+}
 .filter-border {
     border-color: #231f20;
     border-width: 5px;
@@ -82,6 +126,12 @@
     margin-top: 20px;
     width: 130px;
 }
+
+.button-color3{
+    background-color: #17a398;
+    color: white;
+}
+
 
 .tab{
     margin-left:-15px;
@@ -163,6 +213,16 @@
     margin-left: 10px;
     margin-bottom: 50px;
 }
+.space-class{
+    margin-top: 20px;
+}
+
+.testuje2 {
+    margin-right: 0px;
+    margin-left: 0px;
+    margin-bottom: 50px;
+}
+
 
 .filter2 {
     margin-right: 160px;
@@ -309,3 +369,15 @@ a, .btn-link {
     .loading-progress-text:after {
         content: var(--blazor-load-percentage-text, "Loading");
     }
+
+
+.grid-profile{
+    margin-top: 50px;
+    margin-left: 160px;
+
+}
+
+.divider-user-profile-event{
+    color: white
+}
+

@@ -2,12 +2,15 @@
 using ComUnity.Application.Common.Exceptions;
 using ComUnity.Application.Database;
 using ComUnity.Application.Features.ManagingEvents.Entities;
+using ComUnity.Application.Features.UserProfileManagement.Dtos;
 using ComUnity.Application.Features.UserProfileManagement.Entities;
 using ComUnity.Application.Infrastructure.Services;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
+using System.Linq;
 using static ComUnity.Application.Features.UserProfileManagement.GetUserProfileResponse;
 
 namespace ComUnity.Application.Features.UserProfileManagement;
@@ -34,11 +37,20 @@ public record GetUserProfileResponse(
     bool IsFriend,
     bool IsFriendshipRequestSent,
     bool IsFriendshipRequestReceived,
+    ICollection<UserDto> UserFriends,
     ICollection<FavouriteCategory> FavouriteCategories,
-    ICollection<ParticipatedInEvent> ParticipatedInEvents)
+    ICollection<UserEventsDto> UserEvents)
 {
-    public record FavouriteCategory(Guid Id, string Name);
-    public record ParticipatedInEvent(Guid Id, string Name, string Category);
+    public record FavouriteCategory(Guid Id, string Name, string? CategoyPic);
+    public record UserEventsDto(
+        Guid Id,
+        string OwnerName,
+        string Name,
+        DateTime EventDate,
+        double Cost,
+        string EventCat,
+        string? EventCategoryPicture
+        );
 }
 
 internal class GetUserProfileQueryHandler : IRequestHandler<GetUserProfileQuery, GetUserProfileResponse>
@@ -72,8 +84,34 @@ internal class GetUserProfileQueryHandler : IRequestHandler<GetUserProfileQuery,
         var favouriteCategories = await _context
             .Set<EventCategory>()
             .Where(x => user.FavoriteCategories.Select(x => x.EventCategoryId).Contains(x.Id))
-            .Select(x => new FavouriteCategory(x.Id, x.CategoryName))
+            .Select(x => new FavouriteCategory(x.Id, x.CategoryName, x.ImageId.HasValue ? _azureStorageService.GetReadFileToken(x.ImageId.Value) : null))
             .ToListAsync(cancellationToken);
+
+        var userFriendsRelations = await _context.Set<Relationship>()
+            .Where(r => r.RelationshipType == "Friendship" && r.User2Id == user.UserId)
+            .Select(x => x.User1Id)
+            .ToListAsync();
+
+        var userFriends = await _context
+            .Set<UserProfile>()
+            .Include(ur => ur.Relationships.Where(r => r.RelationshipType == "Friendship" && r.User2Id == user.UserId))
+            .Where(u => u.UserId != user.UserId)
+            .Where(r => userFriendsRelations.Contains(r.UserId))
+            .Select(x => new UserDto(x.UserId, x.Username, x.ProfilePicture.HasValue ? _azureStorageService.GetReadFileToken(x.ProfilePicture.Value) : null))
+            .ToListAsync(cancellationToken);
+
+        var userEvents = await _context
+            .Set<Event>()
+            .Where(e => e.Participants.Contains(user))
+            .Select(x => new UserEventsDto (
+                x.Id,
+                x.Participants.FirstOrDefault(y => y.UserId == x.OwnerId).Username,
+                x.EventName,
+                x.EventDate,
+                x.Cost, 
+                x.EventCategory.CategoryName,
+                x.EventCategory.ImageId.HasValue ? _azureStorageService.GetReadFileToken(x.EventCategory.ImageId.Value) : null))
+            .ToListAsync();
 
         var profilePicture = user.ProfilePicture.HasValue ? _azureStorageService.GetReadFileToken(user.ProfilePicture.Value) : null;
         var requestUserSideRelationship = await _context.Set<Relationship>().FirstOrDefaultAsync(x => x.User1Id == requestUserId && x.User2Id == user.UserId, cancellationToken);
@@ -90,7 +128,8 @@ internal class GetUserProfileQueryHandler : IRequestHandler<GetUserProfileQuery,
             IsFriendshipRequestReceived: fetchedUserSideRelationship?.RelationshipType == RelationshipTypes.FrienshipRequested,
             IsFriend: requestUserSideRelationship?.RelationshipType == RelationshipTypes.Friendship,
             FavouriteCategories: favouriteCategories,
-            ParticipatedInEvents: Array.Empty<ParticipatedInEvent>());
+            UserFriends: userFriends,
+            UserEvents: userEvents);
     }
 
     private int CalculateAge(DateTime dateOfBirth)

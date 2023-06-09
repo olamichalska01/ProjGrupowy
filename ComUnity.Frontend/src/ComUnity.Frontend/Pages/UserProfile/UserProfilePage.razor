@@ -6,109 +6,260 @@
 @inject IAzureStorageFileUploader _fileUploader
 @inject ErrorHandler _errorHandler
 @inject ISnackbar _snackbar
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;500;700&display=swap" rel="stylesheet">
 
 <MudOverlay @bind-Visible="isLoading" DarkBackground="true">
     <MudProgressCircular Color="Color.Primary" Size="Size.Large" Indeterminate="true" />
 </MudOverlay>
 
+
+
 @if(!isLoading)
 {
-    <MudContainer Class="ml-10 mt-10">
-        <MudStack Row="true" AlignItems="AlignItems.End">
-            <div>
-                <MudImage Src="@(userProfile?.ProfilePicture ?? string.Empty)" Width="200" Height="200" Alt="Profile picture" Elevation="25" Class="rounded-lg" />
-                @if (isOwner)
-                {
-                    <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles" Class="relative d-inline-block mt-0" style="right: 30px; top: 170px">
-                        <ButtonTemplate>
-                            <MudIconButton HtmlTag="label"
-                                   Variant="Variant.Filled"
-                                   Size="Size.Small"
-                                   Color="Color.Info"
-                                   Icon="@Icons.Material.Filled.PhotoCamera"
-                                           for="@context">
-                            </MudIconButton>
-                        </ButtonTemplate>
-                    </MudFileUpload>
-                }
-            </div>
-            <MudText Typo="Typo.h2">@userProfile!.Username</MudText>
-            <MudSpacer />
-            @if(isOwner)
-            {
-                @if(isInEditingMode)
-                {
-                    <MudButton Color="Color.Success" Size="Size.Small" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Save" OnClick="UpdateUserProfile">Save changes</MudButton>
-                    <MudButton Size="Size.Small" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Cancel" OnClick="CancelEditing">Cancel</MudButton>
-                }
-                else
-                {
-                    <MudButton Size="Size.Small" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Edit" OnClick="HandleEditProfileButtonClicked">Edit profile</MudButton>
-                }
-            }
-            @if(userProfile!.IsFriendshipRequestReceived)
-            {
-                <MudButton Size="Size.Small" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.PersonAdd" OnClick="AcceptFriendRequest">Accept friend request</MudButton>
-            }
-            else if (userProfile.IsFriendshipRequestSent)
-            {
-                <MudButton Size="Size.Small" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Cancel" OnClick="CancelFriendRequest">Cancel friend request</MudButton>
-            } 
-            else if (!userProfile!.IsFriend)
-            {
-                <MudButton Size="Size.Small" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Person" OnClick="SendFriendRequest">Send friend request</MudButton>
-            }
-        </MudStack>
-        <MudDivider Class="my-5" />
-        <MudStack Row="true" Class="flex-grow-1">
-            <MudPaper Width="300px" Class="pa-4">
-                <MudText Typo="Typo.h5">User details</MudText>
+    <MudGrid Class="grid-profile">
+        <MudItem xs="12">
+            <MudGrid>
+                <MudItem xs="3">
+                    <div>
+                        <MudAvatar Style="height:230px; width:230px; font-size:2rem;">
+                            <MudImage Width="70" Src="@(userProfile?.ProfilePicture ?? string.Empty)" Alt="" Elevation="0" />
+                        </MudAvatar>
 
-                <MudDivider Class="my-5" />
-
-                @if (!string.IsNullOrWhiteSpace(userProfile?.City))
-                {
-                    <MudText Typo="Typo.subtitle2" Class="mb-1">City</MudText>
-                    @if (isInEditingMode)
-                    {
-                        <MudTextField T="string" Label="City" Variant="Variant.Text" @bind-Value="updateUserProfileCommand.City" Lines="1" />
-                    }
-                    else
-                    {
-                        <MudText Typo="Typo.body2">@userProfile!.City</MudText>
-                    }
-                }
-
-                @if (userProfile?.Age is not null)
-                {
-                    <MudText Typo="Typo.subtitle2" Class="mb-1 mt-5">Age</MudText>
-                    <MudText Typo="Typo.body2">@userProfile!.Age</MudText>
-                }
-
-                @if (userProfile?.FavouriteCategories.Count > 0)
-                {
-                    <MudText Typo="Typo.subtitle2" Class="mb-1 mt-5">Favourite Categories</MudText>
-                    <MudText Typo="Typo.body2">@string.Join(", ", userProfile.FavouriteCategories.Select(x => x.Name))</MudText>
-                }
-            </MudPaper>
-            <div>
-                <MudStack>
-                    <MudPaper Width="100%" Class="pa-4">
-                        <MudText Typo="Typo.h5">About me</MudText>
-                        @if(isInEditingMode)
+                        @if (isOwner)
                         {
-                            <MudTextField T="string" Label="About me" Variant="Variant.Text" @bind-Value="updateUserProfileCommand.AboutMe" Lines="5" />
+                            <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles" Class="relative d-inline-block mt-0" style="right: 30px; top: 170px">
+                                <ButtonTemplate>
+                                    <MudIconButton HtmlTag="label"
+                                                   Variant="Variant.Filled"
+                                                   Size="Size.Small"
+                                                   Color="Color.Dark"
+                                                   Icon="@Icons.Material.Filled.PhotoCamera"
+                                                   for="@context">
+                                    </MudIconButton>
+                                </ButtonTemplate>
+                            </MudFileUpload>
+                        }
+                    </div>
+
+                    <br />
+                    @if (isOwner)
+                    {
+                        @if (isInEditingMode)
+                        {
+                            <MudButton Color="Color.Success" Size="Size.Small" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Save" OnClick="UpdateUserProfile">Save changes</MudButton>
+                            <MudButton Size="Size.Small" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Cancel" OnClick="CancelEditing">Cancel</MudButton>
                         }
                         else
                         {
-                            <MudText Typo="Typo.body2" Class="mb-1 mt-5">@userProfile!.AboutMe</MudText>
+                            <MudButton Size="Size.Small" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Edit" OnClick="HandleEditProfileButtonClicked">Edit profile</MudButton>
+                        }
+                    }
+                    @if (userProfile!.IsFriendshipRequestReceived)
+                    {
+                        <MudButton Size="Size.Small" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.PersonAdd" OnClick="AcceptFriendRequest">Accept friend request</MudButton>
+                    }
+                    else if (userProfile.IsFriendshipRequestSent)
+                    {
+                        <MudButton Size="Size.Small" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Cancel" OnClick="CancelFriendRequest">Cancel friend request</MudButton>
+                    }
+                    else if (!userProfile!.IsFriend && !isOwner)
+                    {
+                        <MudButton Size="Size.Small" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Person" OnClick="SendFriendRequest">Send friend request</MudButton>
+                    }
+                </MudItem>
+                <MudItem xs="6">
+                    <MudPaper Elevation="0">
+                        <MudText Class="username-font">@userProfile!.Username</MudText>
+                    </MudPaper>
+                    <MudGrid>
+                        <MudItem xs="3">
+                            <MudPaper Elevation="0">
+                                @if (!string.IsNullOrWhiteSpace(userProfile?.City))
+                                {
+                                    <MudText Class="font-title1">City</MudText>
+                                    @if (isInEditingMode)
+                                    {
+                                        <MudTextField  @bind-Value="updateUserProfileCommand.City" Lines="1" />
+                                    }
+                                    else
+                                    {
+                                        <MudText Class="">@userProfile!.City</MudText>
+                                    }
+                                }
+                            </MudPaper>
+                        </MudItem>
+                        <MudItem xs="3">
+                            <MudPaper Elevation="0">
+                                @if (userProfile?.Age is not null)
+                                {
+                                    <MudText Class="font-title1">Age</MudText>
+                                    <MudText>@userProfile!.Age</MudText>
+                                }
+                            </MudPaper>
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudPaper Elevation="0">
+                                @if (userProfile?.AboutMe is not null)
+                                {
+                                    <MudText Class="font-title1">About me</MudText>
+                                    @if (isInEditingMode)
+                                    {
+                                        <MudTextField T="string" Variant="Variant.Text" @bind-Value="updateUserProfileCommand.AboutMe" Lines="5" />
+                                    }
+                                    else
+                                    {
+                                        <MudText>@userProfile!.AboutMe</MudText>
+                                    }
+                                }
+                            </MudPaper>
+                        </MudItem>
+                    </MudGrid>
+                </MudItem>
+            </MudGrid>
+            
+            
+        </MudItem>
+        <MudItem xs="3">
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudPaper Elevation="0">
+                        <MudText Class="up-event-title-font2">
+                            Favourite categories
+                        </MudText>
+                        @foreach (var c in userProfile.FavouriteCategories)
+                        {
+                            <MudTooltip Class="go-to-profile-text" Text="Click to go to profile" Placement="Placement.Right">
+                                <MudListItem>
+                                    <MudText Class="d-flex align-center">
+                                        <MudImage Src="@(c?.CategoyPic ?? string.Empty)" Width="50" Height="50" Alt="" Elevation="0" />
+                                        <span class="avatar-class-participants font-detials-people2 cursor-pointer">@c.Name</span>
+                                    </MudText>
+                                </MudListItem>
+                            </MudTooltip>
                         }
                     </MudPaper>
-                </MudStack>
-            </div>
-           
-        </MudStack>
-    </MudContainer>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudPaper Elevation="0">
+                        <MudText Class="up-event-title-font2 c2">
+                            Friends
+                        </MudText>
+                        <MudList>
+                            @foreach(var f in userProfile.UserFriends)
+                            {
+                                <MudTooltip Class="go-to-profile-text" Text="Click to go to profile" Placement="Placement.Right">
+                                    <MudListItem Href="." Class="d-flex align-center">
+                                        <MudText Class="d-flex align-center">
+                                            <MudAvatar Style="height:50px; width:50px; font-size:2rem;">
+                                                <MudImage Width="70" Src="@(f.ProfilePicture ?? string.Empty)" Alt="" Elevation="0" />
+                                            </MudAvatar>
+                                            <a href="../user/@f.UserId">
+                                                <span class="avatar-class-participants font-detials-people2 cursor-pointer">@f.UserName</span>
+                                            </a>
+                                        </MudText>
+                                    </MudListItem>
+                                </MudTooltip>
+                            }
+                        </MudList>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+            
+        </MudItem>
+        <MudItem xs="6">
+            <MudPaper Elevation="0">
+                <MudText Class="event-user-title">Events you signed up for (@UserEvents.Count())</MudText>
+
+                <MudTable Items="@UserEvents" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info" Elevation="0" Class="testuje2">
+                    <HeaderContent>
+                    </HeaderContent>
+                    <RowTemplate>
+
+                        <MudItem xs="12" >
+                            <MudPaper Class="d-flex float-left pa-1 mt-6" Height="150px">
+
+                                <MudCard Elevation="0" Class="c1">
+                                    <MudText Class="up-event-title-font">@context.Name</MudText>
+                                    <MudText Class="font-author">
+                                        by @context.OwnerName
+                                    </MudText>
+                                        <MudText Class="space-class">
+                                            <span class="font-details">Price: </span><span class="font-details-values">@context.Cost $</span>
+                                        </MudText>
+                                        <MudText Class="">
+                                            <span class="font-details">Date: </span><span class="font-details-values">@context.EventDate.Date.ToString("dd.MM.yyyy")</span>
+                                        </MudText>
+                                </MudCard>
+
+
+                                <MudCard Elevation="0">
+                                    <MudList>
+                                        <MudText Class="d-flex align-center mb-3 ml-4">
+                                            <MudImage Src="@(context?.EventCategoryPicture ?? string.Empty)" Class="mr-2" Width=" 50" Height="50" Alt="" Elevation="0" />
+                                            <MudText Class="">@context.EventCat </MudText>
+                                        </MudText>                                    
+                                        <MudListItem Class="">
+                                            <MudButton Class="button-color3" Href="@($" /events/{context.Id}")" EndIcon="@Icons.Material.Filled.ArrowForward" Variant="Variant.Filled">Go to event page</MudButton>
+                                        </MudListItem>
+                                    </MudList>
+                                </MudCard>
+
+                            </MudPaper>
+                        </MudItem>
+
+                    </RowTemplate>
+                   
+                </MudTable>
+
+                <MudText Class="event-user-title">Events you are hosting (@UserOwnedEvents.Count())</MudText>
+
+                <MudTable Items="@UserOwnedEvents" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info" Elevation="0" Class="testuje2">
+                    <HeaderContent>
+                    </HeaderContent>
+                    <RowTemplate>
+
+                        <MudItem xs="12">
+                            <MudPaper Class="d-flex float-left pa-1 mt-6" Height="150px">
+
+                                <MudCard Elevation="0" Class="c1">
+                                    <MudText Class="up-event-title-font">@context.Name</MudText>
+                                    <MudText Class="font-author">
+                                        by @context.OwnerName
+                                    </MudText>
+                                    <MudText Class="space-class">
+                                        <span class="font-details">Price: </span><span class="font-details-values">@context.Cost $</span>
+                                    </MudText>
+                                    <MudText Class="">
+                                        <span class="font-details">Date: </span><span class="font-details-values">@context.EventDate.Date.ToString("dd.MM.yyyy")</span>
+                                    </MudText>
+                                </MudCard>
+
+
+                                <MudCard Elevation="0">
+                                    <MudList>
+                                        <MudText Class="d-flex align-center mb-3 ml-4">
+                                            <MudImage Src="@(context?.EventCategoryPicture ?? string.Empty)" Class="mr-2" Width=" 50" Height="50" Alt="" Elevation="0" />
+                                            <MudText Class="">@context.EventCat </MudText>
+                                        </MudText>
+                                        <MudListItem Class="">
+                                            <MudButton Class="button-color3" Href="@($" /events/{context.Id}")" EndIcon="@Icons.Material.Filled.ArrowForward" Variant="Variant.Filled">Go to event page</MudButton>
+                                        </MudListItem>
+                                    </MudList>
+                                </MudCard>
+
+                            </MudPaper>
+                        </MudItem>
+
+                    </RowTemplate>
+                    
+                </MudTable>
+
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+
 }
 
 @code {
@@ -117,6 +268,8 @@
     protected Task<AuthenticationState> AuthState { get; set; }
 
     GetUserProfileResponse? userProfile;
+    private ICollection<UserEventsDto> UserEvents = new List<UserEventsDto>();
+    private ICollection<UserEventsDto> UserOwnedEvents = new List<UserEventsDto>();
 
     private bool isInEditingMode = false;
 
@@ -140,6 +293,8 @@
 
         isLoading = true;
         await LoadUserProfile();
+        UserEvents = userProfile.UserEvents.Where(u => !u.OwnerName.Equals(userProfile.Username)).ToList();
+        UserOwnedEvents = userProfile.UserEvents.Where(u => u.OwnerName.Equals(userProfile.Username)).ToList();
         isLoading = false;
 
         StateHasChanged();

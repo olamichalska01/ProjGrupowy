@@ -92,7 +92,7 @@
                         <MudTooltip Class="go-to-profile-text" Text="Click to go to profile" Placement="Placement.Right">
                             @foreach(var p in EventParticipants.Where(x => x.UserName == Event.OwnerName))
                             {
-                                <a href="/user/{@p.UserId}">
+                                <a href="/user/@p.UserId">
                                     <span class="avatar-class-participants font-detials-people2 cursor-pointer">@Event.OwnerName</span>
                                 </a>
                             }
@@ -112,7 +112,7 @@
                                 <MudImage Width="70" Src="@(p.ProfilePicture ?? string.Empty)" Alt="" Elevation="0" />
                             </MudAvatar>
                             <MudTooltip Class="go-to-profile-text" Text="Click to go to profile" Placement="Placement.Right">
-                                <a href="/user/{@p.UserId}">
+                                <a href="user/@p.UserId.ToString()">
                                     <span class="avatar-class-participants font-detials-people2 cursor-pointer">@p.UserName</span>
                                 </a>
                             </MudTooltip>
