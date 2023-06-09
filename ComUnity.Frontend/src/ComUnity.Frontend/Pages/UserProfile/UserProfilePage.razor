@@ -158,7 +158,9 @@
                                             <a href="../user/@f.UserId">
                                                 <span class="avatar-class-participants font-detials-people2 cursor-pointer">@f.UserName</span>
                                             </a>
+                                            <MudButton Class="delete-friend-button" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" OnClick="() => DeleteFriend(f.UserId)">Delete</MudButton>
                                         </MudText>
+                                       
                                     </MudListItem>
                                 </MudTooltip>
                             }
@@ -298,7 +300,7 @@
             UserEvents = userProfile.UserEvents.Where(u => !u.OwnerName.Equals(userProfile.Username)).ToList();
             UserOwnedEvents = userProfile.UserEvents.Where(u => u.OwnerName.Equals(userProfile.Username)).ToList();
         }
-       
+
         isLoading = false;
 
         StateHasChanged();
@@ -382,5 +384,15 @@
         {
             _snackbar.Add("Successfuly canceled request!", MudBlazor.Severity.Success);
         }
+    }
+
+    private async Task DeleteFriend(Guid userID)
+    {
+        var isSuccess = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiUsersDeleteFriendAsync(userID));
+        if (isSuccess)
+        {
+            _snackbar.Add("Friend deleted!", MudBlazor.Severity.Warning);
+        }
+        StateHasChanged();
     }
 }
