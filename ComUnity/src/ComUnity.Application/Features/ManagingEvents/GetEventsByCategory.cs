@@ -54,6 +54,8 @@ public class GetEventsByCategoryController : ApiControllerBase
                     e.TakenPlacesAmount,
                     e.MaxAmountOfPeople,
                     e.Place,
+                    e.Location.X,
+                    e.Location.Y,
                     e.EventDate,
                     e.Cost,
                     e.MinAge,

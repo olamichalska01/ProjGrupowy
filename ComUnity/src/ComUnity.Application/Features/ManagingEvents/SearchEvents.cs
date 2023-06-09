@@ -133,6 +133,8 @@ internal class SearchEventQueryHandler : IRequestHandler<SearchEventsQuery, Sear
                 x.TakenPlacesAmount,
                 x.MaxAmountOfPeople,
                 x.Place,
+                x.Location.X,
+                x.Location.Y,
                 x.EventDate,
                 x.Cost,
                 x.MinAge,

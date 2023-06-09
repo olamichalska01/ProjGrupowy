@@ -1,4 +1,5 @@
-﻿@using ComUnity.Frontend.Extensions;
+﻿@using BlazorLeaflet;
+@using ComUnity.Frontend.Extensions;
 @using ComUnity.Frontend.Services;
 @page "/events/{eventID}"
 @layout MainLayout
@@ -7,6 +8,10 @@
 @inject ISnackbar Snackbar
 @inject ErrorHandler _errorHandler
 @inject NavigationManager _navigation
+@using BlazorLeaflet.Models;
+@using System.Globalization;
+@inject IJSRuntime jsRuntime
+@implements IAsyncDisposable
 @inject AuthenticationStateProvider _authenticationStateProvider
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,40 +27,50 @@
             <MudText class="font-normal" Typo="Typo.body2">Join us for a thrilling and action-packed family football event that promises a day of fun, excitement, and friendly competition!eshments on the sidelines. Lace up your shoes, grab your jerseys, and let the games begin!</MudText>
         </MudPaper>
         <MudPaper Class="event-details1" Elevation="0">
-            <MudText Class="event-details-for-details">Event details</MudText>
-            <MudList Class="tab">
-                <MudListItem Class="mt-n3 mb-2">
-                    <MudImage Src="@(Event?.EventCategoryPicture ?? string.Empty)" Width=" 50" Height="50" Alt="" Elevation="0" />
-                    <MudText Class="mt-n10 ml-15 font-details-category">@Event.EventCategory </MudText>
-                </MudListItem>
-                <MudListItem Class="mt-n3">
-                    <MudText Class="font-details">
-                        <span class="font-details">Price: </span><span class="font-details-values">@Event.Cost $</span>
-                    </MudText>
-                </MudListItem>
-                <MudListItem Class="mt-n3">
-                    <MudText Class="font-details">
-                        <span class="font-details">Date: </span><span class="font-details-values">@Event.EventDate.Date.ToString("dd.MM.yyyy")</span>
-                    </MudText>
-                </MudListItem>
-                <MudListItem Class="mt-n3">
-                    <MudText Class="font-details">
-                        <span class="font-details">Free places: </span><span class="font-details-values">@FreePlaces</span>
-                    </MudText>
-                </MudListItem>
-                <MudListItem Class="mt-n3">
-                    <MudText Class="font-details">
-                        <span class="font-details">Mininimum age: </span><span class="font-details-values">@Event.MinAge</span>
-                    </MudText>
-                </MudListItem>
-                <MudListItem Class="mt-n3">
-                    <MudText Class="font-details">
-                        <span class="font-details">Location: </span><span class="font-details-values">@Event.Place</span>
-                    </MudText>
-                </MudListItem>
-            </MudList>
-            <div @onclick="HandleJoining"><MudButton Class="d-flex align-center justify-center button-color2" Variant="Variant.Filled" Disabled="@IsJoiningNotPossible" OnClick="HandleJoining">Join!</MudButton></div>
-            
+            <MudGrid>
+            <MudItem xs="6" >
+                <MudPaper Elevation="0">
+                    <MudText Class="event-details-for-details">Event details</MudText>
+                    <MudList Class="tab">
+                        <MudListItem Class="mt-n3 mb-2">
+                            <MudImage Src="@(Event?.EventCategoryPicture ?? string.Empty)" Width=" 50" Height="50" Alt="" Elevation="0" />
+                            <MudText Class="mt-n10 ml-15 font-details-category">@Event.EventCategory </MudText>
+                        </MudListItem>
+                        <MudListItem Class="mt-n3">
+                            <MudText Class="font-details">
+                                <span class="font-details">Price: </span><span class="font-details-values">@Event.Cost $</span>
+                            </MudText>
+                        </MudListItem>
+                        <MudListItem Class="mt-n3">
+                            <MudText Class="font-details">
+                                <span class="font-details">Date: </span><span class="font-details-values">@Event.EventDate.Date.ToString("dd.MM.yyyy")</span>
+                            </MudText>
+                        </MudListItem>
+                        <MudListItem Class="mt-n3">
+                            <MudText Class="font-details">
+                                <span class="font-details">Free places: </span><span class="font-details-values">@FreePlaces</span>
+                            </MudText>
+                        </MudListItem>
+                        <MudListItem Class="mt-n3">
+                            <MudText Class="font-details">
+                                <span class="font-details">Mininimum age: </span><span class="font-details-values">@Event.MinAge</span>
+                            </MudText>
+                        </MudListItem>
+                        <MudListItem Class="mt-n3">
+                            <MudText Class="font-details">
+                                <span class="font-details">Location: </span><span class="font-details-values">@Event.Place</span>
+                            </MudText>
+                        </MudListItem>
+                    </MudList>
+                    <div @onclick="HandleJoining"><MudButton Class="d-flex align-center justify-center button-color2" Variant="Variant.Filled" Disabled="@IsJoiningNotPossible" OnClick="HandleJoining">Join!</MudButton></div>
+                </MudPaper>
+            </MudItem>
+                <MudItem xs="6">
+                    <MudPaper Elevation="0">
+                        <div id="map" style="width:300px; height:400px;"></div>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
         </MudPaper>
     </MudItem>
     <MudItem xs="6">
@@ -79,7 +94,7 @@
                         Participants (@Event.TakenPlaces)
                     </MudText>
                 </MudListItem>
-                @foreach(var p in Event.Participants.Where(x => x.UserName != Event.OwnerName))
+                @foreach(var p in EventParticipants.Where(x => x.UserName != Event.OwnerName))
                 {
                     <MudListItem>
                         <MudText Class="d-flex align-center avatar-class-participants">
@@ -102,25 +117,52 @@
     protected Task<AuthenticationState> AuthState { get; set; }
 
     private EventDto Event = new EventDto();
+    private ICollection<UserDto> EventParticipants = new List<UserDto>();
     private int FreePlaces = 0;
     private bool IsJoiningNotPossible = false;
     GetUserProfileResponse? userProfile;
     private bool alreadyJoined = false;
 
+    private IJSObjectReference? module;
+    private string? result;
+
     [Parameter]
     public String eventID { get; set; }
-
 
     protected override async Task OnInitializedAsync()
     {
         await LoadEvent(Guid.Parse(eventID));
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadEvent(Guid.Parse(eventID));
+            string locationString = Event.LocationY.ToString("G", CultureInfo.InvariantCulture) + ", " + Event.LocationX.ToString("G", CultureInfo.InvariantCulture);
+            var raw = "[ { \"type\": \"Feature\",\"geometry\": { \"type\": \"Point\",\"coordinates\": [ " + locationString + " ]}, \"properties\": { \"name\": \"Here!\" } } ]";
+            module = await jsRuntime.InvokeAsync<IJSObjectReference>("import", "./leafletmap.js");
+            if (module != null)
+            {
+                result = await module.InvokeAsync<string>("load_map", Convert.ToString(raw));
+            }
+        }
+    }
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        if (module is not null)
+        {
+            await module.DisposeAsync();
+        }
+    }
+
+
     private async Task LoadEvent(Guid eventId)
     {
         GetEventByIdResponse getEventResponse = await _client.ApiEventsGetAsync(eventId);
 
         Event = getEventResponse.EventDetails;
+        EventParticipants = Event.Participants;
         FreePlaces = Event.MaxAmountOfPeople - Event.TakenPlaces;
         var user = (await AuthState).User;
         var authenticatedUserId = user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;

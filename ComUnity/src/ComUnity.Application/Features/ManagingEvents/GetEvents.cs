@@ -40,7 +40,10 @@ public class GetEventsController : ApiControllerBase
 
         public async Task<GetEventsResponse> Handle(GetEventsQuery request, CancellationToken cancellationToken)
         {
-            var events = await _context.Set<Event>().Include(x => x.EventCategory).Include(y => y.Participants).ToListAsync(cancellationToken);
+            var events = await _context.Set<Event>()
+                .Include(x => x.EventCategory)
+                .Include(y => y.Participants)
+                .ToListAsync(cancellationToken);
             var users = await _context.Set<UserProfile>().ToListAsync();
 
             return new GetEventsResponse(
@@ -52,6 +55,8 @@ public class GetEventsController : ApiControllerBase
                     e.TakenPlacesAmount,
                     e.MaxAmountOfPeople,
                     e.Place,
+                    e.Location.X,
+                    e.Location.Y,
                     e.EventDate,
                     e.Cost,
                     e.MinAge,

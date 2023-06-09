@@ -4975,6 +4975,12 @@ namespace ComUnity.Frontend.Api
         [Newtonsoft.Json.JsonProperty("place", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string Place { get; set; }
 
+        [Newtonsoft.Json.JsonProperty("locationX", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public double LocationX { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("locationY", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public double LocationY { get; set; }
+
         [Newtonsoft.Json.JsonProperty("eventDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.DateTime EventDate { get; set; }
 

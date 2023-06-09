@@ -40,7 +40,10 @@ public class GetEventByIdController : ApiControllerBase
 
         public async Task<GetEventByIdResponse> Handle(GetEventByIdQuery request, CancellationToken cancellationToken)
         {
-            var result = await _context.Set<Event>().Include(x => x.EventCategory).Include(y => y.Participants).FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
+            var result = await _context.Set<Event>()
+                .Include(x => x.EventCategory)
+                .Include(y => y.Participants)
+                .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
 
             if (result == null)
             {
@@ -57,6 +60,8 @@ public class GetEventByIdController : ApiControllerBase
                     result.TakenPlacesAmount,
                     result.MaxAmountOfPeople,
                     result.Place,
+                    result.Location.X,
+                    result.Location.Y,
                     result.EventDate,
                     result.Cost,
                     result.MinAge,
