@@ -62,7 +62,10 @@
                             </MudText>
                         </MudListItem>
                     </MudList>
-                    <div @onclick="HandleJoining"><MudButton Class="d-flex align-center justify-center button-color2" Variant="Variant.Filled" Disabled="@IsJoiningNotPossible" OnClick="HandleJoining">Join!</MudButton></div>
+                    <span>
+                        <div @onclick="HandleJoining"><MudButton Class="d-flex align-center justify-center button-color2" Variant="Variant.Filled" Disabled="@IsJoiningNotPossible" OnClick="HandleJoining">Join!</MudButton></div>
+                        <div @onclick="HandleLeave"><MudButton Class="d-flex align-center justify-center button-color2" Variant="Variant.Filled" Disabled="@IsLeavingNotPossible" OnClick="HandleLeave">Leave event</MudButton></div>
+                    </span>
                 </MudPaper>
             </MudItem>
                 <MudItem xs="6">
@@ -120,6 +123,7 @@
     private ICollection<UserDto> EventParticipants = new List<UserDto>();
     private int FreePlaces = 0;
     private bool IsJoiningNotPossible = false;
+    private bool IsLeavingNotPossible = false;
     GetUserProfileResponse? userProfile;
     private bool alreadyJoined = false;
 
@@ -168,6 +172,9 @@
         var authenticatedUserId = user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
         (_, userProfile) = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiUsersGetAsync(Guid.Parse(authenticatedUserId)));
 
+        IsJoiningNotPossible = false;
+        alreadyJoined = false;
+
         if(userProfile.Age < Event.MinAge || FreePlaces == 0)
         {
             IsJoiningNotPossible = true;
@@ -181,6 +188,7 @@
                 IsJoiningNotPossible = true;
             }
         }
+        IsLeavingNotPossible = !IsJoiningNotPossible;
 
         // Update the UI
         UpdateDisplayedEvents();
@@ -211,6 +219,26 @@
             await LoadEvent(Guid.Parse(eventID));
 
             Snackbar.Add("Woo-hoo! You just joined this event!", MudBlazor.Severity.Success);
+        }
+    }
+
+    private async Task HandleLeave()
+    {
+        Snackbar.Clear();
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+
+        if (!alreadyJoined)
+        {
+            Snackbar.Add("You are not a participant.", MudBlazor.Severity.Info);
+            alreadyJoined = true;
+        }
+        else
+        {
+            LeaveEventCommand leaveEventCommand = new LeaveEventCommand { UserId = userProfile.UserId, EventId = Event.Id };
+            await _client.ApiUserLeaveAsync(leaveEventCommand);
+            await LoadEvent(Guid.Parse(eventID));
+
+            Snackbar.Add("You just left this event.", MudBlazor.Severity.Success);
         }
     }
 
