@@ -293,8 +293,12 @@
 
         isLoading = true;
         await LoadUserProfile();
-        UserEvents = userProfile.UserEvents.Where(u => !u.OwnerName.Equals(userProfile.Username)).ToList();
-        UserOwnedEvents = userProfile.UserEvents.Where(u => u.OwnerName.Equals(userProfile.Username)).ToList();
+        if(userProfile != null)
+        {
+            UserEvents = userProfile.UserEvents.Where(u => !u.OwnerName.Equals(userProfile.Username)).ToList();
+            UserOwnedEvents = userProfile.UserEvents.Where(u => u.OwnerName.Equals(userProfile.Username)).ToList();
+        }
+       
         isLoading = false;
 
         StateHasChanged();
