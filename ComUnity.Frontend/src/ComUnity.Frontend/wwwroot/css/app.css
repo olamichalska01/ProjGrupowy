@@ -43,7 +43,7 @@
     font-weight: 700;
     font-size: 18px;
     color: #7ebdc2;
-    margin-top: 30px;
+    margin-top: 0px;
 }
 .font-detials-people2 {
     font-family: 'Poppins', sans-serif;
@@ -171,7 +171,12 @@
 .event-details2 {
     width: 500px;
     margin-left: 50px;
-    overflow:scroll;
+    overflow: scroll;
+    margin-top: 50px;
+    border-left-width: 1px;
+    border-color: #d4d4d4;
+    border-radius: 0;
+    padding-left: 30px;
 }
 
 .back-button {
