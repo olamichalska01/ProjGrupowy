@@ -76,14 +76,14 @@
                     <MudGrid>
                         <MudItem xs="3">
                             <MudPaper Elevation="0">
+                                <MudText Class="font-title1">City</MudText>
+                                @if (isInEditingMode)
+                                {
+                                    <MudTextField @bind-Value="updateUserProfileCommand.City" Lines="1" />
+                                }
                                 @if (!string.IsNullOrWhiteSpace(userProfile?.City))
                                 {
-                                    <MudText Class="font-title1">City</MudText>
-                                    @if (isInEditingMode)
-                                    {
-                                        <MudTextField  @bind-Value="updateUserProfileCommand.City" Lines="1" />
-                                    }
-                                    else
+                                    @if (!isInEditingMode)
                                     {
                                         <MudText Class="">@userProfile!.City</MudText>
                                     }
@@ -92,23 +92,23 @@
                         </MudItem>
                         <MudItem xs="3">
                             <MudPaper Elevation="0">
+                                <MudText Class="font-title1">Age</MudText>
                                 @if (userProfile?.Age is not null)
                                 {
-                                    <MudText Class="font-title1">Age</MudText>
                                     <MudText>@userProfile!.Age</MudText>
                                 }
                             </MudPaper>
                         </MudItem>
                         <MudItem xs="12">
                             <MudPaper Elevation="0">
+                                <MudText Class="font-title1">About me</MudText>
+                                @if (isInEditingMode)
+                                {
+                                    <MudTextField T="string" Variant="Variant.Text" @bind-Value="updateUserProfileCommand.AboutMe" Lines="5" />
+                                }
                                 @if (userProfile?.AboutMe is not null)
                                 {
-                                    <MudText Class="font-title1">About me</MudText>
-                                    @if (isInEditingMode)
-                                    {
-                                        <MudTextField T="string" Variant="Variant.Text" @bind-Value="updateUserProfileCommand.AboutMe" Lines="5" />
-                                    }
-                                    else
+                                    @if (!isInEditingMode)
                                     {
                                         <MudText>@userProfile!.AboutMe</MudText>
                                     }
