@@ -381,3 +381,12 @@ a, .btn-link {
     color: white
 }
 
+.friends-container {
+    display: flex;
+    align-items: center;
+}
+
+.delete-friend-button {
+    margin-left: 10px;
+    background-color: #BB4430
+}
