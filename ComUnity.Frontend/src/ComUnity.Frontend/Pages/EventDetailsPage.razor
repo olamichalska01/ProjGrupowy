@@ -77,7 +77,7 @@
         </MudPaper>
     </MudItem>
     <MudItem xs="6">
-        <MudPaper Class="event-details2" Elevation="0" MaxHeight="70vh" MinHeight="70vh">
+        <MudPaper Class="event-details2" Elevation="0" MaxHeight="75vh" MinHeight="75vh">
             <MudList>
                 <MudListItem>
                     <MudText Class="font-detials-people">
@@ -89,7 +89,14 @@
                         <MudAvatar Style="height:80px; width:80px; font-size:2rem;">
                             <MudImage Width="70" Src="@(Event.OwnerPicture ?? string.Empty)" Alt="" Elevation="0" />
                         </MudAvatar>
-                        <span class="avatar-class-participants font-detials-people2">@Event.OwnerName</span>
+                        <MudTooltip Class="go-to-profile-text" Text="Click to go to profile" Placement="Placement.Right">
+                            @foreach(var p in EventParticipants.Where(x => x.UserName == Event.OwnerName))
+                            {
+                                <a href="/user/{@p.UserId}">
+                                    <span class="avatar-class-participants font-detials-people2 cursor-pointer">@Event.OwnerName</span>
+                                </a>
+                            }
+                        </MudTooltip>
                     </MudText>
                 </MudListItem>
                 <MudListItem>
@@ -104,7 +111,11 @@
                             <MudAvatar Style="height:80px; width:80px; font-size:2rem;">
                                 <MudImage Width="70" Src="@(p.ProfilePicture ?? string.Empty)" Alt="" Elevation="0" />
                             </MudAvatar>
-                            <span class="avatar-class-participants font-detials-people2">@p.UserName</span>
+                            <MudTooltip Class="go-to-profile-text" Text="Click to go to profile" Placement="Placement.Right">
+                                <a href="/user/{@p.UserId}">
+                                    <span class="avatar-class-participants font-detials-people2 cursor-pointer">@p.UserName</span>
+                                </a>
+                            </MudTooltip>
                         </MudText>
                     </MudListItem>
                 }               
