@@ -390,3 +390,18 @@ a, .btn-link {
     margin-left: 10px;
     background-color: #BB4430
 }
+
+.delete-category-button {
+    margin-top: 25px;
+    margin-left: 10px;
+    background-color: #BB4430
+}
+
+.edit-category-button {
+    margin-top: 25px;
+    margin-left: 10px;
+    background-color: #7EBDC2
+}
+.container {
+    margin-bottom: 25px;
+}

@@ -15,41 +15,46 @@
 <MudCard>
     <MudCardContent>
         <MudGrid>
-            <MudTable Items="@Events" RowsPerPage="4" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+            <MudTable Items="@Events"  RowsPerPage="6" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info" Elevation="0" Class="testuje">
                 <HeaderContent>
                     <MudTh>Name</MudTh>
-                    <MudTh>image</MudTh>
+                    <MudTh>Image</MudTh>
+                    <MudTh></MudTh>
+                    <MudTh></MudTh>
                     <MudTh></MudTh>
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd DataLabel="Name"><b>@context.Name</b></MudTd>
-                    
                     <MudTd DataLabel="image">
                         <MudImage Src="@(context?.ImageId ?? string.Empty)" Width="50" Height="50" Alt="category picture" Elevation="0" />
                     </MudTd>
+                    <MudTd>      </MudTd>
+                    <MudButton Class="edit-category-button" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit">Edit</MudButton>
+                    <MudButton Class="delete-category-button" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete">Delete</MudButton>
                 </RowTemplate>
                 <PagerContent>
+                    <MudGrid Class = "container">
+                        <MudTextField @bind-Value="TextValue" Label="Category name" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+                        <MudFileUpload T="IBrowserFile" FilesChanged="Testuje">
+                            <ButtonTemplate>
+                                <MudFab HtmlTag="label"
+                                        Class="edit-category-button"
+                                        Icon="@Icons.Material.Filled.Image"
+                                        Label="Load picture"
+                                        for="@context" />
+                            </ButtonTemplate>
+                        </MudFileUpload>
+                        <MudButton Class="edit-category-button" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Add" OnClick="UploadFiles">Add</MudButton>
+                    </MudGrid>
                     <MudTablePager />
                 </PagerContent>
             </MudTable>
         </MudGrid>
+
     </MudCardContent>
 </MudCard>
 
-<MudGrid>
-    <MudTextField @bind-Value="TextValue" Label="Standard" Variant="Variant.Text" Margin="Margin.Dense"></MudTextField>
-    <MudFileUpload T="IBrowserFile" FilesChanged="Testuje">
-        <ButtonTemplate>
-            <MudFab HtmlTag="label"
-                    Color="Color.Secondary"
-                    Icon="@Icons.Material.Filled.Image"
-                    Label="Load picture"
-                    for="@context" />
-        </ButtonTemplate>
-    </MudFileUpload>
-    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Color="Color.Primary" OnClick="UploadFiles">Send</MudButton>
 
-</MudGrid>
 
 
 
@@ -57,6 +62,7 @@
     public string TextValue { get; set; }
     private List<EventCategory> Events = new List<EventCategory>();
     IBrowserFile testowy; 
+
 
     protected override async Task OnInitializedAsync()
     {
