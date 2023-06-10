@@ -89,7 +89,7 @@
     private async Task SignOut()
     {
         await _client.ApiAuthLogoutAsync();
-        (_authenticationStateProvider as CookieAuthenticationStateProvider)!.ClearIdentity();
+        await (_authenticationStateProvider as CookieAuthenticationStateProvider)!.ClearIdentity();
         _navigation.NavigateTo("/login");
     }
 
