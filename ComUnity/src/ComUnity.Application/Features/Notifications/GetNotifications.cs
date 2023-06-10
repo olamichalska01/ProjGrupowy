@@ -23,7 +23,7 @@ public record GetNotificationsQuery : IRequest<GetNotificationsResponse>;
 
 public record GetNotificationsResponse(ICollection<GetNotificationsResponse.Notification> Notifications)
 {
-    public record Notification(Guid Id, string Type, string Content, DateTime NotificationDate);
+    public record Notification(Guid Id, string Type, string Content, DateTime NotificationDate, Dictionary<string, string>? AdditionalProperties);
 }
 
 
@@ -49,6 +49,7 @@ internal record GetNotificationsQueryHandler : IRequestHandler<GetNotificationsQ
                 x.Id,
                 x.Type,
                 x.Content,
-                x.NotificationDate)).ToList());
+                x.NotificationDate,
+                x.AdditionalData)).ToList());
     }
 }

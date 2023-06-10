@@ -65,7 +65,7 @@ internal class AddFriendCommandHandler : IRequestHandler<AddFriendCommand, Unit>
         var relationshipId = NewId.NextGuid();
 
         relationship = new Relationship(relationshipId, sender.UserId, request.UserId, RelationshipTypes.FrienshipRequested);
-        relationship.DomainEvents.Add(new FriendRequestSentEvent(sender.Username, relationshipId, request.UserId));
+        relationship.DomainEvents.Add(new FriendRequestSentEvent(sender.UserId, sender.Username, relationshipId, request.UserId));
         _context.Add(relationship);
         await _context.SaveChangesAsync(cancellationToken);
 
@@ -75,14 +75,17 @@ internal class AddFriendCommandHandler : IRequestHandler<AddFriendCommand, Unit>
 
 public class FriendRequestSentEvent : DomainEvent
 {
+    public Guid SenderId { get; }
+
     public string SenderName { get; }
 
     public Guid RequestId { get; }
 
     public Guid ReceiverId { get; }
 
-    public FriendRequestSentEvent(string senderName, Guid requestId, Guid receiverId)
+    public FriendRequestSentEvent(Guid senderId, string senderName, Guid requestId, Guid receiverId)
     {
+        SenderId = senderId;
         SenderName = senderName;
         RequestId = requestId;
         ReceiverId = receiverId;

@@ -14,23 +14,15 @@
 <MudLayout>
     <MudAppBar Dense="true" Style="background-color: white">
         <MudSpacer />
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" OnClick="ToggleNotifications">
-                <MudBadge Content="@notifications.Count" Overlap="true" Class="mx-6 my-4">
-                    <MudIcon Color="Color.Dark" Icon="@Icons.Material.Outlined.Notifications" Size="Size.Small" />
+        <MudButton Variant="Variant.Text" DisableElevation="true" OnClick="ToggleNotifications">
+                <MudBadge Content="@notifications.Count" Overlap="true">
+                    <MudIcon Icon="@Icons.Material.Outlined.Notifications" Size="Size.Small" />
                 </MudBadge>
         </MudButton>
-        <MudPopover Open="_isOpen" OverflowBehavior="OverflowBehavior.FlipAlways" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" Paper="false">
-            <MudPaper Outlined="true" Class="px-4 py-8">
-                <MudList>
-                    @foreach(var notification in notifications)
-                    {
-                        <MudListItem>
-                            @notification.Content
-                            @notification.NotificationDate
-                            @notification.Type
-                        </MudListItem>
-                    }
-                </MudList>
+        <MudPopover Open="_isOpen" OverflowBehavior="OverflowBehavior.FlipAlways" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopRight" Paper="false">
+            <MudPaper Width="500px">
+                <ComUnity.Frontend.Shared.Notifications.NotificationsPopover Notifications="@notifications">
+                </ComUnity.Frontend.Shared.Notifications.NotificationsPopover>
             </MudPaper>
         </MudPopover>
         <MudMenu Dense="true" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopRight">
@@ -85,6 +77,7 @@
         if (!user.Identity!.IsAuthenticated)
         {
             _navigation.NavigateTo($"login?redirectUrl={Uri.EscapeDataString(_navigation.Uri)}");
+            return;
         }
 
         var userId = user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
@@ -102,7 +95,7 @@
 
     private async Task LoadNotifications()
     {
-        var (isSuccess, response) = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiNotificationsAsync());
+        var (isSuccess, response) = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiNotificationsGetAsync());
         if(isSuccess)
         {
             notifications = response!.Notifications;
