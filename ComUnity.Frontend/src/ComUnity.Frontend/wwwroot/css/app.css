@@ -159,10 +159,13 @@
 .button-auth {
     background-color: #662C91;
     color: white;
-    width: 130px;
     margin: 10px 10px 10px 10px;
 }
-
+.button-auth-cancel {
+    border-color: #662C91;
+    color: #662C91;
+    margin: 10px 10px 10px 10px;
+}
 .tab {
     margin-left: -15px;
 }
