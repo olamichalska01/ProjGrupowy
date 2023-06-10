@@ -19,7 +19,7 @@ internal class FriendRequestSentEventHandler : INotificationHandler<DomainEventN
     public async Task Handle(DomainEventNotification<FriendRequestSentEvent> notification, CancellationToken cancellationToken)
     {
         var domainEvent = notification.DomainEvent;
-        var message = $"{domainEvent.SenderName} has sent you a friend request.";
+        var message = "{SenderName} has sent you a friend request.";
         var newNotification = new Notification(
             id: NewId.NextGuid(),
             userId: domainEvent.ReceiverId,
@@ -27,7 +27,7 @@ internal class FriendRequestSentEventHandler : INotificationHandler<DomainEventN
             content: message,
             notificationDate: DateTime.UtcNow,
             expirationDate: null,
-            additionalData: new Dictionary<string, string>() { { "RequestId", domainEvent.RequestId.ToString() } });
+            additionalData: new Dictionary<string, string>() { { "SenderId", domainEvent.SenderId.ToString() }, { "SenderName", domainEvent.SenderName } });
 
         _context.Add(newNotification);
         await _context.SaveChangesAsync(cancellationToken);

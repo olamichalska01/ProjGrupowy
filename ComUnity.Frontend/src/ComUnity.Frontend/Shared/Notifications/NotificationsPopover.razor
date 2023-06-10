@@ -1,0 +1,100 @@
+﻿@using ComUnity.Frontend.Extensions;
+@inject IComUnityApiClient _client
+@inject ErrorHandler _errorHandler
+@inject ISnackbar _snackbar
+
+
+<MudText Typo="Typo.h6" Class="notifications-header">Notifications</MudText>
+<MudDivider />
+@if (notifications.Count > 0)
+{
+    <MudStack Spacing="0">
+        @foreach (var notification in notifications)
+        {
+            <div class="notifications-list-element">
+                <div class="notification-content">
+                    <MudText Typo="Typo.body1">@notification.GetMessage()</MudText>
+                    @if (notification.Type == NotificationTypes.FriendshipRequested)
+                    {
+                        <MudButton Size="Size.Small"
+                                   Class="button-color3"
+                                   OnClick="() => AcceptFriendship(notification)"
+                                   StartIcon="@Icons.Material.Filled.Add"
+                                   Variant="Variant.Filled">
+                            Accept
+                        </MudButton>
+                        <MudButton Color="Color.Warning"
+                                   Size="Size.Small"
+                                   OnClick="() => RejectFriendship(notification)"
+                                   StartIcon="@Icons.Material.Filled.Cancel"
+                                   Variant="Variant.Filled">
+                            Reject
+                        </MudButton>
+                    }
+                </div>
+                <MudIconButton Style="margin-right:20px" OnClick="() => DeleteNotification(notification)" Size="Size.Small" Icon="@Icons.Material.Outlined.Delete" aria-label="delete"></MudIconButton>
+            </div>
+            <MudDivider />
+        }
+    </MudStack>
+}
+else
+{
+    <MudText Typo="Typo.body1" Class="notifications-header">No notifications.</MudText>
+}
+
+@code {
+    [Parameter]
+    public ICollection<Notification> notifications { get; set; }
+
+    public async Task DeleteNotification(Notification notification)
+    {
+        var isSuccess = await _errorHandler.ExecuteWithErrorHandling(() =>
+            _client.ApiNotificationsDeleteAsync(notification.Id));
+
+        if(isSuccess)
+        {
+            notifications.Remove(notification);
+        }
+    }
+
+    public async Task AcceptFriendship(Notification notification)
+    {
+        if (!notification.AdditionalProperties.TryGetValue("SenderId", out var senderId))
+        {
+            return;
+        }
+
+        var isSuccess = await _errorHandler.ExecuteWithErrorHandling(() =>
+            _client.ApiFriendshipRequestsAcceptAsync(new AcceptFriendshipRequestCommand 
+            { 
+                UserId = Guid.Parse(senderId) 
+            }));
+
+        if (!isSuccess)
+        {
+            return;
+        }
+
+        var senderName = notification.AdditionalProperties.GetValueOrDefault("SenderName");
+        _snackbar.Add($"You are now friends with {senderName}");
+        await DeleteNotification(notification);
+    }
+
+
+    public async Task RejectFriendship(Notification notification)
+    {
+        if (!notification.AdditionalProperties.TryGetValue("SenderId", out var senderId))
+        {
+            return;
+        }
+
+        var isSuccess = await _errorHandler.ExecuteWithErrorHandling(() =>
+            _client.ApiFriendshipRequestsAsync(Guid.Parse(senderId)));
+
+        if (isSuccess)
+        {
+            await DeleteNotification(notification);
+        }
+    }
+}
