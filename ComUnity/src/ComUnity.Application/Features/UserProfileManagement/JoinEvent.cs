@@ -81,9 +81,7 @@ namespace ComUnity.Application.Features.UserProfileManagement
                     }
                 }
 
-                e.Participants.Add(u);
-                e.TakenPlacesAmount++;
-                u.UserEvents.Add(e);
+                e.AddParticipant(u);
 
                 await _context.SaveChangesAsync(cancellationToken);
 

@@ -86,7 +86,7 @@ internal class SearchEventQueryHandler : IRequestHandler<SearchEventsQuery, Sear
         var query = _context.Set<Event>()
             .AsNoTracking()
             .Include(x => x.EventCategory)
-            .Where(x => x.EventDate > DateTime.UtcNow);
+            .Where(x => x.StartDate > DateTime.UtcNow);
 
         if (request.Filters is not null)
         {
@@ -108,7 +108,7 @@ internal class SearchEventQueryHandler : IRequestHandler<SearchEventsQuery, Sear
         {
             if(request.Sort.SortBy == SortableProperties.Date)
             {
-                query = query.OrderByDirection(request.Sort.Direction.ToLowerInvariant(), x => x.EventDate);
+                query = query.OrderByDirection(request.Sort.Direction.ToLowerInvariant(), x => x.StartDate);
             }
             else if (request.Sort.SortBy == SortableProperties.Distance)
             {
@@ -118,24 +118,24 @@ internal class SearchEventQueryHandler : IRequestHandler<SearchEventsQuery, Sear
 
         var total = await query.CountAsync(cancellationToken);
         var results = await query
+            .Include(x => x.Owner)
             .Skip(skipRows)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
-        var users = await _context.Set<UserProfile>().ToListAsync();
 
         return new SearchEventsResponse(
             TotalCount: total, 
             Results: results.Select(x => new EventDto(
                 x.Id,
-                users.Where(u => u.UserId == x.OwnerId).FirstOrDefault().Username,
-                users.Where(u => u.UserId == x.OwnerId).FirstOrDefault().ProfilePicture.HasValue ? _azureStorageService.GetReadFileToken(users.Where(u => u.UserId == x.OwnerId).FirstOrDefault().ProfilePicture.Value) : null,
+                x.Owner.Username,
+                x.Owner.ProfilePicture.HasValue ? _azureStorageService.GetReadFileToken(x.Owner.ProfilePicture.Value) : null,
                 x.EventName,
                 x.TakenPlacesAmount,
                 x.MaxAmountOfPeople,
                 x.Place,
                 x.Location.X,
                 x.Location.Y,
-                x.EventDate,
+                x.StartDate,
                 x.Cost,
                 x.MinAge,
                 x.EventCategory.CategoryName,

@@ -1,75 +1,285 @@
 ﻿@using ComUnity.Frontend.Extensions;
 @using ComUnity.Frontend.Services;
+@using System.Globalization;
 @page "/events-form"
 @layout MainLayout
 @inject IComUnityApiClient _client
 @inject ErrorHandler _errorHandler
 @inject NavigationManager _navigation
 @inject AuthenticationStateProvider _authenticationStateProvider
+@inject GeoapifyApiClient _geocodingClient
+@inject IJSRuntime jsRuntime
+@inject IValidator<AddEventCommand> _addEventValidator
+@inject ISnackbar _snackbar
+@implements IAsyncDisposable
 
-<MudCard>
-    <MudTextField @bind-Value="EventName" Label="EventName" Variant="Variant.Outlined" />
-    <MudTextField @bind-Value="Place" Label="Where" Variant="Variant.Outlined" />
-    <MudDatePicker Label="Select a Date" Date="SelectedDate" MaxDate="MaxDate" MinDate="@MinDate" Variant="Variant.Outlined"/>
-    <MudNumericField @bind-Value="MaxAmountOfPeople" Label="How many people" Variant="Variant.Outlined" />
-    <MudNumericField @bind-Value="MinAge" Label="Min age" Variant="Variant.Outlined" />
-    <MudNumericField @bind-Value="Cost" Label="Cost" Variant="Variant.Outlined" />
-    @if(selectedCategory != null) {
-        <MudSelect T="EventCategory" Label="Select a category" @bind-Value="selectedCategory" Variant="Variant.Outlined">
-            @foreach (var category in EventCategories)
-            {
-                <MudSelectItem Value="@category">@category.Name</MudSelectItem>;
-            }
-        </MudSelect>
-    }
-    <MudCheckBox Label="Only for friends" @bind-Checked="IsNotPublic" Variant="Variant.Outlined" />
-</MudCard>
-<MudCard>
-    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Color="Color.Primary" OnClick="SendIt">Send</MudButton>
+<div style="position: relative; height: 100%">
+    <div id="map" style="position: absolute; top:0; bottom:0; width:100%; height: 100%; z-index: 100"></div>
+    <div style="z-index: 200; position: absolute; left: 0; max-width: fit-content">
+        <MudPaper MaxWidth="400px" Style="margin-left:70px; margin-top:50px">
+            <MudCard Style="padding:20px">
+                <MudCardContent>
+                    <MudText Typo="Typo.h5" Class="mb-6">Add new event</MudText>
+                    <MudForm @ref="form" Model="model" Validation="@(_addEventValidator.CreateValueValidator())" ValidationDelay="0">
+                        <MudStack Spacing="5">
+                            <MudTextField 
+                                @bind-Value="model.EventName"
+                                For="@(() => model.EventName)"
+                                Immediate="true"
+                                Label="EventName"
+                                Variant="Variant.Outlined" />
+                            <MudStack>
+                                <MudTextField 
+                                    @ref="placeInput"
+                                    Disabled="true"
+                                    @bind-Value="model.Place"
+                                    For="@(() => model.Place)"
+                                    HelperText="Click on map to select place"
+                                    Immediate="true"
+                                    Label="Where"
+                                    Variant="Variant.Outlined" />
+                            </MudStack>
+                            <MudStack Row=true>
+                                <MudDatePicker 
+                                    Error="startDateError is not null"
+                                    ErrorText="@startDateError"
+                                    DateChanged="@((date) => OnStartDateChanged(date))"
+                                    Mask="@(new DateMask("dd.MM.yyyy"))"
+                                    DateFormat="dd.MM.yyyy"
+                                    Label="Select start date"
+                                    Date="startDate"
+                                    MinDate="MinDate"
+                                    MaxDate="MaxDate"
+                                    Variant="Variant.Outlined" />
+                                <MudTimePicker
+                                    Error="startDateError is not null"
+                                    Label="Start Time"
+                                    TimeChanged="@((time) => OnStartTimeChanged(time))"
+                                    Editable="true"
+                                    Time="startTime"
+                                    Variant="Variant.Outlined" />
+                            </MudStack>
+                            <MudStack Row=true>
+                                <MudDatePicker
+                                    Error="endDateError is not null"
+                                    ErrorText="@endDateError"
+                                    DateChanged="@((date) => OnEndDateChanged(date))"
+                                    Mask="@(new DateMask("dd.MM.yyyy"))"
+                                    DateFormat="dd.MM.yyyy"
+                                    Label="Select end date"
+                                    Date="endDate"
+                                    MaxDate="MaxDate"
+                                    MinDate="@MinDate"
+                                    Variant="Variant.Outlined" />
+                                <MudTimePicker
+                                    Error="endDateError is not null"
+                                    TimeChanged="@((time) => OnEndTimeChanged(time))"
+                                    Label="End Time"
+                                    Editable="true"
+                                    Time="endTime"
+                                    Variant="Variant.Outlined" />
+                            </MudStack>
+                            <MudStack Row=true>
+                                <MudNumericField
+                                    For="@(() => model.MaxAmountOfPeople)"
+                                    Immediate="true"
+                                    @bind-Value="model.MaxAmountOfPeople"
+                                    Label="No. people"
+                                    Variant="Variant.Outlined" />
+                                <MudNumericField
+                                    For="@(() => model.MinAge)"
+                                    Immediate="true"
+                                    @bind-Value="model.MinAge"
+                                    Label="Min age"
+                                    Variant="Variant.Outlined" />
+                                <MudNumericField 
+                                    For="@(() => model.Cost)"
+                                    Immediate="true"
+                                    @bind-Value="model.Cost"
+                                    Label="Cost"
+                                    Variant="Variant.Outlined" />
+                            </MudStack>
+                                @if (EventCategories.Count > 0)
+                                {
+                                <MudSelect
+                                    T="string"
+                                    For="@(() => model.EventCategory)"
+                                    Immediate="true"
+                                    Label="Select a category"
+                                    @bind-Value="model.EventCategory"
+                                    Variant="Variant.Outlined">
+                                        @foreach (var category in EventCategories)
+                                        {
+                                        <MudSelectItem Value="@category.Name">@category.Name</MudSelectItem>
+                                        }
+                                </MudSelect>
+                                }
+                            <MudRadioGroup For="@(() => model.IsPublic)" @bind-SelectedOption="model.IsPublic">
+                                <MudRadio Option="true">Public</MudRadio>
+                                <MudRadio Option="false">Friends only</MudRadio>
+                            </MudRadioGroup>
+                            <MudStack>
+                                <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Class="button-color" OnClick="AddEvent">Create</MudButton>
+                            </MudStack>
+                        </MudStack>
+                    </MudForm>
+                </MudCardContent>
+            </MudCard>
+        </MudPaper>
+    </div>
+</div>
 
-</MudCard>
-
-@*<MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Color="Color.Primary" OnClick="DoSth">Create</MudButton>
-*@
 @code {
-    private string EventName { get; set; }
-    private int MaxAmountOfPeople { get; set; }
-    private int MinAge { get; set; }
-    private string Place { get; set; }
-    private int Cost { get; set; }
-    private bool IsNotPublic { get; set; }
-    DateTime SelectedDate = DateTime.Now;
-    DateTime MaxDate = DateTime.Now.AddYears(6);
-    DateTime MinDate = DateTime.Now;
-    private List<EventCategory> EventCategories = new List<EventCategory>();
-    private EventCategory selectedCategory;
-    private string placeholder = "choose category";
+    [AllowNull]
+    MudForm form;
 
-    [CascadingParameter]
-    protected Task<AuthenticationState> AuthState { get; set; }
+    [AllowNull]
+    MudTextField<string> placeInput;
+
+    private DateTime MinDate = DateTime.Now.Date;
+    private DateTime MaxDate = DateTime.Now.Date.AddYears(6);
+
+    private DateTime startDate = DateTime.Now.Date;
+    private TimeSpan? startTime = DateTime.Now.TimeOfDay.Add(TimeSpan.FromMinutes(5));
+    private string? startDateError;
+
+    private DateTime endDate = DateTime.Now.Date;
+    private TimeSpan? endTime = DateTime.Now.TimeOfDay.Add(TimeSpan.FromMinutes(5));
+    private string? endDateError;
+
+    private ICollection<EventCategory> EventCategories = new List<EventCategory>();
+
+    private AddEventCommand model = new();
+
+    private IJSObjectReference? module;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await jsRuntime.InvokeAsync<IJSObjectReference>("import", "./leafletmap.js");
+            if (module != null)
+            {
+                await module.InvokeAsync<string>("initAddEventMapView", DotNetObjectReference.Create(this));
+            }
+        }
+    }
+
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        if (module is not null)
+        {
+            await module.DisposeAsync();
+        }
+    }
+
+    [JSInvokable]
+    public async void EventPositionChanged(double lat, double lng)
+    {
+        await Task.CompletedTask;
+        model.Latitude = lat;
+        model.Longitude = lng;
+        model.Place = await GetMostProbableLocation(lat, lng);
+        placeInput.ResetValidation();
+        StateHasChanged();
+    }
 
     protected override async Task OnInitializedAsync()
     {
-        GetEventsCategoriesResponse getEventCategoriesResponse = await _client.ApiEventsCategoriesAsync();
-
-        EventCategories = getEventCategoriesResponse.Categories.ToList<EventCategory>();
-
-        selectedCategory = EventCategories[0];
+        var (_, getEventCategoriesResponse) = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiEventsCategoriesAsync());
+        EventCategories = getEventCategoriesResponse?.Categories ?? EventCategories;
     }
 
-    private async Task SendIt()
+    private async Task AddEvent()
     {
-        AddEventCommand addEventCommand = new AddEventCommand();
-        addEventCommand.EventName = EventName;
-        addEventCommand.EventDate = SelectedDate;
-        addEventCommand.Latitude = 10;
-        addEventCommand.Longitude = 10;
-        addEventCommand.EventCategory = selectedCategory.Id.ToString();
-        addEventCommand.MaxAmountOfPeople = MaxAmountOfPeople;
-        addEventCommand.MinAge = MinAge;
-        addEventCommand.Place = Place;
-        addEventCommand.Cost = Cost;
-        _client.ApiEventsPostAsync(addEventCommand);
-        _navigation.NavigateTo("/");
+        await form.Validate();
+        await CombineAndValidateDateTimes();
+        if (!form.IsValid || startDateError is not null || endDateError is not null)
+        {
+            return;
+        }
+
+        var (isSuccess, response) = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiEventsPostAsync(model));
+        if (isSuccess)
+        {
+            _snackbar.Add("Successfuly added event!", MudBlazor.Severity.Success);
+            _navigation.NavigateTo($"/events/{response!.Id}");
+        }
+    }
+
+    private async Task<string> GetMostProbableLocation(double lat, double lng)
+    {
+        var response = await _geocodingClient.ReverseGeocode(lat, lng);
+        return response.Features.First().Properties.Formatted;
+    }
+
+    private async Task OnStartDateChanged(DateTime? newStartDate)
+    {
+        if(!newStartDate.HasValue)
+        {
+            return;
+        }
+        startDate = newStartDate.Value;
+        await CombineAndValidateDateTimes();
+    }
+
+    private async Task OnStartTimeChanged(TimeSpan? newStartTime)
+    {
+        startTime = newStartTime;
+        await CombineAndValidateDateTimes();
+    }
+
+    private async Task OnEndDateChanged(DateTime? newEndDate)
+    {
+        if (!newEndDate.HasValue)
+        {
+            return;
+        }
+        endDate = newEndDate.Value;
+        await CombineAndValidateDateTimes();
+    }
+
+
+    private async Task OnEndTimeChanged(TimeSpan? newEndTime)
+    {
+        endTime = newEndTime;
+        await CombineAndValidateDateTimes();
+    }
+
+    private async Task CombineAndValidateDateTimes()
+    {
+        model.StartDate = startDate.Add(startTime!.Value);
+        model.EndDate = endDate.Add(endTime!.Value);
+        var valueValidator = _addEventValidator.CreateValueValidator();
+        startDateError = (await valueValidator(model, "StartDate")).FirstOrDefault();
+        endDateError = (await valueValidator(model, "EndDate")).FirstOrDefault();
+    }
+
+    public class AddEventCommandValidator : AbstractValidator<AddEventCommand>
+    {
+        public AddEventCommandValidator()
+        {
+            RuleFor(x => x.EventName)
+                .NotEmpty()
+                .MinimumLength(3)
+                .MaximumLength(128);
+
+            RuleFor(x => x.StartDate)
+                .NotEmpty()
+                .Must(x => x >= DateTime.Now).WithMessage("Start date have to be in the future.");
+
+            RuleFor(x => x.EndDate)
+                .NotEmpty()
+                .Must((model, x) => x >= model.StartDate).WithMessage("End date have to after start date.");
+
+            RuleFor(x => x.Place)
+                .NotEmpty().WithMessage("Select event location on the map.");
+
+            RuleFor(x => x.EventCategory)
+                .NotEmpty().WithMessage("Select event cateogry.");
+
+            RuleFor(x => x.IsPublic)
+                .NotNull();
+        }
     }
 }

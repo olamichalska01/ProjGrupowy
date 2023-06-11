@@ -87,7 +87,7 @@
         {
             return;
         }
-        (_authenticationStateProvider as CookieAuthenticationStateProvider)!.SetAuthInfo(userInfo!);
+        await (_authenticationStateProvider as CookieAuthenticationStateProvider)!.SetAuthInfo(userInfo!);
         _navigation.NavigateTo(redirectUrl ?? "/");
         
     }
