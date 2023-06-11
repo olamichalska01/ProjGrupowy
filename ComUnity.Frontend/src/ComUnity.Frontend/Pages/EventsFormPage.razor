@@ -108,12 +108,12 @@
                                     Label="Select a category"
                                     @bind-Value="model.EventCategory"
                                     Variant="Variant.Outlined">
-                                        @foreach (var category in EventCategories)
-                                        {
+            @foreach (var category in EventCategories)
+            {
                                         <MudSelectItem Value="@category.Name">@category.Name</MudSelectItem>
-                                        }
-                                </MudSelect>
-                                }
+            }
+        </MudSelect>
+    }
                             <MudRadioGroup For="@(() => model.IsPublic)" @bind-SelectedOption="model.IsPublic">
                                 <MudRadio Option="true">Public</MudRadio>
                                 <MudRadio Option="false">Friends only</MudRadio>
@@ -124,7 +124,7 @@
                         </MudStack>
                     </MudForm>
                 </MudCardContent>
-            </MudCard>
+</MudCard>
         </MudPaper>
     </div>
 </div>
@@ -258,7 +258,7 @@
     public class AddEventCommandValidator : AbstractValidator<AddEventCommand>
     {
         public AddEventCommandValidator()
-        {
+    {
             RuleFor(x => x.EventName)
                 .NotEmpty()
                 .MinimumLength(3)
