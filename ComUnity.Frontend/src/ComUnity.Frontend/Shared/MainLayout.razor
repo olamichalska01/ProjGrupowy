@@ -44,6 +44,7 @@
                 <MudImage Src="logo.png" Alt="logo" Width="250" Elevation="0" />
                 <MudDivider Class="my-2"/>
                 <MudNavLink Href="/events" Match="NavLinkMatch.All">Events</MudNavLink>
+                <MudNavLink Href="/events-form" Match="NavLinkMatch.All">Create Event</MudNavLink>
                 <MudNavLink Href="/servers" Match="NavLinkMatch.Prefix">Friends</MudNavLink>
                 <MudNavGroup Title="Settings" Expanded="true">
                     <MudNavLink Href="/users" Match="NavLinkMatch.Prefix">Users</MudNavLink>
@@ -54,7 +55,7 @@
         </MudStack>
         
     </MudDrawer>
-    <MudMainContent>
+    <MudMainContent Style="height: 100%">
         @Body
     </MudMainContent>
 </MudLayout>

@@ -7,19 +7,23 @@ public class Event
 {
     public Guid Id { get; private set; }
 
+    public virtual UserProfile Owner { get; private set; }
+
     public Guid OwnerId { get; private set; }
 
     public string EventName { get; private set; }
 
     public int MaxAmountOfPeople { get; private set; }
 
-    public int TakenPlacesAmount { get; set; }
+    public int TakenPlacesAmount { get; private set; }
 
     public string Place { get; private set; }
 
     public Point Location { get; private set; }
 
-    public DateTime EventDate { get; private set; }
+    public DateTime StartDate { get; private set; }
+
+    public DateTime EndDate { get; private set; }
 
     public double Cost { get; private set; }
 
@@ -39,28 +43,41 @@ public class Event
         Guid id,
         Guid ownerId,
         string eventName,
-        int takenPlacesAmount,
         int maxAmountOfPeople,
         string place,
         Point location,
-        DateTime eventDate,
+        DateTime startDate,
+        DateTime endDate,
         double cost,
         int minAge,
-        EventCategory eventCategory,
-        ICollection<UserProfile> participants
+        bool isPublic,
+        EventCategory eventCategory
         )
     {
         Id = id;
         OwnerId = ownerId;
         EventName = eventName;
-        TakenPlacesAmount = takenPlacesAmount;
+        TakenPlacesAmount = 0;
         MaxAmountOfPeople = maxAmountOfPeople;
         Place = place;
         Location = location;
-        EventDate = eventDate;
+        StartDate = startDate;
+        EndDate = endDate;
         Cost = cost;
         MinAge = minAge;
+        IsPublic = isPublic;
         EventCategory = eventCategory;
-        Participants = participants;
+    }
+
+    public void AddParticipant(UserProfile newParticipant)
+    {
+        Participants.Add( newParticipant );
+        TakenPlacesAmount++;
+    }
+
+    public void RemoveParticipant(UserProfile participant)
+    {
+        Participants.Remove(participant);
+        TakenPlacesAmount--;
     }
 }

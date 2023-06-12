@@ -62,7 +62,7 @@ public class GetEventByIdController : ApiControllerBase
                     result.Place,
                     result.Location.X,
                     result.Location.Y,
-                    result.EventDate,
+                    result.StartDate,
                     result.Cost,
                     result.MinAge,
                     result.EventCategory.CategoryName,

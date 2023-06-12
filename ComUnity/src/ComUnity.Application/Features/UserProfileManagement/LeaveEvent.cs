@@ -62,9 +62,7 @@ namespace ComUnity.Application.Features.UserProfileManagement
                     throw new CantLeaveYourOwnEventException();
                 }
 
-                e.Participants.Remove(u);
-                e.TakenPlacesAmount--;
-                u.UserEvents.Remove(e);
+                e.RemoveParticipant(u);
 
                 await _context.SaveChangesAsync(cancellationToken);
 

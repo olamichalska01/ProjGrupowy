@@ -107,7 +107,7 @@ internal class GetUserProfileQueryHandler : IRequestHandler<GetUserProfileQuery,
                 x.Id,
                 x.Participants.FirstOrDefault(y => y.UserId == x.OwnerId).Username,
                 x.EventName,
-                x.EventDate,
+                x.StartDate,
                 x.Cost, 
                 x.EventCategory.CategoryName,
                 x.EventCategory.ImageId.HasValue ? _azureStorageService.GetReadFileToken(x.EventCategory.ImageId.Value) : null))

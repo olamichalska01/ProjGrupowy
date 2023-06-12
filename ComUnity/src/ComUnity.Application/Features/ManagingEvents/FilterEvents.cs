@@ -84,29 +84,28 @@ namespace ComUnity.Application.Features.ManagingEvents
 
                 if (request.FromDate > DateTime.MinValue)
                 {
-                    query = query.Where(x => request.FromDate <= x.EventDate);
+                    query = query.Where(x => request.FromDate <= x.StartDate);
                 }
 
                 if (request.ToDate > DateTime.MinValue)
                 {
-                    query = query.Where(x => request.ToDate >= x.EventDate);
+                    query = query.Where(x => request.ToDate >= x.StartDate);
                 }
 
-                var events = await query.ToListAsync(cancellationToken);
-                var users = await _context.Set<UserProfile>().ToListAsync();
+                var events = await query.Include(x => x.Owner).ToListAsync(cancellationToken);
 
                 return new FilterEventsResponse(
                     events.Select(e => new EventDto(
                         e.Id,
-                        users.Where(u => u.UserId == e.OwnerId).FirstOrDefault().Username,
-                        users.Where(u => u.UserId == e.OwnerId).FirstOrDefault().ProfilePicture.HasValue ? _azureStorageService.GetReadFileToken(users.Where(u => u.UserId == e.OwnerId).FirstOrDefault().ProfilePicture.Value) : null,
+                        e.Owner.Username,
+                        e.Owner.ProfilePicture.HasValue ? _azureStorageService.GetReadFileToken(e.Owner.ProfilePicture.Value) : null,
                         e.EventName,
                         e.TakenPlacesAmount,
                         e.MaxAmountOfPeople,
                         e.Place,
                         e.Location.X,
                         e.Location.Y,
-                        e.EventDate,
+                        e.StartDate,
                         e.Cost,
                         e.MinAge,
                         e.EventCategory.CategoryName,

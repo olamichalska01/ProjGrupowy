@@ -37,6 +37,10 @@ public class Program
 
             return new ComUnityApiClient(client);
         });
+        builder.Services.AddScoped(sp =>
+        {
+            return new GeoapifyApiClient(new HttpClient { BaseAddress = new Uri("https://api.geoapify.com/") });
+        });
 
         await builder.Build().RunAsync();
     }

@@ -57,7 +57,7 @@ public class GetEventsController : ApiControllerBase
                     e.Place,
                     e.Location.X,
                     e.Location.Y,
-                    e.EventDate,
+                    e.StartDate,
                     e.Cost,
                     e.MinAge,
                     e.EventCategory.CategoryName,

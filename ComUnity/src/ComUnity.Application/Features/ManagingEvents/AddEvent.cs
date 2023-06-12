@@ -30,10 +30,12 @@ public class AddEventController : ApiControllerBase
         string Place,
         double Latitude,
         double Longitude,
-        DateTime EventDate,
+        DateTime StartDate,
+        DateTime EndDate,
         double Cost, 
         int MinAge,
-        string EventCategory)
+        string EventCategory,
+        bool IsPublic)
         : IRequest<AddEventResponse>;
 
     public record AddEventResponse(
@@ -43,7 +45,7 @@ public class AddEventController : ApiControllerBase
         int MaxAmountOfPeople,
         string Place,
         DateTime EventDate,
-        double Cost,
+        double? Cost,
         int MinAge,
         string EventCategory,
         string UserName
@@ -57,10 +59,16 @@ public class AddEventController : ApiControllerBase
             RuleFor(x => x.EventName).NotEmpty();
             RuleFor(x => x.MaxAmountOfPeople).NotEmpty();
             RuleFor(x => x.Place).NotEmpty();
-            RuleFor(x => x.EventDate).NotEmpty();
-            RuleFor(x => x.Cost).NotEmpty();
+            RuleFor(x => x.StartDate)
+                .NotEmpty()
+                .Must(x => x >= DateTime.Now).WithMessage("Start date have to be in the future."); ;
+            RuleFor(x => x.EndDate)
+                .NotEmpty()
+                .Must((model, x) => x >= model.StartDate).WithMessage("End date have to after start date.");
+            RuleFor(x => x.Cost).GreaterThanOrEqualTo(0);
             RuleFor(x => x.MinAge).NotEmpty();
             RuleFor(x => x.EventCategory).NotEmpty();
+            RuleFor(x => x.IsPublic).NotNull();
         }
     }
 
@@ -93,19 +101,17 @@ public class AddEventController : ApiControllerBase
                 newEventId,
                 userId,
                 request.EventName,
-                1,
                 request.MaxAmountOfPeople,
                 request.Place,
                 new Point(request.Latitude, request.Longitude) { SRID = 4326 },
-                request.EventDate,
+                request.StartDate,
+                request.EndDate,
                 request.Cost,
                 request.MinAge,
-                eCategory,
-                new List<UserProfile>()
-                );
+                request.IsPublic,
+                eCategory);
 
-            e.Participants.Add(user);
-            user.UserEvents.Add(e);
+            e.AddParticipant(user);
 
             await _context.AddAsync(e, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
@@ -116,7 +122,7 @@ public class AddEventController : ApiControllerBase
                 e.TakenPlacesAmount,
                 e.MaxAmountOfPeople,
                 e.Place,
-                e.EventDate,
+                e.StartDate,
                 e.Cost,
                 e.MinAge,
                 e.EventCategory.CategoryName,

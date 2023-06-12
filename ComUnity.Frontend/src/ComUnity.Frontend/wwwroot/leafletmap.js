@@ -26,3 +26,33 @@ export function load_map(raw) {
 
     return "";
 }
+
+export function initAddEventMapView(dotnetHelper) {
+    const map = L.map('map', { center: [52.237, 21.017], zoom: 19 });
+
+    const locateOptions = {
+        watch: false,
+        setView: true,
+        maxZoom: 19
+    };
+
+    map.setZoom(8);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+    map.locate(locateOptions)
+        .on('locationfound', (e) => {
+            map.flyTo(e.latlng, map.getZoom());
+        })
+        .on('locationerror', (e) => {
+            console.log('Error while loading user location.');
+        })
+
+    var marker = null;
+    map.on('click', (e) => {
+        if (!marker) {
+            marker = L.marker(e.latlng).addTo(map);
+        } else {
+            marker.setLatLng(e.latlng);
+        }
+        dotnetHelper.invokeMethodAsync("EventPositionChanged", e.latlng.lat, e.latlng.lng);
+    })
+}
