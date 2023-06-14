@@ -43,6 +43,7 @@ public class GetEventByIdController : ApiControllerBase
             var result = await _context.Set<Event>()
                 .Include(x => x.EventCategory)
                 .Include(y => y.Participants)
+                .Include(x => x.Posts)
                 .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
 
             if (result == null)
@@ -67,7 +68,8 @@ public class GetEventByIdController : ApiControllerBase
                     result.MinAge,
                     result.EventCategory.CategoryName,
                     result.EventCategory.ImageId.HasValue ? _azureStorageService.GetReadFileToken(result.EventCategory.ImageId.Value) : null,
-                    result.Participants.Select(y => new UserDto(y.UserId, y.Username, y.ProfilePicture.HasValue ? _azureStorageService.GetReadFileToken(y.ProfilePicture.Value) : null))));
+                    result.Participants.Select(y => new UserDto(y.UserId, y.Username, y.ProfilePicture.HasValue ? _azureStorageService.GetReadFileToken(y.ProfilePicture.Value) : null)),
+                    result.Posts.Select(p => new PostDto(p.Id, p.AuthorName, p.PostName, p.PublishedDate, p.PostText))));
         }
     }
 }

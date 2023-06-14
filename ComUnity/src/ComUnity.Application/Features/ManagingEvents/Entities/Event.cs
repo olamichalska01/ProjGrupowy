@@ -35,6 +35,8 @@ public class Event
 
     public ICollection<UserProfile> Participants { get; private set; } = new List<UserProfile>();
 
+    public ICollection<Post> Posts { get; private set; } = new List<Post>();
+
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public Event() { }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
@@ -79,5 +81,10 @@ public class Event
     {
         Participants.Remove(participant);
         TakenPlacesAmount--;
+    }
+
+    public void AddPost(Post newPost)
+    {
+        Posts.Add(newPost);
     }
 }
