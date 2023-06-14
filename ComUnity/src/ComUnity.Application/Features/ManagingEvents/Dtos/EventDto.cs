@@ -19,4 +19,5 @@ public record EventDto(
     int MinAge,
     string EventCategory,
     string? EventCategoryPicture,
-    IEnumerable<UserDto> Participants);
+    IEnumerable<UserDto> Participants,
+    IEnumerable<PostDto>? Posts);

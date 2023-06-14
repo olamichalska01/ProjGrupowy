@@ -134,6 +134,42 @@ namespace ComUnity.Application.Database.Migrations
                     b.ToTable("EventCategory");
                 });
 
+            modelBuilder.Entity("ComUnity.Application.Features.ManagingEvents.Entities.Post", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AuthorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AuthorName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("EventId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("PostName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PostText")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("PublishedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("EventId");
+
+                    b.ToTable("Post");
+                });
+
             modelBuilder.Entity("ComUnity.Application.Features.Notifications.Entities.Notification", b =>
                 {
                     b.Property<Guid>("Id")
@@ -265,6 +301,21 @@ namespace ComUnity.Application.Database.Migrations
                     b.Navigation("Owner");
                 });
 
+            modelBuilder.Entity("ComUnity.Application.Features.ManagingEvents.Entities.Post", b =>
+                {
+                    b.HasOne("ComUnity.Application.Features.UserProfileManagement.Entities.UserProfile", "Author")
+                        .WithMany()
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ComUnity.Application.Features.ManagingEvents.Entities.Event", null)
+                        .WithMany("Posts")
+                        .HasForeignKey("EventId");
+
+                    b.Navigation("Author");
+                });
+
             modelBuilder.Entity("ComUnity.Application.Features.UserProfileManagement.Entities.Relationship", b =>
                 {
                     b.HasOne("ComUnity.Application.Features.UserProfileManagement.Entities.UserProfile", "User1")
@@ -316,6 +367,11 @@ namespace ComUnity.Application.Database.Migrations
                         .HasForeignKey("UserEventsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("ComUnity.Application.Features.ManagingEvents.Entities.Event", b =>
+                {
+                    b.Navigation("Posts");
                 });
 
             modelBuilder.Entity("ComUnity.Application.Features.UserProfileManagement.Entities.UserProfile", b =>
