@@ -154,6 +154,10 @@
 
 
 @code {
+    [AllowNull]
+    [CascadingParameter]
+    protected Task<AuthenticationState> AuthState { get; set; }
+
     private List<EventDto> Events = new List<EventDto>();
     private List<EventCategory> EventCategories = new List<EventCategory>();
     private int TotalEvents;
@@ -167,6 +171,14 @@
 
     protected override async Task OnInitializedAsync()
     {
+        base.OnInitialized();
+        var user = (await AuthState).User;
+        if (!user.Identity!.IsAuthenticated)
+        {
+            _navigation.NavigateTo($"login?redirectUrl={Uri.EscapeDataString(_navigation.Uri)}");
+            return;
+        }
+
         await LoadEvents();
     }
 

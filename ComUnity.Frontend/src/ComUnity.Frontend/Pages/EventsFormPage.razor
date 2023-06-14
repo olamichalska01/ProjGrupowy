@@ -134,6 +134,10 @@
     MudForm form;
 
     [AllowNull]
+    [CascadingParameter]
+    protected Task<AuthenticationState> AuthState { get; set; }
+
+    [AllowNull]
     MudTextField<string> placeInput;
 
     private DateTime MinDate = DateTime.Now.Date;
@@ -155,6 +159,13 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        var user = (await AuthState).User;
+        if (!user.Identity!.IsAuthenticated)
+        {
+            _navigation.NavigateTo($"login?redirectUrl={Uri.EscapeDataString(_navigation.Uri)}");
+            return;
+        }
+
         if (firstRender)
         {
             module = await jsRuntime.InvokeAsync<IJSObjectReference>("import", "./leafletmap.js");

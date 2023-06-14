@@ -146,6 +146,13 @@
 
     protected override async Task OnInitializedAsync()
     {
+        var user = (await AuthState).User;
+        if (!user.Identity!.IsAuthenticated)
+        {
+            _navigation.NavigateTo($"login?redirectUrl={Uri.EscapeDataString(_navigation.Uri)}");
+            return;
+        }
+
         await LoadEvent(Guid.Parse(eventID));
     }
 

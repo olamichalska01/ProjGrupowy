@@ -406,8 +406,7 @@ a, .btn-link {
 
 .grid-profile{
     margin-top: 50px;
-    margin-left: 160px;
-
+    padding-left: 160px;
 }
 
 .divider-user-profile-event {
@@ -435,7 +434,8 @@ a, .btn-link {
 
 .delete-friend-button {
     margin-left: 10px;
-    background-color: #BB4430
+    background-color: #BB4430;
+    color: white;
 }
 
 .delete-category-button {

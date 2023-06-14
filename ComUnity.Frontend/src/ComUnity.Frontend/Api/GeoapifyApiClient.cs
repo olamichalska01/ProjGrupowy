@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Globalization;
 using System.Web;
 
 #pragma warning disable 8618 
@@ -18,7 +19,7 @@ namespace ComUnity.Frontend.Api
 
         public async Task<GeocodingResult> ReverseGeocode(double lat, double lng)
         {
-            var response = await _httpClient.GetAsync($"v1/geocode/reverse?lat={HttpUtility.UrlEncode(lat.ToString())}&lon={HttpUtility.UrlEncode(lng.ToString())}&apiKey={ApiKey}");
+            var response = await _httpClient.GetAsync($"v1/geocode/reverse?lat={HttpUtility.UrlEncode(lat.ToString("G", CultureInfo.InvariantCulture))}&lon={HttpUtility.UrlEncode(lng.ToString("G", CultureInfo.InvariantCulture))}&apiKey={ApiKey}");
             if(response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadAsStringAsync();

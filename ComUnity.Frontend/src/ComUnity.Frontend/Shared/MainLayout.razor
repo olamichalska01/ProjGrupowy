@@ -14,17 +14,19 @@
 <MudLayout>
     <MudAppBar Dense="true" Style="background-color: white">
         <MudSpacer />
+        <div>
         <MudButton Variant="Variant.Text" DisableElevation="true" OnClick="ToggleNotifications">
                 <MudBadge Content="@notifications.Count" Overlap="true">
                     <MudIcon Icon="@Icons.Material.Outlined.Notifications" Size="Size.Small" />
                 </MudBadge>
         </MudButton>
-        <MudPopover Open="_isOpen" OverflowBehavior="OverflowBehavior.FlipAlways" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopRight" Paper="false">
+        <MudPopover Open="_isOpen" OverflowBehavior="OverflowBehavior.FlipAlways" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" Paper="false">
             <MudPaper Width="500px">
                 <ComUnity.Frontend.Shared.Notifications.NotificationsPopover Notifications="@notifications">
                 </ComUnity.Frontend.Shared.Notifications.NotificationsPopover>
             </MudPaper>
         </MudPopover>
+        </div>
         <MudMenu Dense="true" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopRight">
             <ActivatorContent>
                 <MudAvatar Color="Color.Warning" Variant="Variant.Filled" Size="Size.Small">
