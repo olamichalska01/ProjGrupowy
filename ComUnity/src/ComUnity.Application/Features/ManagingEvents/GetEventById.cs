@@ -43,6 +43,7 @@ public class GetEventByIdController : ApiControllerBase
             var result = await _context.Set<Event>()
                 .Include(x => x.EventCategory)
                 .Include(y => y.Participants)
+                .Include(x => x.Posts)
                 .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
 
             if (result == null)

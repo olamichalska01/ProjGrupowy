@@ -74,6 +74,32 @@
                     </MudPaper>
                 </MudItem>
             </MudGrid>
+            <MudPaper Class="event-details3" Elevation="0">
+                <MudList>
+                    <MudListItem>
+                        @foreach (var post in Posts)
+                        {
+                            <MudCard>
+                                <MudCardHeader Class="event-post">
+                                    <CardHeaderContent>
+                                        <MudText Typo="Typo.body1" Class="event-post-title">@post.PostName</MudText>
+                                        <MudText Typo="Typo.body2" Class="event-post-author">@post.AuthorName</MudText>
+                                    </CardHeaderContent>
+                                    <CardHeaderActions>
+                                        <MudText Typo="Typo.body2">@post.PublishedDate</MudText>
+                                    </CardHeaderActions>
+                                </MudCardHeader>
+                                <MudCardContent>
+                                    <MudText Typo="Typo.body2">@post.PostText</MudText>
+                                </MudCardContent>
+                                <MudCardActions>
+                                    <MudIconButton Icon="@Icons.Material.Filled.Favorite" Color="Color.Default" />
+                                </MudCardActions>
+                            </MudCard>
+                        }
+                    </MudListItem>
+                </MudList>
+            </MudPaper>
         </MudPaper>
     </MudItem>
     <MudItem xs="6">
@@ -132,11 +158,13 @@
 
     private EventDto Event = new EventDto();
     private ICollection<UserDto> EventParticipants = new List<UserDto>();
+    private ICollection<PostDto> Posts = new List<PostDto>();
     private int FreePlaces = 0;
     private bool IsJoiningNotPossible = false;
     private bool IsLeavingNotPossible = false;
     GetUserProfileResponse? userProfile;
     private bool alreadyJoined = false;
+    private UserDto currentUser = new UserDto();
 
     private IJSObjectReference? module;
     private string? result;
@@ -178,10 +206,14 @@
 
         Event = getEventResponse.EventDetails;
         EventParticipants = Event.Participants;
+        Posts = Event.Posts;
         FreePlaces = Event.MaxAmountOfPeople - Event.TakenPlaces;
         var user = (await AuthState).User;
         var authenticatedUserId = user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
         (_, userProfile) = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiUsersGetAsync(Guid.Parse(authenticatedUserId)));
+
+        currentUser.UserName = userProfile.Username;
+        currentUser.UserId = userProfile.UserId;
 
         IsJoiningNotPossible = false;
         alreadyJoined = false;

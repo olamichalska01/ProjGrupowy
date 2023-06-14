@@ -278,6 +278,10 @@
     padding-left: 30px;
 }
 
+.event-details3 {
+    margin-top: 50px;
+}
+
 .back-button {
     color: #17a398;
     margin-left: 50px;
@@ -290,6 +294,19 @@
     font-size: 50px;
     margin-bottom: 20px;
     color: #231f20;
+}
+
+.event-post-title {
+    font-family: 'Poppins', sans-serif;
+    color: #dcc786;
+}
+
+.event-post {
+    font-family: 'Poppins', sans-serif;
+}
+
+.event-post-author {
+    color: blue;
 }
 
 .event-details-for-details {

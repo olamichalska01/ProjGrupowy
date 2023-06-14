@@ -43,6 +43,7 @@ public class GetEventsController : ApiControllerBase
             var events = await _context.Set<Event>()
                 .Include(x => x.EventCategory)
                 .Include(y => y.Participants)
+                .Include(z => z.Posts)
                 .ToListAsync(cancellationToken);
             var users = await _context.Set<UserProfile>().ToListAsync();
 
