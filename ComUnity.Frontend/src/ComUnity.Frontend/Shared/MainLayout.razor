@@ -12,12 +12,12 @@
 <MudSnackbarProvider />
 
 <MudLayout>
-    <MudAppBar Dense="true" Style="background-color: white">
+    <MudAppBar Dense="true" Style="background-color: white" Class="app-bar-class">
         <MudSpacer />
         <div>
-        <MudButton Variant="Variant.Text" DisableElevation="true" OnClick="ToggleNotifications">
+        <MudButton Variant="Variant.Text" DisableElevation="true" OnClick="ToggleNotifications" Class="bell-button">
                 <MudBadge Content="@notifications.Count" Overlap="true">
-                    <MudIcon Icon="@Icons.Material.Outlined.Notifications" Size="Size.Small" />
+                    <MudIcon Icon="@Icons.Material.Outlined.Notifications" Size="Size.Large" />
                 </MudBadge>
         </MudButton>
         <MudPopover Open="_isOpen" OverflowBehavior="OverflowBehavior.FlipAlways" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" Paper="false">
@@ -29,9 +29,9 @@
         </div>
         <MudMenu Dense="true" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopRight">
             <ActivatorContent>
-                <MudAvatar Color="Color.Warning" Variant="Variant.Filled" Size="Size.Small">
-                    <MudIcon Color="Color.Dark" Icon="@Icons.Custom.Uncategorized.Radioactive" Size="Size.Small" />
-                </MudAvatar>
+                    <MudAvatar Color="Color.Warning" Variant="Variant.Filled" Size="Size.Medium">
+                        <MudImage Width="5" Src="@(userProfilePic?.ProfilePicture ?? string.Empty)" Alt="" Elevation="0" />
+                    </MudAvatar>
             </ActivatorContent>
             <ChildContent>
                 <MudMenuItem Href="@userProfile" IconSize="Size.Small" IconColor="Color.Dark" Icon="@Icons.Material.Outlined.Person">Profile</MudMenuItem>
@@ -68,6 +68,7 @@
     protected Task<AuthenticationState> AuthState { get; set; }
 
     private string userProfile = string.Empty;
+    GetUserProfileResponse? userProfilePic;
 
     private ICollection<Notification> notifications = Array.Empty<Notification>();
 
@@ -84,6 +85,7 @@
         }
 
         var userId = user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
+        (_, userProfilePic) = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiUsersGetAsync(new Guid(userId)));
         userProfile = $"user/{userId}";
 
         await LoadNotifications();

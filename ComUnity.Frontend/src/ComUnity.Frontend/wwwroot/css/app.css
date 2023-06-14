@@ -409,6 +409,17 @@ a, .btn-link {
     padding-left: 160px;
 }
 
+.app-bar-class {
+    height: 70px;
+    display: flex;
+}
+
+.bell-button{
+    height: 60px;
+    margin-right: 30px;
+    margin-top: 10px;
+}
+
 .divider-user-profile-event {
     color: white
 }
