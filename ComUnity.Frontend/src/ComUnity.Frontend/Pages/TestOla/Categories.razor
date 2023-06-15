@@ -7,10 +7,10 @@
 @inject ErrorHandler _errorHandler
 @inject ISnackbar _snackbar
 @using ComUnity.Frontend.Extensions;
+@using Microsoft.AspNetCore.Authorization;
 @inject NavigationManager _navigation
 @inject AuthenticationStateProvider _authenticationStateProvider
-
-
+@attribute [Authorize(Roles = "admin")]
 
 <MudCard>
     <MudCardContent>

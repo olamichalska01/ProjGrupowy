@@ -32,7 +32,7 @@
         </div>
         <MudMenu Dense="true" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopRight">
             <ActivatorContent>
-                    <MudAvatar Color="Color.Transparent" Variant="Variant.Filled" Size="Size.Medium">
+                <MudAvatar Style="@($"color:{Colors.LightGreen.Accent3}; background:{Colors.Grey.Lighten5};")" Variant="Variant.Filled" Size="Size.Medium">
                         <MudImage Width="5" Src="@(userProfilePic?.ProfilePicture ?? "userPic.png")" Alt="" Elevation="0" />
                     </MudAvatar>
             </ActivatorContent>
@@ -60,6 +60,9 @@
                         </NestedList>
                     </MudListItem>
                     <MudListItem Href="/events-form"><MudText Class="menu-left-style">Create Event</MudText></MudListItem>
+                    <AuthorizeView Roles="admin">
+                        <MudListItem Href="/categories"><MudText Class="menu-left-style">Manage categories</MudText></MudListItem>
+                    </AuthorizeView>
                 </MudList>
             </MudNavMenu>
         </MudStack>
