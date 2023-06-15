@@ -177,6 +177,28 @@
     color: #7ebdc2;
 }
 
+.form-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 28px;
+    color: #bb4430;
+    margin-left: 15px;
+}
+.c3{
+    margin-bottom:10px;
+}
+.form-font {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 200;
+    font-size: 14px;
+    color: #231f20;
+}
+.form-font2 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    color: #231f20;
+}
 .my-filters-style {
     background-color: #f3dfa2;
     font-family: 'Poppins', sans-serif;
