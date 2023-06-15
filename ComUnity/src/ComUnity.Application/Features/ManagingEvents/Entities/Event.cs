@@ -1,9 +1,10 @@
-﻿using ComUnity.Application.Features.UserProfileManagement.Entities;
+﻿using ComUnity.Application.Common;
+using ComUnity.Application.Features.UserProfileManagement.Entities;
 using NetTopologySuite.Geometries;
 
 namespace ComUnity.Application.Features.ManagingEvents.Entities;
 
-public class Event
+public class Event : IHasDomainEvent
 {
     public Guid Id { get; private set; }
 
@@ -38,6 +39,8 @@ public class Event
     public ICollection<UserProfile> Participants { get; private set; } = new List<UserProfile>();
 
     public ICollection<Post> Posts { get; private set; } = new List<Post>();
+
+    public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public Event() { }

@@ -2,7 +2,7 @@
 @inject IComUnityApiClient _client
 @inject ErrorHandler _errorHandler
 @inject ISnackbar _snackbar
-
+@inject NavigationManager _navigation
 
 <MudText Typo="Typo.h6" Class="notifications-header">Notifications</MudText>
 <MudDivider />
@@ -29,6 +29,16 @@
                                    StartIcon="@Icons.Material.Filled.Cancel"
                                    Variant="Variant.Filled">
                             Reject
+                        </MudButton>
+                    }
+                    @if (notification.Type == NotificationTypes.FriendHasAddedNewEvent || notification.Type == NotificationTypes.NewEventPostAdded)
+                    {
+                        <MudButton Color="Color.Warning"
+                                   Size="Size.Small"
+                                   OnClick="@(() => _navigation.NavigateTo($"events/{notification.GetTokenValue("EventId")}"))"
+                                   StartIcon="@Icons.Material.Filled.Cancel"
+                                   Variant="Variant.Filled">
+                            Go to event
                         </MudButton>
                     }
                 </div>

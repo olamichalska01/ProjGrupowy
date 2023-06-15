@@ -117,6 +117,7 @@ public class AddEventController : ApiControllerBase
                 eCategory);
 
             e.AddParticipant(user);
+            e.DomainEvents.Add(new EventCreatedEvent(newEventId, userId, user.Username));
 
             await _context.AddAsync(e, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
@@ -135,5 +136,19 @@ public class AddEventController : ApiControllerBase
                 e.Participants.First(x => x.UserId == userId).Username
                 );
         }
+    }
+}
+
+public class EventCreatedEvent : DomainEvent
+{
+    public Guid EventId { get; }
+    public Guid CreatorId { get; }
+    public string CreatorName { get; }
+
+    public EventCreatedEvent(Guid eventId, Guid creatorId, string creatorName)
+    {
+        EventId = eventId;
+        CreatorId = creatorId;
+        CreatorName = creatorName;
     }
 }
