@@ -54,7 +54,7 @@ namespace ComUnity.Application.Features.ManagingEvents
             public async Task<FilterEventsResponse> Handle(FilterEventsQuery request, CancellationToken cancellationToken)
             {
                 var query = _context.Set<Event>()
-                     .Include(x => x.EventCategory).Where(x=> x.Id != null);
+                     .Include(x => x.EventCategory).Where(x=> x.IsPublic);
 
                 if(request.CategoryName != null)
                 {
@@ -99,6 +99,7 @@ namespace ComUnity.Application.Features.ManagingEvents
                         e.Id,
                         e.Owner.Username,
                         e.Owner.ProfilePicture.HasValue ? _azureStorageService.GetReadFileToken(e.Owner.ProfilePicture.Value) : null,
+                        e.IsPublic,
                         e.EventName,
                         e.EventDescription,
                         e.TakenPlacesAmount,

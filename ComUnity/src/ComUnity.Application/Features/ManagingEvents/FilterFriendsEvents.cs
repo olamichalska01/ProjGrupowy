@@ -119,6 +119,7 @@ namespace ComUnity.Application.Features.ManagingEvents
                         e.Id,
                         e.Owner.Username,
                         e.Owner.ProfilePicture.HasValue ? _azureStorageService.GetReadFileToken(e.Owner.ProfilePicture.Value) : null,
+                        e.IsPublic,
                         e.EventName,
                         e.EventDescription,
                         e.TakenPlacesAmount,

@@ -129,6 +129,7 @@ internal class SearchEventQueryHandler : IRequestHandler<SearchEventsQuery, Sear
                 x.Id,
                 x.Owner.Username,
                 x.Owner.ProfilePicture.HasValue ? _azureStorageService.GetReadFileToken(x.Owner.ProfilePicture.Value) : null,
+                x.IsPublic,
                 x.EventName,
                 x.EventDescription,
                 x.TakenPlacesAmount,

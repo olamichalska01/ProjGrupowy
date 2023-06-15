@@ -242,7 +242,7 @@
 
     private async Task DoSth()
     {
-        FilterFriendsEventsResponse getEventsResponse = await _client.ApiEventsFilterFriendsEventsAsync(CategoryFilter, PriceFromFilter, PriceToFilter, AmountOfPeopleFilter, MinAgeFilter, DateRangeFilter.Start, DateRangeFilter.End);
+        FilterEventsResponse getEventsResponse = await _client.ApiEventsFilterAsync(CategoryFilter, PriceFromFilter, PriceToFilter, AmountOfPeopleFilter, MinAgeFilter, DateRangeFilter.Start, DateRangeFilter.End);
 
         Events = getEventsResponse.Events.ToList<EventDto>();
 

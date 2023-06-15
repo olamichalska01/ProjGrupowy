@@ -57,6 +57,7 @@ public class GetEventByIdController : ApiControllerBase
                     result.Id,
                     users.Where(u => u.UserId == result.OwnerId).FirstOrDefault().Username,
                     users.Where(u => u.UserId == result.OwnerId).FirstOrDefault().ProfilePicture.HasValue ? _azureStorageService.GetReadFileToken(users.Where(u => u.UserId == result.OwnerId).FirstOrDefault().ProfilePicture.Value) : null,
+                    result.IsPublic,
                     result.EventName,
                     result.EventDescription,
                     result.TakenPlacesAmount,

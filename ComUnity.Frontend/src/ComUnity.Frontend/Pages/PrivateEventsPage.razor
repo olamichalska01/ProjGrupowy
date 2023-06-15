@@ -235,9 +235,9 @@
 
     private async Task DoSth()
     {
-        FilterEventsResponse getEventsResponse = await _client.ApiEventsFilterAsync(CategoryFilter, PriceFromFilter, PriceToFilter, AmountOfPeopleFilter, MinAgeFilter, DateRangeFilter.Start, DateRangeFilter.End);
+        FilterFriendsEventsResponse getFriendsEventsResponse = await _client.ApiEventsFilterFriendsEventsAsync(CategoryFilter, PriceFromFilter, PriceToFilter, AmountOfPeopleFilter, MinAgeFilter, DateRangeFilter.Start, DateRangeFilter.End);
 
-        Events = getEventsResponse.Events.ToList<EventDto>();
+        Events = getFriendsEventsResponse.Events.ToList<EventDto>();
 
         // Update the total number of events
         TotalEvents = Events.Count;

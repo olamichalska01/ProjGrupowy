@@ -158,7 +158,6 @@
                         }
                         @foreach (var c in userProfile.FavouriteCategories)
                         {
-                            <MudTooltip Class="go-to-profile-text" Text="Click to go to profile" Placement="Placement.Right">
                                 <MudListItem>
                                     <MudText Class="d-flex align-center">
                                         <MudImage Src="@(c?.CategoyPic ?? string.Empty)" Width="50" Height="50" Alt="" Elevation="0" />
@@ -169,7 +168,6 @@
                                         }
                                     </MudText>
                                 </MudListItem>
-                            </MudTooltip>
                         }
                     </MudPaper>
                 </MudItem>
@@ -226,7 +224,7 @@
                     <RowTemplate>
 
                         <MudItem xs="12" >
-                            <MudPaper Class="d-flex float-left pa-1 mt-6" Height="150px">
+                            <MudPaper Class="d-flex float-left pa-1 mt-6" Height="170px">
 
                                 <MudCard Elevation="0" Class="c1">
                                     <MudText Class="up-event-title-font">@context.Name</MudText>
@@ -269,7 +267,7 @@
                     <RowTemplate>
 
                         <MudItem xs="12">
-                            <MudPaper Class="d-flex float-left pa-1 mt-6" Height="150px">
+                            <MudPaper Class="d-flex float-left pa-1 mt-6" Height="170px">
 
                                 <MudCard Elevation="0" Class="c1">
                                     <MudText Class="up-event-title-font">@context.Name</MudText>

@@ -74,6 +74,7 @@ namespace ComUnity.Application.Features.ManagingEvents
                         e.Id,
                         users.Where(u => u.UserId == e.OwnerId).FirstOrDefault().Username,
                         users.Where(u => u.UserId == e.OwnerId).FirstOrDefault().ProfilePicture.HasValue ? _azureStorageService.GetReadFileToken(users.Where(u => u.UserId == e.OwnerId).FirstOrDefault().ProfilePicture.Value) : null,
+                        e.IsPublic,
                         e.EventName,
                         e.EventDescription,
                         e.TakenPlacesAmount,

@@ -8,6 +8,7 @@ public record EventDto(
     Guid Id,
     string OwnerName,
     string? OwnerPicture,
+    bool isPublic,
     string Name,
     string Description,
     int TakenPlaces,
