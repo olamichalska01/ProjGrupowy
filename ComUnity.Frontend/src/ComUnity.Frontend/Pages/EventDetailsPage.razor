@@ -112,8 +112,8 @@
                 </MudListItem>
                 <MudListItem>
                     <MudText Class="d-flex align-center avatar-class-participants">
-                        <MudAvatar Style="height:80px; width:80px; font-size:2rem;">
-                            <MudImage Width="70" Src="@(Event.OwnerPicture ?? "user.png")" Alt="" Elevation="0" />
+                        <MudAvatar Style="height:80px; width:80px; font-size:2rem; background-color: white;">
+                            <MudImage Width="70" Src="@(Event.OwnerPicture ?? "userPic.png")" Alt="" Elevation="0" />
                         </MudAvatar>
                         <MudTooltip Class="go-to-profile-text" Text="Click to go to profile" Placement="Placement.Right">
                             @foreach(var p in EventParticipants.Where(x => x.UserName == Event.OwnerName))
@@ -135,7 +135,7 @@
                     <MudListItem>
                         <MudText Class="d-flex align-center avatar-class-participants">
                             <MudAvatar Style="height:80px; width:80px; font-size:2rem; background-color: white;">
-                                <MudImage Width="70" Src="@(p.ProfilePicture ?? "user.png")" Alt="" Elevation="0" />
+                                <MudImage Width="70" Src="@(p.ProfilePicture ?? "userPic.png")" Alt="" Elevation="0" />
                             </MudAvatar>
                             <MudTooltip Class="go-to-profile-text" Text="Click to go to profile" Placement="Placement.Right">
                                 <a href="user/@p.UserId.ToString()">

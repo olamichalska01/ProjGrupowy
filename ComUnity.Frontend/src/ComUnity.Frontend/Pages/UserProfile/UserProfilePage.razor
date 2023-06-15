@@ -24,7 +24,7 @@
             <MudGrid>
                 <MudItem xs="3">
                     <div>
-                        <MudAvatar Style="height:230px; width:230px; font-size:2rem;">
+                        <MudAvatar Style="height:230px; width:230px; font-size:2rem;background-color: white;">
                             <MudImage Width="70" Src="@(userProfile?.ProfilePicture ?? "user.png")" Alt="" Elevation="0" />
                         </MudAvatar>
 
@@ -155,8 +155,8 @@
                                 <MudListItem Class="d-flex align-center" OnClick="(() => GotoProfile(f.UserId.ToString()))">
 
                                         <MudText Class="d-flex align-center" >
-                                            <MudAvatar Style="height:50px; width:50px; font-size:2rem;">
-                                                <MudImage Width="70" Src="@(f.ProfilePicture ?? "user.png")" Alt="" Elevation="0" />
+                                            <MudAvatar Style="height:50px; width:50px; font-size:2rem;background-color: white;">
+                                                <MudImage Width="70" Src="@(f.ProfilePicture ?? "userPic.png")" Alt="" Elevation="0" />
                                             </MudAvatar>
                                    
                                                 <a href="user/@f.UserId">

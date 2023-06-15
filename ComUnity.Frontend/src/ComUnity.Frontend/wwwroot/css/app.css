@@ -208,8 +208,9 @@
     margin-bottom: 10px;
 }
 
-.avatar-class{
+.avatar-class {
     margin-left: 10px;
+    background-color: white;
 }
 
 .participant-holder {

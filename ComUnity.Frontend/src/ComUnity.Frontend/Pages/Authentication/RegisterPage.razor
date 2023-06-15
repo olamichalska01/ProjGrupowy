@@ -132,8 +132,8 @@
                 .Length(12, 64);
 
             RuleFor(x => x.DateOfBirth)
-            .NotEmpty()
-            .Must(x => DateTime.UtcNow.AddYears(-13) > x).WithMessage("You must be at least 13 years old to use this application.");
+                .NotEmpty()
+                .Must(x => DateTime.UtcNow.AddYears(-13) > x).WithMessage("You must be at least 13 years old to use this application.");
 
             RuleFor(x => x.Username)
                 .NotEmpty()
