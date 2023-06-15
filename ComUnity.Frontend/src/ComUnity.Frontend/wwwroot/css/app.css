@@ -15,6 +15,16 @@
     color: #231f20;
     margin-bottom: 10px;
 }
+.up-event-title-font3 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 22px;
+    color: #231f20;
+    margin-right: 8px;
+}
+.c4{
+    margin-bottom: 20px;
+}
 .font-title1 {
     font-family: 'Poppins', sans-serif;
     font-weight: 500;
@@ -218,6 +228,10 @@
     font-weight: 400;
     font-size: 18px;
     color: #3d3839;
+}
+
+.up-grid1 {
+    margin-left: 80px;
 }
 
 .avatar-class {

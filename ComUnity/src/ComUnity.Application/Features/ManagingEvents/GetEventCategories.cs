@@ -24,7 +24,7 @@ public class GetEventsCategoriesController : ApiControllerBase
 
     public record GetEventsCategoriesResponse(ICollection<GetEventsCategoriesResponse.EventCategory> Categories)
     {
-        public record EventCategory(string Name, string? ImageId);
+        public record EventCategory(string Name, string? ImageId, Guid Id);
     };
 
     internal class GetEventsCategoriesQueryHandler : IRequestHandler<GetEventsCategoriesQuery, GetEventsCategoriesResponse>
@@ -43,7 +43,7 @@ public class GetEventsCategoriesController : ApiControllerBase
             var eventCategories = await _context.Set<EventCategory>().ToListAsync(cancellationToken);
             return new GetEventsCategoriesResponse(
                 eventCategories.Select(category =>
-                  new GetEventsCategoriesResponse.EventCategory(category.CategoryName, category.ImageId.HasValue ? _azureStorageService.GetReadFileToken(category.ImageId.Value) : null)).ToList());
+                  new GetEventsCategoriesResponse.EventCategory(category.CategoryName, category.ImageId.HasValue ? _azureStorageService.GetReadFileToken(category.ImageId.Value) : null, category.Id)).ToList());
         }
     }
 }

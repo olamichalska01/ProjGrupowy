@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;500;700&display=swap" rel="stylesheet">
 
-<MudOverlay @bind-Visible="isLoading" DarkBackground="true">
-    <MudProgressCircular Color="Color.Primary" Size="Size.Large" Indeterminate="true" />
+<MudOverlay @bind-Visible="isLoading" DarkBackground="false">
+    <MudProgressCircular Class="load-events" Color="Color.Dark" Size="Size.Large" Indeterminate="true" />
 </MudOverlay>
 
 
@@ -70,7 +70,7 @@
                         <MudButton Size="Size.Small" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Person" OnClick="SendFriendRequest">Send friend request</MudButton>
                     }
                 </MudItem>
-                <MudItem xs="6">
+                <MudItem xs="6" Class="up-grid1">
                     <MudPaper Elevation="0">
                         <MudText Class="username-font">@userProfile!.Username</MudText>
                     </MudPaper>
@@ -126,9 +126,36 @@
             <MudGrid>
                 <MudItem xs="12">
                     <MudPaper Elevation="0">
-                        <MudText Class="up-event-title-font2">
-                            Favourite categories
-                        </MudText>
+                        @if (isInEditingMode)
+                        {
+                            <MudText Class="d-flex align-center" >
+                                <MudText Class="up-event-title-font3">
+                                    Favourite categories
+                                </MudText>
+                                <MudIconButton Icon="@Icons.Material.Filled.Add" OnClick="(() => editFavCategories = !editFavCategories)" />
+                            </MudText>
+                            @if (editFavCategories)
+                            {
+                                <MudList>
+                                    @foreach (var ec in EventCategories)
+                                    {
+                                        <MudListItem>
+                                            <MudText Class="d-flex align-center">
+                                                <MudImage Src="@(ec?.ImageId ?? string.Empty)" Width="50" Height="50" Alt="" Elevation="0" />
+                                                <span class="avatar-class-participants font-detials-people2">@ec.Name</span>
+                                                <MudIconButton Icon="@Icons.Material.Filled.Add" OnClick="(() => AddCatToFavs(ec.Id))" />
+                                            </MudText>
+                                        </MudListItem>
+                                    }
+                                </MudList>
+                            }
+                        }
+                        @if (!isInEditingMode)
+                        {
+                            <MudText Class="up-event-title-font2">
+                                Favourite categories
+                            </MudText>
+                        }
                         @foreach (var c in userProfile.FavouriteCategories)
                         {
                             <MudTooltip Class="go-to-profile-text" Text="Click to go to profile" Placement="Placement.Right">
@@ -136,6 +163,10 @@
                                     <MudText Class="d-flex align-center">
                                         <MudImage Src="@(c?.CategoyPic ?? string.Empty)" Width="50" Height="50" Alt="" Elevation="0" />
                                         <span class="avatar-class-participants font-detials-people2 cursor-pointer">@c.Name</span>
+                                        @if(isInEditingMode)
+                                        {
+                                            <MudIconButton Icon="@Icons.Material.Filled.Remove" OnClick="(() => RemoveCatFromFavs(c.Id))" />
+                                        }
                                     </MudText>
                                 </MudListItem>
                             </MudTooltip>
@@ -162,9 +193,9 @@
                                                 <a href="user/@f.UserId">
                                                     <span class="avatar-class-participants font-detials-people2 cursor-pointer">@f.UserName</span>
                                                 </a>
-                                        
-                                            
-                                            @if(isOwner)
+
+
+                                            @if (isOwner && isInEditingMode)
                                             {
                                                 <MudButton Class="delete-friend-button" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" OnClick="() => DeleteFriend(f.UserId)">Delete</MudButton>
                                             }
@@ -185,7 +216,7 @@
             </MudGrid>
             
         </MudItem>
-        <MudItem xs="6">
+        <MudItem xs="6" Class="up-grid1">
             <MudPaper Elevation="0">
                 <MudText Class="event-user-title">Events you signed up for (@UserEvents.Count())</MudText>
 
@@ -287,12 +318,15 @@
     GetUserProfileResponse? userProfile;
     private ICollection<UserEventsDto> UserEvents = new List<UserEventsDto>();
     private ICollection<UserEventsDto> UserOwnedEvents = new List<UserEventsDto>();
+    private List<EventCategory> EventCategories = new List<EventCategory>();
 
     private bool isInEditingMode = false;
 
     UpdateUserProfileCommand updateUserProfileCommand = new();
     private bool isLoading = true;
     private bool isOwner = false;
+
+    bool editFavCategories = false;
 
     [AllowNull]
     [Parameter]
@@ -310,10 +344,21 @@
 
         isLoading = true;
         await LoadUserProfile();
+
+
         if(userProfile != null)
         {
             UserEvents = userProfile.UserEvents.Where(u => !u.OwnerName.Equals(userProfile.Username)).ToList();
             UserOwnedEvents = userProfile.UserEvents.Where(u => u.OwnerName.Equals(userProfile.Username)).ToList();
+        }
+
+        foreach (var c in userProfile.FavouriteCategories)
+        {
+            var cat = EventCategories.FirstOrDefault(x => x.Name == c.Name);
+            if (cat != null)
+            {
+                EventCategories.Remove(cat);
+            }
         }
 
         isLoading = false;
@@ -342,6 +387,17 @@
     private async Task LoadUserProfile()
     {
         (_, userProfile) = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiUsersGetAsync(userId));
+        GetEventsCategoriesResponse getEventsResponse = await _client.ApiEventsCategoriesAsync();
+
+        EventCategories = getEventsResponse.Categories.ToList<EventCategory>();
+        foreach (var c in userProfile.FavouriteCategories)
+        {
+            var cat = EventCategories.FirstOrDefault(x => x.Name == c.Name);
+            if (cat != null)
+            {
+                EventCategories.Remove(cat);
+            }
+        }
     }
 
     private void HandleEditProfileButtonClicked()
@@ -359,6 +415,7 @@
     {
         updateUserProfileCommand = new();
         isInEditingMode = false;
+        editFavCategories = false;
         StateHasChanged();
     }
 
@@ -371,6 +428,7 @@
         }
 
         isInEditingMode = false;
+        editFavCategories = false;
         await LoadUserProfile();
     }
 
@@ -422,6 +480,31 @@
     {
         _navigation.NavigateTo("/");
         _navigation.NavigateTo($"/user/{i}");
+    }
+
+    private async Task RemoveCatFromFavs(Guid id)
+    {
+        DeleteFavoriteCategoryCommand delCat = new DeleteFavoriteCategoryCommand { UserId = userId, CategoryId = id };
+        var isSuccess = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiFavoriteAsync(delCat));
+        if (isSuccess)
+        {
+            _snackbar.Add("Category deleted from favourites!", MudBlazor.Severity.Info);
+        }
+        await LoadUserProfile();
+        UpdateDisplay();
+    }
+
+    private async Task AddCatToFavs(Guid id)
+    {
+        AddFavoriteCategoryCommand newFavCat = new AddFavoriteCategoryCommand { UserId = userId, EventCategoryId = id };
+        bool isSuccess;
+        (isSuccess, _) = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiUserFavoriteAsync(newFavCat));
+        if (isSuccess)
+        {
+            _snackbar.Add("Category added to favourites!", MudBlazor.Severity.Info);
+        }
+        await LoadUserProfile();
+        UpdateDisplay();
     }
 
     private void UpdateDisplay()
