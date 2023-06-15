@@ -13,5 +13,7 @@ internal class EventEntityConfiguration : IEntityTypeConfiguration<Event>
         builder.HasOne(x => x.EventCategory).WithMany();
 
         builder.HasOne(x => x.Owner).WithMany().OnDelete(DeleteBehavior.NoAction);
+
+        builder.Ignore(x  => x.DomainEvents);
     }
 }

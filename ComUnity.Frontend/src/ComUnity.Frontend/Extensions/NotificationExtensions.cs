@@ -20,4 +20,13 @@ public static class NotificationExtensions
 
         return stringBuilder.ToString();
     }
+
+    public static string GetTokenValue(this Notification notification, string TokenName)
+    {
+        if (notification.AdditionalProperties is null)
+        {
+            return string.Empty;
+        }
+        return notification.AdditionalProperties.GetValueOrDefault(TokenName, string.Empty);
+    }
 }

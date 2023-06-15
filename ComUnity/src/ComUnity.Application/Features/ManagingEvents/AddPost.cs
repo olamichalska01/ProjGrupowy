@@ -72,11 +72,23 @@ public class AddPostController : ApiControllerBase
                 request.PostText);
 
             eventObject.AddPost(post);
+            eventObject.DomainEvents.Add(new NewEventPostEvent(eventObject.Id, user.Username));
 
             await _context.AddAsync(post, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
 
             return Unit.Value;
         }
+    }
+}
+public class NewEventPostEvent : DomainEvent
+{
+    public Guid EventId { get; }
+    public string CreatorName { get; }
+
+    public NewEventPostEvent(Guid eventId, string creatorName)
+    {
+        EventId = eventId;
+        CreatorName = creatorName;
     }
 }
