@@ -19,28 +19,39 @@
                  Class="font-auth-title">Register</MudText>
         <MudForm Model="@model" @ref="@form" Validation="@(_registerValidator.CreateValueValidator())" ValidationDelay="1000">
             <MudCardContent Class="pa-10">
+                <MudTextField 
+                            Variant="Variant.Outlined"
+                            @bind-Value="model.Email"
+                            For="@(() => model.Email)"
+                            Immediate="true"
+                            Label="Email" />
                 <MudTextField Variant="Variant.Outlined"
-                              @bind-Value="model.Email"
-                              For="@(() => model.Email)"
-                              Immediate="true"
-                              Label="Email" />
+                            Label="Username"
+                            Class="mt-3"
+                            Immediate="true"
+                            @bind-Value="model.Username"
+                            For="@(() => model.Username)"
+                            InputType="InputType.Text" />
                 <MudTextField Variant="Variant.Outlined"
-                              Label="Username"
-                              Class="mt-3"
-                              Immediate="true"
-                              @bind-Value="model.Username"
-                              For="@(() => model.Username)"
-                              InputType="InputType.Text" />
-                <MudTextField Variant="Variant.Outlined"
-                              Label="Password"
-                              Class="mt-3"
-                              HelperText="Choose a strong password"
-                              Immediate="true"
-                              @bind-Value="model.Password"
-                              For="@(() => model.Password)"
-                              InputType="InputType.Password" />
-                <MudDatePicker Variant="Variant.Outlined" Label="Date of birth"
-                               @bind-Date="_dateOfBirth" DisableToolbar="true" />
+                            Label="Password"
+                            Class="mt-3"
+                            HelperText="Choose a strong password"
+                            Immediate="true"
+                            @bind-Value="model.Password"
+                            For="@(() => model.Password)"
+                            InputType="InputType.Password" />
+                <MudDatePicker 
+                            Variant="Variant.Outlined"
+                            Error="birthDateError is not null"
+                            ErrorText="@birthDateError"
+                            Label="Date of birth" 
+                            Mask="@(new DateMask("dd.MM.yyyy"))" 
+                            DateChanged="@((date) => OnDateChanged(date))"
+                            DateFormat="dd.MM.yyyy"
+                            Date="birthDate"
+                            Required="true" 
+                            RequiredError="You must enter your birth date." 
+                            DisableToolbar="true" />
                 <MudText Class="mt-4 font-normal2">You already have an account? <MudLink Class="font-normal2" Href="/login">Login here!</MudLink></MudText>
             </MudCardContent>
             <MudCardActions>
@@ -58,8 +69,8 @@
 
     [AllowNull]
     MudForm form;
-
-    DateTime? _dateOfBirth;
+    DateTime birthDate = new DateTime(2000, 01, 01);
+    private string? birthDateError;
 
     private RegisterUserCommand model = new();
 
@@ -82,13 +93,30 @@
             return;
         }
 
-        model.DateOfBirth = _dateOfBirth!.Value;
+        model.DateOfBirth = birthDate;
         var (isSuccess, _) = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiUsersPostAsync(model));
         if(isSuccess)
         {
             _snackbar.Add($"Successfuly created your account. You need to activate your account using link we will send to your e-mail address ({model.Email})", MudBlazor.Severity.Success);
             _navigation.NavigateTo("/login");
         }
+    }
+
+    private async Task OnDateChanged(DateTime? newDate)
+    {
+        if (!newDate.HasValue)
+        {
+            return;
+        }
+        birthDate = newDate.Value;
+        await CombineAndValidateDateTimes();
+    }
+
+    private async Task CombineAndValidateDateTimes()
+    {
+        model.DateOfBirth = birthDate;
+        var valueValidator = _registerValidator.CreateValueValidator();
+        birthDateError = (await valueValidator(model, "DateOfBirth")).FirstOrDefault();
     }
 
     public class RegisterUserCommandValidator : AbstractValidator<RegisterUserCommand>
@@ -102,6 +130,10 @@
             RuleFor(x => x.Password)
                 .NotEmpty()
                 .Length(12, 64);
+
+            RuleFor(x => x.DateOfBirth)
+            .NotEmpty()
+            .Must(x => DateTime.UtcNow.AddYears(-13) > x).WithMessage("You must be at least 13 years old to use this application.");
 
             RuleFor(x => x.Username)
                 .NotEmpty()
