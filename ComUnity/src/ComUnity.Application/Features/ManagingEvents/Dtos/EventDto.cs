@@ -9,6 +9,7 @@ public record EventDto(
     string OwnerName,
     string? OwnerPicture,
     string Name,
+    string Description,
     int TakenPlaces,
     int MaxAmountOfPeople,
     string Place,

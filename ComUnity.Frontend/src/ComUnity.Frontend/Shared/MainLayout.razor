@@ -43,7 +43,7 @@
     <MudDrawer Open="true" Style="z-index: 1900">
         <MudStack>
             <MudNavMenu>
-                <MudImage Src="logo.png" Alt="logo" Width="250" Elevation="0" />
+                <MudImage Src="logo.png" Alt="logo" Width="240"  Elevation="0" />
                 <MudDivider Class="my-2"/>
                 <MudList Clickable="true">
                     <MudListItem Text="Events" InitiallyExpanded="true">
@@ -51,18 +51,13 @@
                             <MudListItem Href="/events">
                                 All
                             </MudListItem>
-                            <MudListItem Href="/publicevents">
-                                Public
-                            </MudListItem>
                             <MudListItem Href="/eventsbyfriends">
                                 Hosted by friends
                             </MudListItem>
                         </NestedList>
                     </MudListItem>
+                    <MudListItem Href="/events-form">Create Event</MudListItem>
                 </MudList>
-               
-                <MudNavLink Href="/events-form" Match="NavLinkMatch.All">Create Event</MudNavLink>
-                <MudNavLink Href="/servers" Match="NavLinkMatch.Prefix">Friends</MudNavLink>
             </MudNavMenu>
         </MudStack>
         

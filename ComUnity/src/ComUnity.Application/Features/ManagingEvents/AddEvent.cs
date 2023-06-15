@@ -26,6 +26,7 @@ public class AddEventController : ApiControllerBase
 
     public record AddEventCommand(
         string EventName,
+        string Description,
         int MaxAmountOfPeople,
         string Place,
         double Latitude,
@@ -41,6 +42,7 @@ public class AddEventController : ApiControllerBase
     public record AddEventResponse(
         Guid Id,
         string EventName,
+        string Description,
         int TakenPlaces,
         int MaxAmountOfPeople,
         string Place,
@@ -57,6 +59,8 @@ public class AddEventController : ApiControllerBase
         public AddEventValidator()
         {
             RuleFor(x => x.EventName).NotEmpty();
+            RuleFor(x => x.Description).NotEmpty();
+            RuleFor(x => x.Description).Must(x => x.Length <= 1000);
             RuleFor(x => x.MaxAmountOfPeople).NotEmpty();
             RuleFor(x => x.Place).NotEmpty();
             RuleFor(x => x.StartDate)
@@ -101,6 +105,7 @@ public class AddEventController : ApiControllerBase
                 newEventId,
                 userId,
                 request.EventName,
+                request.Description,
                 request.MaxAmountOfPeople,
                 request.Place,
                 new Point(request.Latitude, request.Longitude) { SRID = 4326 },
@@ -119,6 +124,7 @@ public class AddEventController : ApiControllerBase
             return new AddEventResponse(
                 e.Id,
                 e.EventName,
+                e.EventDescription,
                 e.TakenPlacesAmount,
                 e.MaxAmountOfPeople,
                 e.Place,

@@ -270,7 +270,6 @@
 .event-details2 {
     width: 500px;
     margin-left: 50px;
-    overflow: scroll;
     margin-top: 50px;
     border-left-width: 1px;
     border-color: #d4d4d4;

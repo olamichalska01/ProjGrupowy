@@ -25,7 +25,7 @@
                 <MudItem xs="3">
                     <div>
                         <MudAvatar Style="height:230px; width:230px; font-size:2rem;">
-                            <MudImage Width="70" Src="@(userProfile?.ProfilePicture ?? string.Empty)" Alt="" Elevation="0" />
+                            <MudImage Width="70" Src="@(userProfile?.ProfilePicture ?? "user.png")" Alt="" Elevation="0" />
                         </MudAvatar>
 
                         @if (isOwner)
@@ -156,7 +156,7 @@
 
                                         <MudText Class="d-flex align-center" >
                                             <MudAvatar Style="height:50px; width:50px; font-size:2rem;">
-                                                <MudImage Width="70" Src="@(f.ProfilePicture ?? string.Empty)" Alt="" Elevation="0" />
+                                                <MudImage Width="70" Src="@(f.ProfilePicture ?? "user.png")" Alt="" Elevation="0" />
                                             </MudAvatar>
                                    
                                                 <a href="user/@f.UserId">

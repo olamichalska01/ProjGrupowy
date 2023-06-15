@@ -21,10 +21,10 @@
 <MudButton Variant="Variant.Text" StartIcon="@Icons.Material.Filled.ArrowBack" Class="back-button" Href="/events">Browse events</MudButton>
 
 <MudGrid>
-    <MudItem xs="6">
+    <MudItem xs="8">
         <MudPaper Class="event-details1" Elevation="0">
             <MudText Class="event-title-for-details">@Event.Name</MudText>
-            <MudText class="font-normal" Typo="Typo.body2">Join us for a thrilling and action-packed family football event that promises a day of fun, excitement, and friendly competition!eshments on the sidelines. Lace up your shoes, grab your jerseys, and let the games begin!</MudText>
+            <MudText class="font-normal" Typo="Typo.body2">@Event.Description</MudText>
         </MudPaper>
         <MudPaper Class="event-details1" Elevation="0">
             <MudGrid>
@@ -102,8 +102,8 @@
             </MudPaper>
         </MudPaper>
     </MudItem>
-    <MudItem xs="6">
-        <MudPaper Class="event-details2" Elevation="0" MaxHeight="75vh" MinHeight="75vh">
+    <MudItem xs="4">
+        <MudPaper Class="event-details2" Elevation="0" MinHeight="75vh">
             <MudList>
                 <MudListItem>
                     <MudText Class="font-detials-people">
@@ -113,7 +113,7 @@
                 <MudListItem>
                     <MudText Class="d-flex align-center avatar-class-participants">
                         <MudAvatar Style="height:80px; width:80px; font-size:2rem;">
-                            <MudImage Width="70" Src="@(Event.OwnerPicture ?? string.Empty)" Alt="" Elevation="0" />
+                            <MudImage Width="70" Src="@(Event.OwnerPicture ?? "user.png")" Alt="" Elevation="0" />
                         </MudAvatar>
                         <MudTooltip Class="go-to-profile-text" Text="Click to go to profile" Placement="Placement.Right">
                             @foreach(var p in EventParticipants.Where(x => x.UserName == Event.OwnerName))
@@ -134,8 +134,8 @@
                 {
                     <MudListItem>
                         <MudText Class="d-flex align-center avatar-class-participants">
-                            <MudAvatar Style="height:80px; width:80px; font-size:2rem;">
-                                <MudImage Width="70" Src="@(p.ProfilePicture ?? string.Empty)" Alt="" Elevation="0" />
+                            <MudAvatar Style="height:80px; width:80px; font-size:2rem; background-color: white;">
+                                <MudImage Width="70" Src="@(p.ProfilePicture ?? "user.png")" Alt="" Elevation="0" />
                             </MudAvatar>
                             <MudTooltip Class="go-to-profile-text" Text="Click to go to profile" Placement="Placement.Right">
                                 <a href="user/@p.UserId.ToString()">

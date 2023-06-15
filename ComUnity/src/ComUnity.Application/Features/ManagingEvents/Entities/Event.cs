@@ -13,6 +13,8 @@ public class Event
 
     public string EventName { get; private set; }
 
+    public string EventDescription { get; private set; }
+
     public int MaxAmountOfPeople { get; private set; }
 
     public int TakenPlacesAmount { get; private set; }
@@ -45,6 +47,7 @@ public class Event
         Guid id,
         Guid ownerId,
         string eventName,
+        string eventDescription,
         int maxAmountOfPeople,
         string place,
         Point location,
@@ -59,6 +62,7 @@ public class Event
         Id = id;
         OwnerId = ownerId;
         EventName = eventName;
+        EventDescription = eventDescription;
         TakenPlacesAmount = 0;
         MaxAmountOfPeople = maxAmountOfPeople;
         Place = place;

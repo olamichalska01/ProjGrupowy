@@ -105,12 +105,23 @@
                     <MudText Class="mb-6 ml-4 font-author  d-flex align-center" Typo="Typo.body2">
                         by @context.OwnerName
                         <MudAvatar Class="avatar-class">
-                            <MudImage Src="@(context?.OwnerPicture ?? string.Empty)" Alt="" Elevation="0" />
+                            <MudImage Src="@(context?.OwnerPicture ?? "user.png")" Alt="" Elevation="0" />
                         </MudAvatar>
                       
                     </MudText>
                     
-                    <MudText Class="font-normal ml-4" Typo="Typo.body2">Join us for a thrilling and action-packed family football event that promises a day of fun, excitement, and friendly competition! Don't miss out on this unforgettable experience that combines the love for sports and the warmth of family camaraderie.</MudText>
+                    @if (@context.Description.Length <= 350)
+                    {
+                        <MudText Class="font-normal ml-4" Typo="Typo.body2">
+                            @context.Description
+                        </MudText>
+                    } else
+                    {
+                        <MudText Class="font-normal ml-4" Typo="Typo.body2">
+                            @context.Description.Substring(0, 350) ...
+                        </MudText>
+                    }
+                        
                 </MudCard>
 
 
@@ -148,7 +159,7 @@
 
     </RowTemplate>
     <PagerContent >
-        <MudTablePager Class="pagination-style" LastIcon="null" FirstIcon="null" HorizontalAlignment=HorizontalAlignment.Center/>
+        <MudTablePager Class="pagination-style" HorizontalAlignment=HorizontalAlignment.Center/>
     </PagerContent>
 </MudTable>
 

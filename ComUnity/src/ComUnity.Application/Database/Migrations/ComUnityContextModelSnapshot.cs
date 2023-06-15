@@ -77,6 +77,10 @@ namespace ComUnity.Application.Database.Migrations
                     b.Property<Guid>("EventCategoryId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("EventDescription")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("EventName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");

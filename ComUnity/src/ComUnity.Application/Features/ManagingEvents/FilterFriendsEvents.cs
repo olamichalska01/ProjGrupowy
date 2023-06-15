@@ -55,8 +55,6 @@ namespace ComUnity.Application.Features.ManagingEvents
 
             public async Task<FilterFriendsEventsResponse> Handle(FilterFriendsEventsQuery request, CancellationToken cancellationToken)
             {
-                /*var query = _context.Set<Event>()
-                    .Include(x => x.EventCategory).Where(x=>x.Id!=null);*/
                 var requestUserId = _authenticatedUserProvider.GetUserId();
 
                 var userFriendsRelations = await _context.Set<Relationship>()
@@ -122,6 +120,7 @@ namespace ComUnity.Application.Features.ManagingEvents
                         e.Owner.Username,
                         e.Owner.ProfilePicture.HasValue ? _azureStorageService.GetReadFileToken(e.Owner.ProfilePicture.Value) : null,
                         e.EventName,
+                        e.EventDescription,
                         e.TakenPlacesAmount,
                         e.MaxAmountOfPeople,
                         e.Place,
