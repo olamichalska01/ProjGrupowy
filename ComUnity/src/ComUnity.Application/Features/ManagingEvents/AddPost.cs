@@ -1,8 +1,6 @@
 ﻿using ComUnity.Application.Common;
 using ComUnity.Application.Database;
 using ComUnity.Application.Features.ManagingEvents.Entities;
-using ComUnity.Application.Features.ManagingEvents.Exceptions;
-using ComUnity.Application.Features.UserProfileManagement;
 using ComUnity.Application.Features.UserProfileManagement.Entities;
 using ComUnity.Application.Infrastructure.Services;
 using FluentValidation;
@@ -11,14 +9,13 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NetTopologySuite.Geometries;
 
 namespace ComUnity.Application.Features.ManagingEvents;
 
 public class AddPostController : ApiControllerBase
 {
     [HttpPost("/api/events/{eventId}/addPost")]
-    [ProducesResponseType(typeof(AddPostResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> AddPost([FromRoute] Guid eventId, [FromBody] AddPostCommand command, CancellationToken cancellationToken)
     {
         var addPostCommand = command with {  EventId = eventId };
@@ -32,19 +29,8 @@ public class AddPostController : ApiControllerBase
         Guid EventId,
         string PostName,
         string PostText,
-        string AuthorName,
         DateTime Date)
-        : IRequest<AddPostResponse>;
-
-    public record AddPostResponse(
-        Guid id, 
-        Guid EventId,
-        string PostName,
-        string PostText,
-        DateTime Date,
-        string AuthorName
-        )
-        : IRequest<AddPostResponse>;
+        : IRequest<Unit>;
 
     public class AddPostValidator : AbstractValidator<AddPostCommand>
     {
@@ -52,12 +38,10 @@ public class AddPostController : ApiControllerBase
         {
             RuleFor(x => x.PostName).NotEmpty();
             RuleFor(x => x.PostText).NotEmpty();
-            RuleFor(x => x.AuthorName).NotEmpty();
-            RuleFor(x => x.Date).NotEmpty();
         }
     }
 
-    internal class AddPostHandler : IRequestHandler<AddPostCommand, AddPostResponse>
+    internal class AddPostHandler : IRequestHandler<AddPostCommand, Unit>
     {
         private readonly ComUnityContext _context;
         private readonly IAuthenticatedUserProvider _authenticatedUserProvider;
@@ -68,9 +52,8 @@ public class AddPostController : ApiControllerBase
             _authenticatedUserProvider = authenticatedUserProvider;
         }
 
-        public async Task<AddPostResponse> Handle(AddPostCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(AddPostCommand request, CancellationToken cancellationToken)
         {
-
             var newPostId = NewId.NextGuid();
             var userId = _authenticatedUserProvider.GetUserId();
             var user = await _context.Set<UserProfile>().FirstOrDefaultAsync(u => u.UserId == userId);
@@ -78,12 +61,14 @@ public class AddPostController : ApiControllerBase
             var eventId = request.EventId;
             var eventObject = await _context.Set<Event>().FirstOrDefaultAsync(e => e.Id == eventId);
 
+            var date = DateTime.UtcNow;
+
             var post = new Post(
                 newPostId,
                 user.Username,
                 userId,
                 request.PostName,
-                request.Date,
+                date,
                 request.PostText);
 
             eventObject.AddPost(post);
@@ -91,14 +76,7 @@ public class AddPostController : ApiControllerBase
             await _context.AddAsync(post, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
 
-            return new AddPostResponse(
-                post.Id,
-                eventId,
-                post.PostName,
-                post.PostText,
-                post.PublishedDate,
-                post.AuthorName
-                );
+            return Unit.Value;
         }
     }
 }

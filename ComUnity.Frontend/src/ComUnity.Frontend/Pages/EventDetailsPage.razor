@@ -74,9 +74,36 @@
                     </MudPaper>
                 </MudItem>
             </MudGrid>
-            <MudPaper Class="event-details3" Elevation="0">
-                <MudList>
-                    <MudListItem>
+            @if (alreadyJoined)
+            {
+                <MudPaper Class="event-details3" Elevation="0">
+                    <MudText class="font-detials-people mb-5" Typo="Typo.h5">Discussion</MudText>
+                    <MudCard Class="mb-5">
+                        <MudCardContent>
+                            <div>
+                                <MudForm @ref="addPostForm" Model="addPostModel">
+                                    <MudStack Spacing="5" Class="mb-5">
+                                        <MudTextField @bind-Value="addPostModel.PostName"
+                                                      For="@(() => addPostModel.PostName)"
+                                                      Immediate="true"
+                                                      Label="Title"
+                                                      Variant="Variant.Outlined" />
+                                        <MudTextField @bind-Value="addPostModel.PostText"
+                                                      For="@(() => addPostModel.PostText)"
+                                                      Immediate="true"
+                                                      Lines="5"
+                                                      Label="Content"
+                                                      Variant="Variant.Outlined" />
+                                    </MudStack>
+                                    <MudStack Row="true">
+                                        <MudSpacer />
+                                        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Class="button-color" OnClick="AddPost">Send</MudButton>
+                                    </MudStack>
+                                </MudForm>
+                            </div>
+                        </MudCardContent>
+                    </MudCard>
+                    <MudStack Spacing="5">
                         @foreach (var post in Posts)
                         {
                             <MudCard>
@@ -92,14 +119,11 @@
                                 <MudCardContent>
                                     <MudText Typo="Typo.body2">@post.PostText</MudText>
                                 </MudCardContent>
-                                <MudCardActions>
-                                    <MudIconButton Icon="@Icons.Material.Filled.Favorite" Color="Color.Default" />
-                                </MudCardActions>
                             </MudCard>
                         }
-                    </MudListItem>
-                </MudList>
-            </MudPaper>
+                    </MudStack>
+                </MudPaper>
+            }
         </MudPaper>
     </MudItem>
     <MudItem xs="4">
@@ -169,6 +193,10 @@
     private IJSObjectReference? module;
     private string? result;
 
+    private AddPostCommand addPostModel = new();
+    [AllowNull]
+    MudForm addPostForm;
+
     [Parameter]
     public String eventID { get; set; }
 
@@ -202,9 +230,9 @@
         }
         catch(Exception e)
         {
-            
+
         }
-        
+
     }
     async ValueTask IAsyncDisposable.DisposeAsync()
     {
@@ -310,5 +338,15 @@
     {
         // Update the displayed events based on the current page
         UpdateDisplayedEvents();
+    }
+
+    private async Task AddPost()
+    {
+        var isSuccess = await _errorHandler.ExecuteWithErrorHandling(() => _client.ApiEventsAddPostAsync(Event.Id, addPostModel));
+        if (isSuccess)
+        {
+            addPostForm = new();
+            await LoadEvent(Event.Id);
+        }
     }
 }
