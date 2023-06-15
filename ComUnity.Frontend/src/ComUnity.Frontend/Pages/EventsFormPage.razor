@@ -39,7 +39,7 @@
                                 @bind-Value="model.Description"
                                 For="@(() => model.Description)"
                                 Immediate="true"
-                                Label="Description" Counter="1000" MaxLength="1000"
+                                Label="Description" Counter="1000" MaxLength="1000" Required="true"
                                 Validation="@(new Func<string, IEnumerable<string>>(MaxCharacters))"
                                 Variant="Variant.Outlined"
                                 Lines="6" />
@@ -98,12 +98,14 @@
                                 <MudNumericField
                                     For="@(() => model.MaxAmountOfPeople)"
                                     Immediate="true"
+                                    Validation="@(new Func<int, IEnumerable<string>>(MinValueOfField))"
                                     @bind-Value="model.MaxAmountOfPeople"
                                     Label="No. people"
                                     Variant="Variant.Outlined" />
                                 <MudNumericField
                                     For="@(() => model.MinAge)"
                                     Immediate="true"
+                                    Validation="@(new Func<int, IEnumerable<string>>(MinValueOfField))"
                                     @bind-Value="model.MinAge"
                                     Label="Min age"
                                     Variant="Variant.Outlined" />
@@ -285,6 +287,12 @@
     {
         if (!string.IsNullOrEmpty(ch) && 1000 < ch?.Length)
             yield return "Max 1000 characters";
+    }
+
+    private IEnumerable<string> MinValueOfField(int val)
+    {
+        if (val == 0)
+            yield return "Invalid value.";
     }
 
     public class AddEventCommandValidator : AbstractValidator<AddEventCommand>
