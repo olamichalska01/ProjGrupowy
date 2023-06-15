@@ -12,7 +12,7 @@
 <MudSnackbarProvider />
 
 <MudLayout>
-    <MudAppBar Dense="true" Style="background-color: white" Class="app-bar-class">
+    <MudAppBar Dense="true" Style="background-color: white" Class="app-bar-class" Elevation="1">
         <MudSpacer />
         <div>
         <MudButton Variant="Variant.Text" DisableElevation="true" OnClick="ToggleNotifications" Class="bell-button">
@@ -45,14 +45,24 @@
             <MudNavMenu>
                 <MudImage Src="logo.png" Alt="logo" Width="250" Elevation="0" />
                 <MudDivider Class="my-2"/>
-                <MudNavLink Href="/events" Match="NavLinkMatch.All">Events</MudNavLink>
+                <MudList Clickable="true">
+                    <MudListItem Text="Events" InitiallyExpanded="true">
+                        <NestedList>
+                            <MudListItem Href="/events">
+                                All
+                            </MudListItem>
+                            <MudListItem Href="/publicevents">
+                                Public
+                            </MudListItem>
+                            <MudListItem Href="/eventsbyfriends">
+                                Hosted by friends
+                            </MudListItem>
+                        </NestedList>
+                    </MudListItem>
+                </MudList>
+               
                 <MudNavLink Href="/events-form" Match="NavLinkMatch.All">Create Event</MudNavLink>
                 <MudNavLink Href="/servers" Match="NavLinkMatch.Prefix">Friends</MudNavLink>
-                <MudNavGroup Title="Settings" Expanded="true">
-                    <MudNavLink Href="/users" Match="NavLinkMatch.Prefix">Users</MudNavLink>
-                    <MudNavLink Href="/security" Match="NavLinkMatch.Prefix">Security</MudNavLink>
-                </MudNavGroup>
-                <MudNavLink Href="/about" Match="NavLinkMatch.Prefix">About</MudNavLink>
             </MudNavMenu>
         </MudStack>
         

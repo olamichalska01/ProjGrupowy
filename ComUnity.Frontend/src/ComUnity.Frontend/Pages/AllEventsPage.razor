@@ -184,19 +184,26 @@
 
     private async Task LoadEvents()
     {
-        GetEventsCategoriesResponse getEventCategoriesResponse = await _client.ApiEventsCategoriesAsync();
+        try
+        {
+            GetEventsCategoriesResponse getEventCategoriesResponse = await _client.ApiEventsCategoriesAsync();
 
-        EventCategories = getEventCategoriesResponse.Categories.ToList<EventCategory>();
-        // Fetch all events from the API
-        GetEventsResponse getEventsResponse = await _client.ApiEventsGetAsync();
+            EventCategories = getEventCategoriesResponse.Categories.ToList<EventCategory>();
+            // Fetch all events from the API
+            GetEventsResponse getEventsResponse = await _client.ApiEventsGetAsync();
 
-        Events = getEventsResponse.Events.ToList<EventDto>();
+            Events = getEventsResponse.Events.ToList<EventDto>();
 
-        // Update the total number of events
-        TotalEvents = Events.Count;
+            // Update the total number of events
+            TotalEvents = Events.Count;
 
-        // Update the UI
-        UpdateDisplayedEvents();
+            // Update the UI
+            UpdateDisplayedEvents();
+        }
+        catch(Exception e)
+        {
+            
+        }
     }
 
     private void UpdateDisplayedEvents()
@@ -213,7 +220,7 @@
 
     private async Task DoSth()
     {
-        FilterEventsResponse getEventsResponse = await _client.ApiEventsFilterAsync(CategoryFilter, PriceFromFilter, PriceToFilter, AmountOfPeopleFilter, MinAgeFilter, DateRangeFilter.Start, DateRangeFilter.End);
+        FilterFriendsEventsResponse getEventsResponse = await _client.ApiEventsFilterFriendsEventsAsync(CategoryFilter, PriceFromFilter, PriceToFilter, AmountOfPeopleFilter, MinAgeFilter, DateRangeFilter.Start, DateRangeFilter.End);
 
         Events = getEventsResponse.Events.ToList<EventDto>();
 

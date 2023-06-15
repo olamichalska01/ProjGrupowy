@@ -186,17 +186,25 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        try
         {
-            await LoadEvent(Guid.Parse(eventID));
-            string locationString = Event.LocationY.ToString("G", CultureInfo.InvariantCulture) + ", " + Event.LocationX.ToString("G", CultureInfo.InvariantCulture);
-            var raw = "[ { \"type\": \"Feature\",\"geometry\": { \"type\": \"Point\",\"coordinates\": [ " + locationString + " ]}, \"properties\": { \"name\": \"Here!\" } } ]";
-            module = await jsRuntime.InvokeAsync<IJSObjectReference>("import", "./leafletmap.js");
-            if (module != null)
+            if (firstRender)
             {
-                result = await module.InvokeAsync<string>("load_map", Convert.ToString(raw));
+                await LoadEvent(Guid.Parse(eventID));
+                string locationString = Event.LocationY.ToString("G", CultureInfo.InvariantCulture) + ", " + Event.LocationX.ToString("G", CultureInfo.InvariantCulture);
+                var raw = "[ { \"type\": \"Feature\",\"geometry\": { \"type\": \"Point\",\"coordinates\": [ " + locationString + " ]}, \"properties\": { \"name\": \"Here!\" } } ]";
+                module = await jsRuntime.InvokeAsync<IJSObjectReference>("import", "./leafletmap.js");
+                if (module != null)
+                {
+                    result = await module.InvokeAsync<string>("load_map", Convert.ToString(raw));
+                }
             }
         }
+        catch(Exception e)
+        {
+            
+        }
+        
     }
     async ValueTask IAsyncDisposable.DisposeAsync()
     {

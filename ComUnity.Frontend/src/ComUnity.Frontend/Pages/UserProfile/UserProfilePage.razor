@@ -381,6 +381,8 @@
         {
             _snackbar.Add("Successfuly sent request!", MudBlazor.Severity.Success);
         }
+        await LoadUserProfile();
+        UpdateDisplay();
     }
 
     private async Task AcceptFriendRequest()
@@ -390,6 +392,8 @@
         {
             _snackbar.Add("Successfuly accepted request!", MudBlazor.Severity.Success);
         }
+        await LoadUserProfile();
+        UpdateDisplay();
     }
 
     private async Task CancelFriendRequest()
@@ -399,6 +403,8 @@
         {
             _snackbar.Add("Successfuly canceled request!", MudBlazor.Severity.Success);
         }
+        await LoadUserProfile();
+        UpdateDisplay();
     }
 
     private async Task DeleteFriend(Guid userID)
@@ -408,7 +414,8 @@
         {
             _snackbar.Add("Friend deleted!", MudBlazor.Severity.Warning);
         }
-        StateHasChanged();
+        await LoadUserProfile();
+        UpdateDisplay();
     }
 
     private async Task GotoProfile(string i)
@@ -416,4 +423,12 @@
         _navigation.NavigateTo("/");
         _navigation.NavigateTo($"/user/{i}");
     }
+
+    private void UpdateDisplay()
+    {
+        // Update the UI
+        StateHasChanged();
+    }
+
+  
 }
