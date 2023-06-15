@@ -92,77 +92,85 @@
 
 
 
+<MudOverlay @bind-Visible="isLoading" DarkBackground="false">
+    <MudProgressCircular Class="load-events" Color="Color.Dark" Size="Size.Large" Indeterminate="true" />
+</MudOverlay>
+    
 
-<MudTable Items="@Events" RowsPerPage="5" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info" Elevation="0" Class="testuje">
-    <HeaderContent>
-    </HeaderContent>
-    <RowTemplate>
-        <MudItem xs="12" Elevation="23">
-            <MudPaper Class="d-flex justify-space-around pa-4 mt-10 filter2">
 
-                <MudCard Height="250px" Width="70%" Elevation="0" Class="ml-n4">
-                    <MudText Class="testola left-position mb-2 ml-4">@context.Name</MudText>
-                    <MudText Class="mb-6 ml-4 font-author  d-flex align-center" Typo="Typo.body2">
-                        by @context.OwnerName
-                        <MudAvatar Class="avatar-class">
-                            <MudImage Src="@(context?.OwnerPicture ?? "userPic.png")" Alt="" Elevation="0" />
-                        </MudAvatar>
-                      
-                    </MudText>
-                    
-                    @if (@context.Description.Length <= 350)
-                    {
-                        <MudText Class="font-normal ml-4" Typo="Typo.body2">
-                            @context.Description
+@if (!isLoading)
+{
+    <MudTable Items="@Events" RowsPerPage="5" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info" Elevation="0" Class="testuje">
+        <HeaderContent>
+        </HeaderContent>
+        <RowTemplate>
+            <MudItem xs="12" Elevation="23">
+                <MudPaper Class="d-flex justify-space-around pa-4 mt-10 filter2">
+
+                    <MudCard Height="250px" Width="70%" Elevation="0" Class="ml-n4">
+                        <MudText Class="testola left-position mb-2 ml-4">@context.Name</MudText>
+                        <MudText Class="mb-6 ml-4 font-author  d-flex align-center" Typo="Typo.body2">
+                            by @context.OwnerName
+                            <MudAvatar Class="avatar-class">
+                                <MudImage Src="@(context?.OwnerPicture ?? "userPic.png")" Alt="" Elevation="0" />
+                            </MudAvatar>
+
                         </MudText>
-                    } else
-                    {
-                        <MudText Class="font-normal ml-4" Typo="Typo.body2">
-                            @context.Description.Substring(0, 350) ...
-                        </MudText>
-                    }
-                        
-                </MudCard>
 
-
-                <MudDivider Vertical="true" FlexItem="true" />
-
-                <MudCard Height="250px" Width="30%" Elevation="0">
-                    <MudList>
-                        <MudListItem Class="mt-n3 mb-2">
-                            <MudImage Src="@(context?.EventCategoryPicture ?? string.Empty)" Width=" 50" Height="50" Alt="" Elevation="0" />
-                            <MudText Class="mt-n10 ml-15 font-details-category">@context.EventCategory </MudText>
-                        </MudListItem>
-                        <MudListItem Class="mt-n3">
-                            <MudText Class="font-details">
-                                <span class="font-details">Price: </span><span class="font-details-values">@context.Cost $</span>
+                        @if (@context.Description.Length <= 350)
+                        {
+                            <MudText Class="font-normal ml-4" Typo="Typo.body2">
+                                @context.Description
                             </MudText>
-                        </MudListItem>
-                        <MudListItem Class="mt-n3">
-                            <MudText Class="font-details">
-                                <span class="font-details">Date: </span><span class="font-details-values">@context.EventDate.Date.ToString("dd.MM.yyyy")</span>
+                        }
+                        else
+                        {
+                            <MudText Class="font-normal ml-4" Typo="Typo.body2">
+                                @context.Description.Substring(0, 350) ...
                             </MudText>
-                        </MudListItem>
-                        <MudListItem Class="mt-n3">
-                            <MudText Class="font-details">
-                                <span class="font-details">Taken places: </span><span class="font-details-values">@context.TakenPlaces from @context.MaxAmountOfPeople</span>
-                            </MudText>
-                        </MudListItem>
-                        <MudListItem Class="ml-1 mt-3">
-                            <MudButton Class="d-flex align-center justify-center button-color" Href="@($" /events/{context.Id}")" Variant="Variant.Filled" >Check out the details</MudButton>
-                        </MudListItem>
-                    </MudList>
-                </MudCard>
+                        }
 
-            </MudPaper>
-        </MudItem>
+                    </MudCard>
 
-    </RowTemplate>
-    <PagerContent >
-        <MudTablePager Class="pagination-style" HorizontalAlignment=HorizontalAlignment.Center/>
-    </PagerContent>
-</MudTable>
 
+                    <MudDivider Vertical="true" FlexItem="true" />
+
+                    <MudCard Height="250px" Width="30%" Elevation="0">
+                        <MudList>
+                            <MudListItem Class="mt-n3 mb-2">
+                                <MudImage Src="@(context?.EventCategoryPicture ?? string.Empty)" Width=" 50" Height="50" Alt="" Elevation="0" />
+                                <MudText Class="mt-n10 ml-15 font-details-category">@context.EventCategory </MudText>
+                            </MudListItem>
+                            <MudListItem Class="mt-n3">
+                                <MudText Class="font-details">
+                                    <span class="font-details">Price: </span><span class="font-details-values">@context.Cost $</span>
+                                </MudText>
+                            </MudListItem>
+                            <MudListItem Class="mt-n3">
+                                <MudText Class="font-details">
+                                    <span class="font-details">Date: </span><span class="font-details-values">@context.EventDate.Date.ToString("dd.MM.yyyy")</span>
+                                </MudText>
+                            </MudListItem>
+                            <MudListItem Class="mt-n3">
+                                <MudText Class="font-details">
+                                    <span class="font-details">Taken places: </span><span class="font-details-values">@context.TakenPlaces from @context.MaxAmountOfPeople</span>
+                                </MudText>
+                            </MudListItem>
+                            <MudListItem Class="ml-1 mt-3">
+                                <MudButton Class="d-flex align-center justify-center button-color" Href="@($" /events/{context.Id}")" Variant="Variant.Filled" >Check out the details</MudButton>
+                            </MudListItem>
+                        </MudList>
+                    </MudCard>
+
+                </MudPaper>
+            </MudItem>
+
+        </RowTemplate>
+        <PagerContent >
+            <MudTablePager Class="pagination-style" HorizontalAlignment=HorizontalAlignment.Center/>
+        </PagerContent>
+    </MudTable>
+}
 
 @code {
     [AllowNull]
@@ -179,6 +187,7 @@
     private int PriceToFilter { get; set; } = 0;
     private int AmountOfPeopleFilter { get; set; } = 0;
     private DateRange DateRangeFilter = new DateRange(null, null);
+    bool isLoading = true;
 
     protected override async Task OnInitializedAsync()
     {
@@ -189,8 +198,10 @@
             _navigation.NavigateTo($"login?redirectUrl={Uri.EscapeDataString(_navigation.Uri)}");
             return;
         }
-
+        isLoading = true;
         await LoadEvents();
+        isLoading = false;
+        StateHasChanged();
     }
 
     private async Task LoadEvents()

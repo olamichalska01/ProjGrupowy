@@ -208,6 +208,18 @@
     margin-bottom: 10px;
 }
 
+.load-events{
+    margin-top: 100px;
+    margin-left: 200px;
+}
+
+.menu-left-style {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+    font-size: 18px;
+    color: #3d3839;
+}
+
 .avatar-class {
     margin-left: 10px;
     background-color: white;

@@ -6,6 +6,9 @@
 @inject IComUnityApiClient _client
 @inject AuthenticationStateProvider _authenticationStateProvider
 @inject ErrorHandler _errorHandler
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;500;700&display=swap" rel="stylesheet">
 
 <MudThemeProvider />
 <MudDialogProvider />
@@ -40,23 +43,23 @@
         </MudMenu>
 
     </MudAppBar>
-    <MudDrawer Open="true" Style="z-index: 1900">
+    <MudDrawer Open="true" Style="z-index: 1900" >
         <MudStack>
             <MudNavMenu>
                 <MudImage Src="logo.png" Alt="logo" Width="240"  Elevation="0" />
                 <MudDivider Class="my-2"/>
                 <MudList Clickable="true">
-                    <MudListItem Text="Events" InitiallyExpanded="true">
+                    <MudListItem Style="--mud-typography-body1-size: 18px;--mud-typography-body1-family:'Poppins', sans-serif;color: #3d3839;" Text="Events" InitiallyExpanded="true">
                         <NestedList>
                             <MudListItem Href="/events">
-                                All
+                                <MudText Class="menu-left-style">All</MudText>
                             </MudListItem>
                             <MudListItem Href="/eventsbyfriends">
-                                Hosted by friends
+                                <MudText Class="menu-left-style">Hosted by friends</MudText>
                             </MudListItem>
                         </NestedList>
                     </MudListItem>
-                    <MudListItem Href="/events-form">Create Event</MudListItem>
+                    <MudListItem Href="/events-form"><MudText Class="menu-left-style">Create Event</MudText></MudListItem>
                 </MudList>
             </MudNavMenu>
         </MudStack>
