@@ -43,9 +43,14 @@
                         </MudListItem>
                         <MudListItem Class="mt-n3">
                             <MudText Class="font-details">
-                                <span class="font-details">Date: </span><span class="font-details-values">@Event.EventDate.Date.ToString("dd.MM.yyyy")</span>
+                                    <span class="font-details">Start: </span><span class="font-details-values">@Event.EventDateStart.Date.ToString("dd.MM.yyyy")<span class="font-details-values2"> at </span>@Event.EventDateStart.Hour:@Event.EventDateStart.Minute</span>
                             </MudText>
                         </MudListItem>
+                            <MudListItem Class="mt-n3">
+                                <MudText Class="font-details">
+                                    <span class="font-details">End: </span><span class="font-details-values">@Event.EventDateEnd.Date.ToString("dd.MM.yyyy")<span class="font-details-values2"> at </span>@Event.EventDateEnd.Hour:@Event.EventDateEnd.Minute</span>
+                                </MudText>
+                            </MudListItem>
                         <MudListItem Class="mt-n3">
                             <MudText Class="font-details">
                                 <span class="font-details">Free places: </span><span class="font-details-values">@FreePlaces</span>

@@ -104,12 +104,18 @@
     font-size: 18px;
     color: #231f20;
 }
-.font-details-category {
+.font-details-values2 {
     font-family: 'Poppins', sans-serif;
-    font-weight: 700;
+    font-weight: 500;
     font-size: 18px;
-    color: #231f20;
+    color: #9c9c9c;
 }
+    .font-details-category {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 700;
+        font-size: 18px;
+        color: #231f20;
+    }
 .font-detials-people {
     font-family: 'Poppins', sans-serif;
     font-weight: 700;

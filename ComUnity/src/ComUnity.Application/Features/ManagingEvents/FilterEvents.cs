@@ -107,6 +107,7 @@ namespace ComUnity.Application.Features.ManagingEvents
                         e.Location.X,
                         e.Location.Y,
                         e.StartDate,
+                        e.EndDate,
                         e.Cost,
                         e.MinAge,
                         e.EventCategory.CategoryName,

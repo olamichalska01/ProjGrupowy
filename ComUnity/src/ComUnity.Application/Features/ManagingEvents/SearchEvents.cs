@@ -137,6 +137,7 @@ internal class SearchEventQueryHandler : IRequestHandler<SearchEventsQuery, Sear
                 x.Location.X,
                 x.Location.Y,
                 x.StartDate,
+                x.EndDate,
                 x.Cost,
                 x.MinAge,
                 x.EventCategory.CategoryName,
