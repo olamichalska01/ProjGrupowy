@@ -66,14 +66,14 @@ namespace ComUnity.Frontend.Api
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
         System.Threading.Tasks.Task ApiUsersAddFriendAsync(System.Guid userId, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>Success</returns>
+        /// <returns>No Content</returns>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<AddPostResponse> ApiEventsAddPostAsync(System.Guid eventId, AddPostCommand body);
+        System.Threading.Tasks.Task ApiEventsAddPostAsync(System.Guid eventId, AddPostCommand body);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>No Content</returns>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<AddPostResponse> ApiEventsAddPostAsync(System.Guid eventId, AddPostCommand body, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task ApiEventsAddPostAsync(System.Guid eventId, AddPostCommand body, System.Threading.CancellationToken cancellationToken);
 
         /// <returns>Success</returns>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
@@ -1043,17 +1043,17 @@ namespace ComUnity.Frontend.Api
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>No Content</returns>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<AddPostResponse> ApiEventsAddPostAsync(System.Guid eventId, AddPostCommand body)
+        public virtual System.Threading.Tasks.Task ApiEventsAddPostAsync(System.Guid eventId, AddPostCommand body)
         {
             return ApiEventsAddPostAsync(eventId, body, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>No Content</returns>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<AddPostResponse> ApiEventsAddPostAsync(System.Guid eventId, AddPostCommand body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task ApiEventsAddPostAsync(System.Guid eventId, AddPostCommand body, System.Threading.CancellationToken cancellationToken)
         {
             if (eventId == null)
                 throw new System.ArgumentNullException("eventId");
@@ -1073,7 +1073,6 @@ namespace ComUnity.Frontend.Api
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("text/plain"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -1156,14 +1155,9 @@ namespace ComUnity.Frontend.Api
                             throw new SwaggerException<ProblemDetails>("Server Error", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
                         }
                         else
-                        if (status_ == 200)
+                        if (status_ == 204)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<AddPostResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new SwaggerException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
+                            return;
                         }
                         else
                         {
@@ -5637,9 +5631,6 @@ namespace ComUnity.Frontend.Api
         [Newtonsoft.Json.JsonProperty("postText", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PostText { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("authorName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string AuthorName { get; set; }
-
         [Newtonsoft.Json.JsonProperty("date", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.DateTime Date { get; set; }
 
@@ -5653,42 +5644,6 @@ namespace ComUnity.Frontend.Api
         {
 
             return Newtonsoft.Json.JsonConvert.DeserializeObject<AddPostCommand>(data, new Newtonsoft.Json.JsonSerializerSettings());
-
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class AddPostResponse
-    {
-        [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid Id { get; set; }
-
-        [Newtonsoft.Json.JsonProperty("eventId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Guid EventId { get; set; }
-
-        [Newtonsoft.Json.JsonProperty("postName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string PostName { get; set; }
-
-        [Newtonsoft.Json.JsonProperty("postText", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string PostText { get; set; }
-
-        [Newtonsoft.Json.JsonProperty("date", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTime Date { get; set; }
-
-        [Newtonsoft.Json.JsonProperty("authorName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string AuthorName { get; set; }
-
-        public string ToJson()
-        {
-
-            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
-
-        }
-        public static AddPostResponse FromJson(string data)
-        {
-
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<AddPostResponse>(data, new Newtonsoft.Json.JsonSerializerSettings());
 
         }
 
